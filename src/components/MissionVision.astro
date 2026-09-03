@@ -1,0 +1,41 @@
+---
+// Ported from main.js's missionVisionHTML()/renderMissionVision(). Same
+// visual output, static markup instead of a client-side innerHTML render.
+---
+
+<!-- Mission -->
+<div class="flex flex-col md:flex-row items-center gap-16">
+  <div class="flex-1 space-y-6">
+    <h2 class="font-headline-md text-headline-md uppercase tracking-widest text-primary mb-4">Our Mission</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+      To simplify complex wealth management by delivering research-driven asset allocation, proactive
+      portfolio adaptation, and transparent client education. We commit to maximizing risk-adjusted
+      returns while fostering a resilient community of informed, financially independent investors.
+    </p>
+  </div>
+  <div class="flex-1 w-full aspect-[1.5] relative rounded-2xl overflow-hidden shadow-xl">
+    <img
+      alt="Premium financial district skyline at dusk representing the firm's vision and global perspective in wealth management."
+      class="w-full h-full object-cover"
+      src="/images/Mission.jpg.avif"
+    />
+  </div>
+</div>
+<!-- Vision -->
+<div class="flex flex-col md:flex-row-reverse items-center gap-16">
+  <div class="flex-1 space-y-6">
+    <h2 class="font-headline-md text-headline-md uppercase tracking-widest text-primary mb-4">Our Vision</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+      To be the most trusted and preferred financial growth partner, empowering families, entrepreneurs,
+      and professionals to achieve lifelong financial security through data-backed, tailored wealth
+      strategies.
+    </p>
+  </div>
+  <div class="flex-1 w-full aspect-[1.5] relative rounded-2xl overflow-hidden shadow-xl">
+    <img
+      alt="Close-up of a professional advisor in a high-touch consultation with a client in a bright, modern office."
+      class="w-full h-full object-cover"
+      src="/images/Vision.jpg.avif"
+    />
+  </div>
+</div>

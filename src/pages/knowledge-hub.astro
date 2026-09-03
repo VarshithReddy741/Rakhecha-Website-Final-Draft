@@ -1,0 +1,376 @@
+---
+// Ported from "Knowledge hub.html". Fix applied per prompt: removed the
+// leftover "Sovereign Financial" placeholder branding (appeared in the
+// <title> and in the featured event's description) — see the two
+// `FIX:` comments below for the exact before/after.
+//
+// The Reports and Blog tab cards now link to their own /knowledge-hub/[slug]/
+// page (from the articles collection, Prompt 4) instead of the single
+// shared "Article Page.html" every card pointed to.
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import EventRegistrationModal from "../components/EventRegistrationModal.astro";
+
+const articles = await getCollection("articles");
+const bySlug = (slug: string) => articles.find((a) => a.data.slug === slug)!;
+const reportsArticles = [bySlug("navigating-secondary-markets"), bySlug("analyzing-global-fpi-inflows")];
+const blogArticles = [bySlug("future-of-family-offices"), bySlug("demystifying-private-credit")];
+---
+
+<BaseLayout
+  title="Knowledge Hub - Events | Rakhecha Finserv"
+  description="Explore Rakhecha Finserv's Knowledge Hub for market outlook events, roundtables, research, videos, and editorial insights on wealth management and capital markets."
+  bodyClass="bg-white text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col"
+>
+  <Fragment slot="meta">
+    <style>
+      .text-gradient {
+        background: linear-gradient(90deg, #123b5d, #0b2a45);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    </style>
+  </Fragment>
+
+  <Header />
+
+  <main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-12 pb-section-gap">
+    <header class="mb-12">
+      <h1 class="font-display-lg text-display-lg text-primary mb-8 md:text-display-lg text-headline-lg-mobile">Events &amp; Experiences</h1>
+      <div class="flex overflow-x-auto border-b border-outline-variant/30 hide-scrollbar gap-8">
+        <button class="tab-btn font-cta-text text-cta-text text-primary border-b-2 border-primary pb-4 whitespace-nowrap active-tab" data-target="upcoming-events">Upcoming Events</button>
+        <button class="tab-btn font-cta-text text-cta-text text-on-surface-variant hover:text-primary pb-4 whitespace-nowrap transition-colors" data-target="past-events">Past Events</button>
+        <button class="tab-btn font-cta-text text-cta-text text-on-surface-variant hover:text-primary pb-4 whitespace-nowrap transition-colors" data-target="reports">Reports</button>
+        <button class="tab-btn font-cta-text text-cta-text text-on-surface-variant hover:text-primary pb-4 whitespace-nowrap transition-colors" data-target="videos">Videos</button>
+        <button class="tab-btn font-cta-text text-cta-text text-on-surface-variant hover:text-primary pb-4 whitespace-nowrap transition-colors" data-target="blog">Blog</button>
+      </div>
+    </header>
+    <section class="mb-section-gap space-y-6 border-b border-outline-variant/30 pb-6">
+      <div class="relative w-full max-w-2xl">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary-light">search</span>
+        <input class="w-full pl-12 pr-4 py-4 bg-surface-blue-2 border border-primary-light/40 rounded-DEFAULT focus:outline-none focus:border-primary focus:ring-1 focus:ring-secondary transition-all font-body-md text-body-md text-on-surface ambient-shadow placeholder:text-outline" placeholder="Search events, webinars, and more..." type="text" />
+      </div>
+      <div class="flex flex-col md:flex-row justify-end items-start md:items-center gap-6">
+        <div class="flex items-center gap-4 w-full md:w-auto">
+          <div class="relative w-full md:w-48">
+            <select class="w-full appearance-none bg-surface-container-lowest border border-outline-variant rounded-DEFAULT py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-secondary transition-all cursor-pointer">
+              <option value="">Business Line</option>
+              <option value="ib">Investment Banking</option>
+              <option value="wm">Wealth Management</option>
+              <option value="ins">Insurance</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[20px]">expand_more</span>
+          </div>
+          <div class="relative w-full md:w-40">
+            <select class="w-full appearance-none bg-surface-container-lowest border border-outline-variant rounded-DEFAULT py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-secondary transition-all cursor-pointer">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="popular">Most Popular</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[20px]">sort</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 1: Upcoming Events Tab -->
+    <div class="tab-content block animate-fade-in" id="upcoming-events">
+      <section class="mb-section-gap">
+        <div class="bg-surface-container-lowest rounded-xl overflow-hidden ambient-shadow flex flex-col md:flex-row border border-outline-variant">
+          <div class="w-full md:w-1/2 relative h-64 md:h-auto">
+            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3IxSWjlmhSNWObBh0S2jp4qCJY-0FbKF9xT7HajjMwHYqB9GXuKrO1iza1TpsZIYSEE1fraUVAoHqGoLSMCYXCGEOfTuUvXh4apQeHQnq5qdYRtEkJUTz-AJJ6AlYcEnhPwAlWsqsafSLmbsyn9yDrhPy8-BzLizWKC2ZTR19rG8pyLbyV4IuCN3qyb4yFyz6izPHjATMXMTquRouUmzkZXIOWh-QfOYfZ4wXDmBEeMKjaSTWGVFOw')"></div>
+            <div class="absolute top-6 left-6 bg-surface-container-lowest text-primary font-label-bold text-label-bold uppercase px-3 py-1 rounded shadow-sm flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">videocam</span> Online Exclusive
+            </div>
+          </div>
+          <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface-container-lowest z-10 relative">
+            <div class="flex items-center gap-3 text-secondary mb-4 font-label-bold text-label-bold tracking-widest uppercase">
+              <span>Next Event</span>
+              <span class="w-8 h-px bg-secondary"></span>
+            </div>
+            <h2 class="font-headline-lg text-headline-lg text-primary mb-2 md:text-headline-lg text-headline-lg-mobile">Global Market Outlook 2024: Navigating Volatility</h2>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-on-surface-variant mb-6 font-body-sm text-body-sm">
+              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">calendar_today</span> October 24, 2024</div>
+              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">schedule</span> 10:00 AM - 11:30 AM (EST)</div>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-8 line-clamp-3">
+              Join Rakhecha Finserv's Chief Investment Officers for an exclusive virtual roundtable. We will dissect emerging market trends, strategic asset allocation shifts, and defensive maneuvers required to protect and grow wealth in an increasingly complex geopolitical landscape.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center gap-6 mt-auto">
+              <button class="w-full sm:w-auto bg-primary text-on-primary font-cta-text text-cta-text px-8 py-3 rounded-lg hover:bg-on-primary-fixed transition-colors flex items-center justify-center gap-2" data-register-event="Global Market Outlook 2024: Navigating Volatility">Register Now <span class="material-symbols-outlined">arrow_forward</span></button>
+              <div class="flex items-center gap-4 text-center">
+                <div class="flex flex-col">
+                  <span class="font-headline-md text-headline-md text-primary">12</span>
+                  <span class="font-label-bold text-label-bold text-on-surface-variant uppercase text-[10px]">Days</span>
+                </div>
+                <span class="text-outline-variant text-xl">:</span>
+                <div class="flex flex-col">
+                  <span class="font-headline-md text-headline-md text-primary">08</span>
+                  <span class="font-label-bold text-label-bold text-on-surface-variant uppercase text-[10px]">Hrs</span>
+                </div>
+                <span class="text-outline-variant text-xl">:</span>
+                <div class="flex flex-col">
+                  <span class="font-headline-md text-headline-md text-primary">45</span>
+                  <span class="font-label-bold text-label-bold text-on-surface-variant uppercase text-[10px]">Min</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="mb-section-gap">
+        <div class="flex justify-between items-end mb-8">
+          <h3 class="font-headline-lg text-headline-lg text-primary">Upcoming Sessions</h3>
+          <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">View Calendar <span class="material-symbols-outlined text-[18px]">calendar_month</span></a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-6 flex flex-col h-full ambient-shadow hover:-translate-y-1 transition-transform duration-300">
+            <div class="flex justify-between items-start mb-4">
+              <span class="bg-surface-variant text-primary font-label-bold text-label-bold uppercase px-2 py-1 rounded text-[10px]">Roundtable</span>
+              <span class="material-symbols-outlined text-outline-variant">bookmark_border</span>
+            </div>
+            <h4 class="font-headline-md text-headline-md text-primary mb-2 line-clamp-2">Private Equity Masterclass: Sourcing Alpha</h4>
+            <div class="text-on-surface-variant font-body-sm text-body-sm mb-4 space-y-1">
+              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">event</span> Nov 05, 2024</div>
+              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">location_on</span> New York, NY (In-Person)</div>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2 flex-grow">An intimate session focusing on proprietary deal sourcing and value creation strategies in the middle market private equity sector.</p>
+            <button class="w-full border border-primary text-primary font-cta-text text-cta-text px-4 py-2 rounded hover:bg-primary hover:text-on-primary transition-colors" data-register-event="Private Equity Masterclass: Sourcing Alpha">Register Interest</button>
+          </div>
+          <div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-6 flex flex-col h-full ambient-shadow hover:-translate-y-1 transition-transform duration-300">
+            <div class="flex justify-between items-start mb-4">
+              <span class="bg-secondary-fixed text-on-secondary-fixed-variant font-label-bold text-label-bold uppercase px-2 py-1 rounded text-[10px]">Webinar</span>
+              <span class="material-symbols-outlined text-outline-variant">bookmark_border</span>
+            </div>
+            <h4 class="font-headline-md text-headline-md text-primary mb-2 line-clamp-2">Sustainable Investing: Beyond ESG Metrics</h4>
+            <div class="text-on-surface-variant font-body-sm text-body-sm mb-4 space-y-1">
+              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">event</span> Nov 12, 2024</div>
+              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">videocam</span> Online Broadcast</div>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2 flex-grow">Deciphering the next wave of sustainable investments focusing on measurable impact rather than superficial compliance.</p>
+            <button class="w-full border border-primary text-primary font-cta-text text-cta-text px-4 py-2 rounded hover:bg-primary hover:text-on-primary transition-colors" data-register-event="Sustainable Investing: Beyond ESG Metrics">Register</button>
+          </div>
+          <div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-6 flex flex-col h-full ambient-shadow hover:-translate-y-1 transition-transform duration-300">
+            <div class="flex justify-between items-start mb-4">
+              <span class="bg-surface-variant text-primary font-label-bold text-label-bold uppercase px-2 py-1 rounded text-[10px]">Workshop</span>
+              <span class="material-symbols-outlined text-outline-variant">bookmark_border</span>
+            </div>
+            <h4 class="font-headline-md text-headline-md text-primary mb-2 line-clamp-2">Legacy Planning &amp; Tax Optimization Seminar</h4>
+            <div class="text-on-surface-variant font-body-sm text-body-sm mb-4 space-y-1">
+              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">event</span> Nov 20, 2024</div>
+              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">location_on</span> London, UK (In-Person)</div>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2 flex-grow">Structuring multi-generational wealth transfer strategies to mitigate risk and optimize tax exposure across jurisdictions.</p>
+            <button class="w-full border border-primary text-primary font-cta-text text-cta-text px-4 py-2 rounded hover:bg-primary hover:text-on-primary transition-colors" data-register-event="Legacy Planning & Tax Optimization Seminar">Register Interest</button>
+          </div>
+        </div>
+      </section>
+      <section class="bg-primary text-on-primary rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="max-w-xl">
+          <h3 class="font-headline-lg text-headline-lg mb-2">Curated Insights, Delivered.</h3>
+          <p class="font-body-md text-body-md text-primary-fixed opacity-90">Subscribe to receive exclusive invitations to future events, expert market commentary, and premium research reports directly in your inbox.</p>
+        </div>
+        <form class="w-full md:w-auto flex flex-col sm:flex-row gap-4">
+          <input class="bg-transparent border border-outline-variant/40 rounded-lg px-4 py-3 text-on-primary placeholder:text-outline-variant focus:outline-none focus:border-secondary-fixed focus:ring-1 focus:ring-secondary-fixed min-w-[280px]" placeholder="Corporate Email Address" type="email" />
+          <button class="bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap" type="button">Subscribe</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- View 2: Past Events Tab -->
+    <div class="tab-content hidden animate-fade-in" id="past-events">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
+        <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 hide-scrollbar">
+          <button class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-bold text-label-bold whitespace-nowrap">All Events</button>
+          <button class="bg-surface-container text-on-surface px-4 py-2 rounded-full font-label-bold text-label-bold hover:bg-surface-variant transition-colors whitespace-nowrap">Webinars</button>
+          <button class="bg-surface-container text-on-surface px-4 py-2 rounded-full font-label-bold text-label-bold hover:bg-surface-variant transition-colors whitespace-nowrap">Roundtables</button>
+          <button class="bg-surface-container text-on-surface px-4 py-2 rounded-full font-label-bold text-label-bold hover:bg-surface-variant transition-colors whitespace-nowrap">Panels</button>
+        </div>
+        <div class="relative w-full md:w-80">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-4 py-2 text-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Search past events..." type="text" />
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <article class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden ambient-shadow group cursor-pointer">
+          <div class="relative h-48 overflow-hidden">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAkw2aKSqPcdbUuJxguWna_mrnXS7uigf1gx49UPpWMiqkwYvB6ISXiFM0LN2qqRU6KLwv5ITJNPrEi4C8IcL5rntKf4w0pO_VYRZJa9VlJSWSdBmHmAdeLI3gB0hVHEjzP599g31BBGSmCr4_OwvPaZinZ9mnRiVVGuxIgVXhLfv0Kflb3FimC4hWeWgs58PiMA7-JNaBT34dRDFmKJg23lW0fZ9pXnd7hjPwem3UY_FR4DOrc4BDM_g')"></div>
+            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary rounded-full w-12 h-12 flex items-center justify-center"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span></div>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-outline font-body-sm text-body-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_today</span> Sep 15, 2024</span>
+              <span class="text-xs font-label-bold text-primary bg-surface-variant px-2 py-0.5 rounded">Panel</span>
+            </div>
+            <h4 class="font-headline-md text-headline-md text-primary mb-3 line-clamp-2 group-hover:text-secondary transition-colors">Q3 Macroeconomic Review &amp; Fixed Income Strategies</h4>
+            <div class="flex gap-2 mb-6 flex-wrap">
+              <span class="text-[11px] font-label-bold text-on-surface-variant bg-white border border-outline-variant px-2 py-1 rounded">Fixed Income</span>
+              <span class="text-[11px] font-label-bold text-on-surface-variant bg-white border border-outline-variant px-2 py-1 rounded">Macro</span>
+            </div>
+            <div class="flex justify-between items-center border-t border-outline-variant pt-4 mt-auto">
+              <a class="text-primary font-cta-text text-cta-text text-sm hover:underline flex items-center gap-1" href="#">Watch Recording <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+              <div class="flex gap-2 text-outline-variant">
+                <button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">share</span></button>
+                <button class="hover:text-[#0a66c2] transition-colors font-bold text-sm">IN</button>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden ambient-shadow group cursor-pointer">
+          <div class="relative h-48 overflow-hidden">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBj5uWUt95q-Fh3KM9dqOuy0ZqtGax2Jp6ZxFlm5sAnjYwaMEsUiwK_vtn-Iypo8Uy7CfEVLHGEiDh783UHx6ft1m-pYXm4-XH5KfSifiyEmvoxAEhHy5sT2W9MJuX7GZcmV4E_qyBwMYKffoodUWSp3z0Cj8uT8-jj25Aj-CzoaefK9U9oc36PIDvFvvqPUkDtuJkoeQQjtPUoACRwZEef9LJ_c66TdViKSg973VMDgUJKjiHhQ7YFqA')"></div>
+            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary rounded-full w-12 h-12 flex items-center justify-center"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span></div>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-outline font-body-sm text-body-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_today</span> Aug 28, 2024</span>
+              <span class="text-xs font-label-bold text-primary bg-surface-variant px-2 py-0.5 rounded">Webinar</span>
+            </div>
+            <h4 class="font-headline-md text-headline-md text-primary mb-3 line-clamp-2 group-hover:text-secondary transition-colors">AI Implementation in Portfolio Management</h4>
+            <div class="flex gap-2 mb-6 flex-wrap">
+              <span class="text-[11px] font-label-bold text-on-surface-variant bg-white border border-outline-variant px-2 py-1 rounded">Technology</span>
+              <span class="text-[11px] font-label-bold text-on-surface-variant bg-white border border-outline-variant px-2 py-1 rounded">Innovation</span>
+            </div>
+            <div class="flex justify-between items-center border-t border-outline-variant pt-4 mt-auto">
+              <a class="text-primary font-cta-text text-cta-text text-sm hover:underline flex items-center gap-1" href="#">Watch Recording <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+              <div class="flex gap-2 text-outline-variant">
+                <button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">share</span></button>
+                <button class="hover:text-[#0a66c2] transition-colors font-bold text-sm">IN</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <!-- View 3: Reports Tab -->
+    <div class="tab-content hidden animate-fade-in" id="reports">
+      <section class="mb-section-gap">
+        <div class="flex justify-between items-end mb-8">
+          <h3 class="font-headline-lg text-headline-lg text-primary">Featured Research</h3>
+          <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">View All Reports <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reportsArticles.map(({ data: a }) => (
+            <a href={`/knowledge-hub/${a.slug}/`} class="contents">
+              <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
+                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.image}')`}></div>
+                <div class="p-6 flex flex-col flex-grow">
+                  <span class="bg-surface-container-high text-primary font-label-bold text-label-bold px-2 py-1 rounded-sm w-max mb-4 uppercase tracking-wider">{a.category}</span>
+                  <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors line-clamp-3">{a.title}</h3>
+                  <div class="mt-auto flex items-center justify-between border-t border-outline-variant/20 pt-4 font-body-sm text-body-sm text-on-surface-variant">
+                    <span>{a.date}</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> {a.readTime}</span>
+                  </div>
+                </div>
+              </article>
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+
+    <!-- View 4: Videos Tab -->
+    <div class="tab-content hidden animate-fade-in" id="videos">
+      <section class="mb-section-gap">
+        <div class="flex justify-between items-end mb-8">
+          <h3 class="font-headline-lg text-headline-lg text-primary">Multimedia</h3>
+          <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">Browse Videos <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
+            <div class="bg-surface-container-high w-full h-56 relative flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[64px] opacity-20">play_circle</span></div>
+            <div class="p-6 flex flex-col flex-grow">
+              <span class="bg-surface-container-high text-primary font-label-bold text-label-bold px-2 py-1 rounded-sm w-max mb-4 uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">play_arrow</span> Video</span>
+              <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors line-clamp-3">Webinar: Wealth Preservation Strategies for UHNWIs</h3>
+              <div class="mt-auto flex items-center justify-between border-t border-outline-variant/20 pt-4 font-body-sm text-body-sm text-on-surface-variant">
+                <span>Sep 28, 2024</span>
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 45 min watch</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <!-- View 5: Blog Tab -->
+    <div class="tab-content hidden animate-fade-in" id="blog">
+      <section class="mb-section-gap">
+        <div class="flex justify-between items-end mb-8">
+          <h3 class="font-headline-lg text-headline-lg text-primary">Editorial Insights</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {blogArticles.map(({ data: a }) => (
+            <a href={`/knowledge-hub/${a.slug}/`} class="contents">
+              <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
+                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.image}')`}></div>
+                <div class="p-6 flex flex-col flex-grow">
+                  <span class="bg-surface-container-high text-primary font-label-bold text-label-bold px-2 py-1 rounded-sm w-max mb-4 uppercase tracking-wider">{a.category}</span>
+                  <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors line-clamp-3">{a.title}</h3>
+                  <div class="mt-auto flex items-center justify-between border-t border-outline-variant/20 pt-4 font-body-sm text-body-sm text-on-surface-variant">
+                    <span>{a.date}</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> {a.readTime}</span>
+                  </div>
+                </div>
+              </article>
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+
+  <EventRegistrationModal />
+
+  <script is:inline src="/scripts/site-effects.js"></script>
+
+  <script>
+    // Tab switching. Ported verbatim from Knowledge hub.html.
+    const tabBtns = document.querySelectorAll<HTMLButtonElement>(".tab-btn");
+    const tabContents = document.querySelectorAll<HTMLElement>(".tab-content");
+
+    tabBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabBtns.forEach((b) => {
+          b.classList.remove("text-primary", "border-primary", "active-tab");
+          b.classList.add("text-on-surface-variant", "border-transparent");
+        });
+        tabContents.forEach((c) => {
+          c.classList.add("hidden");
+          c.classList.remove("block");
+        });
+
+        btn.classList.add("text-primary", "border-primary", "active-tab");
+        btn.classList.remove("text-on-surface-variant", "border-transparent");
+
+        const targetId = btn.getAttribute("data-target");
+        const targetContent = targetId ? document.getElementById(targetId) : null;
+        if (targetContent) {
+          targetContent.classList.remove("hidden");
+          targetContent.classList.add("block");
+        }
+      });
+    });
+
+    // Activate tab from URL hash (e.g. /knowledge-hub/#past-events)
+    function activateTabFromHash() {
+      const targetId = window.location.hash.slice(1);
+      if (!targetId) return;
+      const btn = document.querySelector<HTMLButtonElement>('.tab-btn[data-target="' + targetId + '"]');
+      if (btn) {
+        btn.click();
+        document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+    activateTabFromHash();
+    window.addEventListener("hashchange", activateTabFromHash);
+  </script>
+</BaseLayout>

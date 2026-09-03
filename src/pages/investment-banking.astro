@@ -1,0 +1,350 @@
+---
+// Ported from "IB.html". The panel-toggle JS (toggleIBPanel/toggleIBMobile
+// etc.) is now the shared ServicePanel component (Prompt 3) — this page
+// just supplies its card data and body content. Body HTML is injected via
+// set:html from the same strings the original page's inline <script> used,
+// to guarantee exact content fidelity rather than hand-retyping ~250 lines
+// of nested markup into JSX.
+import { Picture, getImage } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import ServicePanel from "../components/ServicePanel.astro";
+import ibHeroDesktop from "../assets/images/IB Hero Card.png";
+import ibHeroMobile from "../assets/images/IB mobile.png";
+import fundraisingImage from "../assets/images/fundraising.jpg";
+import ipoImage from "../assets/images/IPO.jpg";
+import valuationImage from "../assets/images/Valuation.png";
+import maImage from "../assets/images/M&A.png";
+import secondaryDealsImage from "../assets/images/secondary deals.jpeg";
+import fpiHubImage from "../assets/images/FPI hub.jpeg";
+import creditPaperImage from "../assets/images/Credit paper.jpeg";
+
+// ServicePanel uses `image` both as a CSS background-image (desktop cards)
+// and as a plain <img src> (mobile accordion) — see ServicePanel.astro — so
+// there's no single <img>/<Image> call site to swap there. Instead we
+// pre-optimize through Astro's image pipeline here and hand ServicePanel an
+// already-hashed, already-WebP URL string, same as it always received.
+const [fundraisingOptimized, ipoOptimized, valuationOptimized, maOptimized, secondaryOptimized, fpiOptimized, creditOptimized] =
+  await Promise.all(
+    [fundraisingImage, ipoImage, valuationImage, maImage, secondaryDealsImage, fpiHubImage, creditPaperImage].map((src) =>
+      getImage({ src, width: 800, format: "webp" }),
+    ),
+  );
+
+const ibItems = [
+  { id: "fundraising", title: "Fundraising", desc: "Strategic capital structuring across Equity & Debt markets.", image: fundraisingOptimized.src },
+  { id: "ipo", title: "IPO Listing Advisory", desc: "End-to-end guidance for public market debuts.", image: ipoOptimized.src },
+  { id: "valuation", title: "Valuation", desc: "Rigorous independent valuation services.", image: valuationOptimized.src },
+  { id: "ma", title: "Mergers & Acquisitions", desc: "Strategic advisory from identification to execution.", image: maOptimized.src },
+  { id: "secondary", title: "Secondary Deals", desc: "Navigating the unlisted space with discretion.", image: secondaryOptimized.src },
+  { id: "fpi", title: "FPI Hub", desc: "Streamlined access for Foreign Portfolio Investors.", image: fpiOptimized.src },
+  { id: "credit", title: "Credit Papers", desc: "Lender-ready credit papers for your financing needs.", image: creditOptimized.src },
+];
+
+const ibBodies: Record<string, string> = {
+  fundraising: `
+<h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Fundraising</h2>
+<p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">We advise startups, growth-stage companies, and established businesses in raising capital across equity, quasi-equity, and structured debt instruments. Our end-to-end fundraising mandate covers everything from pitch preparation to investor outreach, term sheet negotiation, and deal closure.</p>
+<div class="fund-anim fund-anim-3">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-8 uppercase tracking-wider">Our Services</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><div><p class="font-label-bold text-primary">Equity fundraising</p><p class="font-body-sm text-on-surface-variant mt-0.5">Seed, Series A to E, Pre-IPO</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><div><p class="font-label-bold text-primary">Debt fundraising</p><p class="font-body-sm text-on-surface-variant mt-0.5">NCDs, venture debt, structured finance</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><p class="font-label-bold text-primary">Strategic investor identification</p></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><p class="font-label-bold text-primary">Business plan &amp; financial model review</p></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">05</span><p class="font-label-bold text-primary">Investor deck &amp; data room preparation</p></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">06</span><p class="font-label-bold text-primary">Term sheet review</p></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">07</span><p class="font-label-bold text-primary">Post-deal IR support</p></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">08</span><p class="font-label-bold text-primary">Credit paper preparation</p></div>
+</div>
+</div>
+<div class="fund-anim fund-anim-4 mt-8 pt-6 border-t border-primary-light/15">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-6 uppercase tracking-wider">Who should use this</h4>
+<ul class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><p class="font-body-sm text-on-surface-variant">Startups seeking capital</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><p class="font-body-sm text-on-surface-variant">Growth-stage companies planning expansion</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><p class="font-body-sm text-on-surface-variant">Promoters looking for PE/VC</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><p class="font-body-sm text-on-surface-variant">Companies preparing to go public</p></li>
+</ul>
+</div>
+`,
+  ipo: `
+<h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">IPO Listing Advisory</h2>
+<p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">End-to-end advisory for your journey to the public markets.</p>
+<div class="fund-anim fund-anim-3">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-8 uppercase tracking-wider">Our Services</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><div><p class="font-label-bold text-primary">IPO readiness</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><div><p class="font-label-bold text-primary">Pre-IPO structuring</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><div><p class="font-label-bold text-primary">DRHP preparation/SEBI filing</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><div><p class="font-label-bold text-primary">Coordination with BRLM/registrars</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">05</span><div><p class="font-label-bold text-primary">Mainboard IPO (BSE/NSE)</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">06</span><div><p class="font-label-bold text-primary">SME IPO (BSE SME/NSE Emerge)</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">07</span><div><p class="font-label-bold text-primary">Investor roadshow</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">08</span><div><p class="font-label-bold text-primary">Grey market/anchor investor strategy</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">09</span><div><p class="font-label-bold text-primary">Post-listing compliance</p></div></div>
+</div>
+</div>
+`,
+  valuation: `
+<h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Valuation</h2>
+<p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">Helping you understand and unlock the value of your business.</p>
+<div class="fund-anim fund-anim-3">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-8 uppercase tracking-wider">Our Services</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><div><p class="font-label-bold text-primary">Business and enterprise valuation</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><div><p class="font-label-bold text-primary">Early-stage to pre-IPO valuation</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><div><p class="font-label-bold text-primary">ESOPs and ESOP trust valuation</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><div><p class="font-label-bold text-primary">Intangible asset and brand valuation</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">05</span><div><p class="font-label-bold text-primary">Real estate and investment portfolio valuation</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">06</span><div><p class="font-label-bold text-primary">Valuation for regulatory compliance (FEMA, SEBI, RBI)</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">07</span><div><p class="font-label-bold text-primary">Fairness opinions for M&amp;A</p></div></div>
+</div>
+</div>
+`,
+  ma: `
+<h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Mergers &amp; Acquisitions</h2>
+<p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">Supporting businesses through strategic transactions, from opportunity to execution.</p>
+<div class="fund-anim fund-anim-3">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-8 uppercase tracking-wider">Our Services</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><div><p class="font-label-bold text-primary">Buy-side M&amp;A</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><div><p class="font-label-bold text-primary">Sell-side M&amp;A</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><div><p class="font-label-bold text-primary">Deal structuring</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><div><p class="font-label-bold text-primary">Regulatory approvals (CCI, NCLT, RBI, SEBI)</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">05</span><div><p class="font-label-bold text-primary">Integration planning</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">06</span><div><p class="font-label-bold text-primary">Cross-border M&amp;A advisory</p></div></div>
+</div>
+</div>
+`,
+  secondary: `
+<h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Secondary Deals</h2>
+<p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">Solving for liquidity in private markets. Navigate India's unlisted and pre-IPO opportunities.</p>
+<div class="fund-anim fund-anim-3">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-8 uppercase tracking-wider">Our Services</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><div><p class="font-label-bold text-primary">Buying/selling unlisted shares</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><div><p class="font-label-bold text-primary">Pre-IPO investment facilitation</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><div><p class="font-label-bold text-primary">Co-investment with institutional VCs</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><div><p class="font-label-bold text-primary">Promoter stake sales</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">05</span><div><p class="font-label-bold text-primary">Employee stock liquidity/ESOP buyouts</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">06</span><div><p class="font-label-bold text-primary">Block deals</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">07</span><div><p class="font-label-bold text-primary">Due diligence on unlisted targets</p></div></div>
+</div>
+</div>
+<div class="fund-anim fund-anim-4 mt-8 pt-6 border-t border-primary-light/15">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-6 uppercase tracking-wider">Active Secondary Inventory</h4>
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant/30 overflow-hidden shadow-lg">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant/30">
+<th class="py-4 px-3 md:px-6 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Company</th>
+<th class="hidden md:table-cell py-4 px-6 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Sector</th>
+<th class="hidden md:table-cell py-4 px-6 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Series/Stage</th>
+<th class="py-4 px-3 md:px-6 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-right whitespace-nowrap"><span class="md:hidden">Price</span><span class="hidden md:inline">Indicative Price</span></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface transition-colors">
+<td class="py-4 px-3 md:py-5 md:px-6">
+<div class="flex items-center">
+<div class="w-7 h-7 md:w-8 md:h-8 rounded bg-primary text-on-primary flex items-center justify-center font-bold mr-2 md:mr-4 text-xs shrink-0">A</div>
+<div>
+<span class="font-body-md text-body-md font-semibold text-primary">Apex Technologies</span>
+<div class="flex flex-nowrap gap-1.5 mt-1.5 md:hidden overflow-x-auto hide-scrollbar">
+<span class="inline-block px-2 py-0.5 bg-surface-variant text-primary-fixed-variant rounded-full font-label-bold text-[9px] whitespace-nowrap shrink-0">Fintech</span>
+<span class="inline-block px-2 py-0.5 bg-surface-variant text-primary-fixed-variant rounded-full font-label-bold text-[9px] whitespace-nowrap shrink-0">Pre-IPO</span>
+</div>
+</div>
+</div>
+</td>
+<td class="hidden md:table-cell py-5 px-6 font-body-sm text-body-sm text-on-surface-variant">Fintech</td>
+<td class="hidden md:table-cell py-5 px-6"><span class="inline-block px-3 py-1 bg-surface-variant text-primary-fixed-variant rounded-full font-label-bold text-[10px]">Pre-IPO</span></td>
+<td class="py-4 px-3 md:py-5 md:px-6 font-body-md text-body-md font-semibold text-primary text-right">₹1,250</td>
+</tr>
+<tr class="hover:bg-surface transition-colors">
+<td class="py-4 px-3 md:py-5 md:px-6">
+<div class="flex items-center">
+<div class="w-7 h-7 md:w-8 md:h-8 rounded bg-tertiary text-on-tertiary flex items-center justify-center font-bold mr-2 md:mr-4 text-xs shrink-0">N</div>
+<div>
+<span class="font-body-md text-body-md font-semibold text-primary">Nexus Health</span>
+<div class="flex flex-nowrap gap-1.5 mt-1.5 md:hidden overflow-x-auto hide-scrollbar">
+<span class="inline-block px-2 py-0.5 bg-surface-variant text-primary-fixed-variant rounded-full font-label-bold text-[9px] whitespace-nowrap shrink-0">Healthcare Tech</span>
+<span class="inline-block px-2 py-0.5 bg-surface-variant text-primary-fixed-variant rounded-full font-label-bold text-[9px] whitespace-nowrap shrink-0">Series C</span>
+</div>
+</div>
+</div>
+</td>
+<td class="hidden md:table-cell py-5 px-6 font-body-sm text-body-sm text-on-surface-variant">Healthcare Tech</td>
+<td class="hidden md:table-cell py-5 px-6"><span class="inline-block px-3 py-1 bg-surface-variant text-primary-fixed-variant rounded-full font-label-bold text-[10px]">Series C</span></td>
+<td class="py-4 px-3 md:py-5 md:px-6 font-body-md text-body-md font-semibold text-primary text-right">₹840</td>
+</tr>
+<tr class="hover:bg-surface transition-colors">
+<td class="py-4 px-3 md:py-5 md:px-6">
+<div class="flex items-center">
+<div class="w-7 h-7 md:w-8 md:h-8 rounded bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold mr-2 md:mr-4 text-xs shrink-0">V</div>
+<div>
+<span class="font-body-md text-body-md font-semibold text-primary">Vanguard Space</span>
+<div class="flex flex-nowrap gap-1.5 mt-1.5 md:hidden overflow-x-auto hide-scrollbar">
+<span class="inline-block px-2 py-0.5 bg-surface-variant text-primary-fixed-variant rounded-full font-label-bold text-[9px] whitespace-nowrap shrink-0">Aerospace</span>
+<span class="inline-block px-2 py-0.5 bg-surface-variant text-primary-fixed-variant rounded-full font-label-bold text-[9px] whitespace-nowrap shrink-0">Series B</span>
+</div>
+</div>
+</div>
+</td>
+<td class="hidden md:table-cell py-5 px-6 font-body-sm text-body-sm text-on-surface-variant">Aerospace</td>
+<td class="hidden md:table-cell py-5 px-6"><span class="inline-block px-3 py-1 bg-surface-variant text-primary-fixed-variant rounded-full font-label-bold text-[10px]">Series B</span></td>
+<td class="py-4 px-3 md:py-5 md:px-6 font-body-md text-body-md font-semibold text-primary text-right">₹420</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p class="font-body-sm text-on-surface-variant italic text-xs mt-3">Pricing and availability are dynamic and subject to frequent change; contact us for the latest inventory and indicative pricing.</p>
+</div>
+<div class="mt-8 pt-6 border-t border-primary-light/15"><h4 class="font-label-bold text-base font-bold text-primary-light mb-6 uppercase tracking-wider">Ecosystem Support &amp; Exit Solutions</h4>
+<ul class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><p class="font-body-sm text-on-surface-variant">Cap table clearance for founders</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><p class="font-body-sm text-on-surface-variant">Exit facilitation for angel investors looking to monetize early-stage positions</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><p class="font-body-sm text-on-surface-variant">Secondary exit structuring for venture capital fund managers approaching end-of-fund life</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><p class="font-body-sm text-on-surface-variant">Profitable ESOP liquidity programs for employees and ESOP holders seeking to convert vested options into cash</p></li>
+</ul></div>
+`,
+  fpi: `
+<h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">FPI Integration</h2>
+<p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-2">Helping global investors access India's private markets. Your partner for entering and exiting India's private markets.</p>
+<p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed italic mb-12">We enable Foreign Portfolio Investors to participate seamlessly in India's high-growth private markets, navigating regulatory frameworks, custody requirements, and exit strategies with precision and speed.</p>
+<div class="fund-anim fund-anim-3">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-8 uppercase tracking-wider">Our Services</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><div><p class="font-label-bold text-primary">Identification of unlisted/pre-IPO opportunities</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><div><p class="font-label-bold text-primary">Structuring entry</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><div><p class="font-label-bold text-primary">FEMA and RBI compliance</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><div><p class="font-label-bold text-primary">Exit strategy advisory (block deals, IPO-linked exits)</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">05</span><div><p class="font-label-bold text-primary">Currency risk/hedging</p></div></div>
+</div>
+</div>
+<div class="fund-anim fund-anim-4 mt-8 pt-6 border-t border-primary-light/15">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-6 uppercase tracking-wider">Target FPI profile</h4>
+<ul class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><p class="font-body-sm text-on-surface-variant">Offshore funds with India mandates</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><p class="font-body-sm text-on-surface-variant">Family offices (Singapore, Mauritius, UAE, Cayman)</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><p class="font-body-sm text-on-surface-variant">Sovereign wealth funds/endowments</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><p class="font-body-sm text-on-surface-variant">Global PE/VC funds</p></li>
+</ul>
+</div>
+`,
+  credit: `
+<h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Credit Papers</h2>
+<p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">Lender-ready credit papers for your financing needs.</p>
+<div class="fund-anim fund-anim-3">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-8 uppercase tracking-wider">Our Services</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><div><p class="font-label-bold text-primary">Lender-ready credit papers/IMs</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><div><p class="font-label-bold text-primary">Financial analysis/credit assessment</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><div><p class="font-label-bold text-primary">Business model/industry analysis</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><div><p class="font-label-bold text-primary">Debt servicing/cash flow assessment</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">05</span><div><p class="font-label-bold text-primary">Financial projections</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">06</span><div><p class="font-label-bold text-primary">Identification of lending institutions</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">07</span><div><p class="font-label-bold text-primary">Documentation support</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">08</span><div><p class="font-label-bold text-primary">Coordination with lenders</p></div></div>
+<div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">09</span><div><p class="font-label-bold text-primary">Presentation support</p></div></div>
+</div>
+</div>
+<div class="fund-anim fund-anim-4 mt-8 pt-6 border-t border-primary-light/15">
+<h4 class="font-label-bold text-base font-bold text-primary-light mb-6 uppercase tracking-wider">Who should use this</h4>
+<ul class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><p class="font-body-sm text-on-surface-variant">Businesses seeking working/growth capital</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><p class="font-body-sm text-on-surface-variant">Companies approaching banks/NBFCs</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><p class="font-body-sm text-on-surface-variant">Startups raising venture debt</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><p class="font-body-sm text-on-surface-variant">Companies refinancing debt</p></li>
+<li class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">05</span><p class="font-body-sm text-on-surface-variant">Businesses seeking structured/private credit</p></li>
+</ul>
+</div>
+`,
+};
+---
+
+<BaseLayout
+  title="Investment Banking Hub - Rakhecha Finserv"
+  description="Rakhecha Finserv's investment banking team advises on fundraising, IPO listings, valuation, M&A, secondary deals, FPI access, and credit papers to unlock your next stage of growth."
+  bodyClass="bg-white text-on-surface font-body-md antialiased min-h-screen flex flex-col"
+>
+  <Header />
+
+  <main class="flex-grow flex flex-col">
+    <!-- Hero Section -->
+    <section class="relative h-screen min-h-[600px] flex items-start md:items-center justify-start overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <Picture
+          src={ibHeroDesktop}
+          alt="Distinctive glass skyscraper with an observation deck against a clear sky"
+          class="hidden md:block w-full h-full object-cover"
+          widths={[768, 1280, 1920]}
+          sizes="100vw"
+          formats={["webp"]}
+          fallbackFormat="webp"
+          loading="eager"
+        />
+        <Picture
+          src={ibHeroMobile}
+          alt="Rock climber scaling a sunlit cliff face"
+          class="md:hidden w-full h-full object-cover object-bottom"
+          widths={[480, 768]}
+          sizes="100vw"
+          formats={["webp"]}
+          fallbackFormat="webp"
+          loading="eager"
+        />
+      </div>
+      <div class="relative z-10 w-full max-w-container-max px-margin-mobile md:px-margin-desktop pt-[24vh] md:pt-0">
+        <h1 class="text-display-lg font-display-lg text-primary mb-6 max-w-4xl">Unlocking the Next Stage of Growth.</h1>
+        <div class="flex gap-4"></div>
+      </div>
+    </section>
+    <!-- Services Interactive Section -->
+    <section class="py-section-gap bg-white relative z-20 -mt-20">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+        <ServicePanel items={ibItems} columns={3} expandedHeight="h-[300px]" expandedScale={false}>
+          <Fragment slot="panel-fundraising">
+            <div set:html={ibBodies.fundraising} />
+          </Fragment>
+          <Fragment slot="panel-ipo">
+            <div set:html={ibBodies.ipo} />
+          </Fragment>
+          <Fragment slot="panel-valuation">
+            <div set:html={ibBodies.valuation} />
+          </Fragment>
+          <Fragment slot="panel-ma">
+            <div set:html={ibBodies.ma} />
+          </Fragment>
+          <Fragment slot="panel-secondary">
+            <div set:html={ibBodies.secondary} />
+          </Fragment>
+          <Fragment slot="panel-fpi">
+            <div set:html={ibBodies.fpi} />
+          </Fragment>
+          <Fragment slot="panel-credit">
+            <div set:html={ibBodies.credit} />
+          </Fragment>
+        </ServicePanel>
+      </div>
+    </section>
+    <!-- Contact CTA -->
+    <section class="py-14 md:py-20 px-margin-mobile md:px-margin-desktop">
+      <div class="max-w-container-max mx-auto">
+        <div class="bg-primary text-on-primary rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div class="max-w-xl">
+            <h2 class="font-headline-lg text-headline-lg mb-2">Ready to Navigate Global Capital Markets?</h2>
+            <p class="font-body-md text-body-md text-primary-fixed opacity-90">Speak with our team to discuss how our investment banking expertise can serve your goals.</p>
+          </div>
+          <a href="/contact-us/" class="bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap inline-block text-center">Contact Us</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

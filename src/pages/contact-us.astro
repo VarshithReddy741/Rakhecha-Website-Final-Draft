@@ -1,0 +1,188 @@
+---
+// Ported from "Contact us page.html". Structural port only — the
+// form-input-premium/form-label-premium styles below are dead CSS in the
+// source (never applied to any element there either); kept as-is.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import FormSuccessState from "../components/FormSuccessState.astro";
+---
+
+<BaseLayout
+  title="Contact Us - Rakhecha Finserv"
+  description="Connect with Rakhecha Finserv's advisory team to discuss your financial goals and explore how we can partner with you for sustainable, long-term growth."
+  bodyClass="bg-surface text-on-surface antialiased min-h-screen flex flex-col"
+>
+  <Header />
+
+  <main class="flex-grow max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap w-full">
+    <div class="mb-16">
+      <h1 class="font-display-lg text-display-lg text-primary mb-4">Contact Us</h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Connect with our advisory team to discuss your financial aspirations and explore how Rakhecha Finserv can partner with you for sustainable growth.</p>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-16">
+      <!-- Left Column: Form -->
+      <div class="lg:col-span-7 bg-surface-container-lowest p-8 lg:p-12 rounded shadow-[0_4px_24px_rgba(27,58,107,0.04)] border border-outline-variant/20">
+        <div id="contactFormCard">
+          <h2 class="font-headline-md text-headline-md text-primary mb-8">Book a Consultation</h2>
+          <p id="contactFormError" class="hidden mb-6 text-sm text-error" role="alert"></p>
+          <form id="contactForm" class="space-y-6" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="fullName">Full Name<span class="text-error ml-1">*</span></label>
+                <input class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="fullName" name="fullName" placeholder="Full Name" required type="text" />
+              </div>
+              <div>
+                <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="serviceSelection">Service Selection<span class="text-error ml-1">*</span></label>
+                <select class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="serviceSelection" name="serviceSelection" required>
+                  <option disabled selected value="">Select a Service</option>
+                  <option value="investment_banking">Investment Banking</option>
+                  <option value="wealth_management">Wealth Management</option>
+                  <option value="insurance">Insurance</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="contactNumber">Contact Number<span class="text-error ml-1">*</span></label>
+                <input class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="contactNumber" name="contactNumber" placeholder="Contact Number" required type="tel" />
+              </div>
+              <div>
+                <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="email">Email Address<span class="text-error ml-1">*</span></label>
+                <input class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="email" name="email" placeholder="Email Address" required type="email" />
+              </div>
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="queryDetails">Query / Requirement Details</label>
+              <textarea class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none" id="queryDetails" name="queryDetails" placeholder="How can we help you?" rows="4"></textarea>
+            </div>
+            <div class="pt-6 border-t border-outline-variant/30 flex justify-end">
+              <button id="contactSubmitButton" class="bg-primary text-on-primary px-8 py-3 rounded-4 font-cta-text text-cta-text hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed" type="submit">Submit Request</button>
+            </div>
+          </form>
+        </div>
+        <div id="contactSuccess" hidden>
+          <FormSuccessState
+            title="Request Received"
+            message="Thank you for reaching out to Rakhecha Finserv. Our advisory team will review your request and get back to you shortly."
+            primaryHref="/"
+            primaryLabel="Return Home"
+            secondaryHref="/wealth-management/"
+            secondaryLabel="Explore Our Services"
+          />
+        </div>
+      </div>
+      <!-- Right Column: Info -->
+      <div class="lg:col-span-5">
+        <div class="bg-surface-container-lowest p-8 rounded shadow-[0_4px_24px_rgba(27,58,107,0.04)] border border-outline-variant/20 flex flex-col h-full">
+          <h3 class="font-headline-md text-headline-md text-primary mb-8">Contact Details</h3>
+          <div class="space-y-8 flex-grow">
+            <div class="flex gap-4 items-start">
+              <span class="material-symbols-outlined text-secondary mt-1" data-icon="location_on">location_on</span>
+              <div>
+                <h4 class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider mb-2">Corporate Office</h4>
+                <p class="font-body-md text-body-md text-on-surface">Room 1303, 13th Floor,<br />Shantiniketan Building 8,<br />Camac Street, Elgin road,<br />Kolkata-700017 West Bengal, India.</p>
+              </div>
+            </div>
+            <div class="flex gap-4 items-start">
+              <span class="material-symbols-outlined text-secondary mt-1" data-icon="mail">mail</span>
+              <div>
+                <h4 class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider mb-2">Direct Inquiries</h4>
+                <ul class="font-body-md text-body-md text-on-surface space-y-2">
+                  <li><a class="hover:text-primary transition-colors border-b border-transparent hover:border-primary" href="mailto:piyush@rakhechafinserv.com">piyush@rakhechafinserv.com</a></li>
+                  <li><a class="hover:text-primary transition-colors border-b border-transparent hover:border-primary" href="mailto:nitish@rakhechafinserv.com">nitish@rakhechafinserv.com</a></li>
+                  <li><a class="hover:text-primary transition-colors border-b border-transparent hover:border-primary" href="mailto:nidhi@rakhechafinserv.com">nidhi@rakhechafinserv.com</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 pt-8 border-t border-outline-variant/20">
+            <a class="inline-flex items-center gap-2 text-primary hover:text-secondary transition-colors font-label-bold text-label-bold uppercase tracking-wider" href="#">
+              <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+              </svg>
+              Connect on LinkedIn
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Company Profile: full-width banner below the form and contact details -->
+    <div class="bg-primary text-on-primary p-8 md:p-10 rounded shadow-sm relative group mt-gutter lg:mt-16">
+      <div class="absolute inset-0 rounded overflow-hidden pointer-events-none">
+        <div class="absolute -right-16 -top-16 w-48 h-48 bg-secondary-container/20 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+      </div>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div class="max-w-xl">
+          <h3 class="font-headline-md text-headline-md mb-4 text-secondary-fixed">Company Profile</h3>
+          <p class="font-body-md text-body-md text-primary-fixed-dim">Get to Know Us Better, Download Our Company Profile for a comprehensive overview of our services and heritage.</p>
+        </div>
+        <button class="bg-secondary-fixed text-on-secondary-fixed px-8 py-4 rounded-full font-cta-text text-cta-text hover:bg-secondary-fixed-dim transition-all shadow-lg flex items-center justify-center gap-3 shrink-0 whitespace-nowrap font-bold" type="button">
+          <span class="material-symbols-outlined" data-icon="download">download</span>
+          Download Company Deck
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+
+  <script>
+    const form = document.querySelector<HTMLFormElement>("#contactForm")!;
+    const formCard = document.querySelector<HTMLElement>("#contactFormCard")!;
+    const successPanel = document.querySelector<HTMLElement>("#contactSuccess")!;
+    const formError = document.querySelector<HTMLParagraphElement>("#contactFormError")!;
+    const submitButton = document.querySelector<HTMLButtonElement>("#contactSubmitButton")!;
+
+    function setFormError(message: string | null) {
+      formError.textContent = message ?? "";
+      formError.classList.toggle("hidden", !message);
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setFormError(null);
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
+
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const payload = await response.json();
+
+        if (!response.ok || !payload.success) {
+          setFormError(payload.errors?._form ?? "We couldn't submit your request. Please check the form and try again.");
+          submitButton.disabled = false;
+          submitButton.textContent = "Submit Request";
+          return;
+        }
+
+        formCard.hidden = true;
+        successPanel.hidden = false;
+      } catch {
+        setFormError("Something went wrong. Please check your connection and try again.");
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Request";
+      }
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  /* @reference makes the project's design tokens available to @apply in
+     this scoped stylesheet — required in Tailwind v4 for per-component
+     <style> blocks (see https://tailwindcss.com/docs/functions-and-directives#reference-directive). */
+  @reference "../styles/global.css";
+
+  .form-input-premium {
+    @apply w-full border-b border-outline-variant/50 bg-transparent py-4 text-on-surface font-body-md focus:border-secondary focus:outline-none focus:ring-0 transition-colors duration-300;
+  }
+  .form-label-premium {
+    @apply absolute left-0 -top-3.5 text-on-surface-variant font-label-bold text-sm transition-all peer-placeholder-shown:text-body-md peer-placeholder-shown:top-4 peer-placeholder-shown:font-normal peer-focus:-top-3.5 peer-focus:text-sm peer-focus:font-label-bold peer-focus:text-primary;
+  }
+</style>

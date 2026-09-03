@@ -1,0 +1,29 @@
+---
+// Ported from "Application Success.html". Header/footer are intentionally
+// absent here too — the source page suppressed both "for
+// Transactional/Success Screens" per its own comments.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import FormSuccessState from "../../components/FormSuccessState.astro";
+---
+
+<BaseLayout
+  title="Application Received - Rakhecha Finserv"
+  description="Your job application to Rakhecha Finserv has been received — our team will review it and follow up if there's a match."
+  noindex
+  bodyClass="bg-surface text-on-surface min-h-screen flex flex-col font-body-md antialiased"
+>
+  <main class="flex-grow flex items-center justify-center py-section-gap px-margin-mobile md:px-margin-desktop">
+    <div class="max-w-2xl w-full">
+      <FormSuccessState
+        titleTag="h1"
+        title="Application Received"
+        message="Thank you for your interest in Rakhecha Finserv. Our talent acquisition team will review your profile and reach out if there is a potential match."
+        primaryHref="/careers/"
+        primaryLabel="Back to Careers"
+        secondaryHref="/"
+        secondaryLabel="Return Home"
+        footnote="A confirmation email has been sent to your provided address."
+      />
+    </div>
+  </main>
+</BaseLayout>

@@ -1,0 +1,61 @@
+---
+// Ported from main.js's founderCardHTML()/renderFounderCards(). Fixes the
+// original bug where every card's onclick hardcoded the same
+// 'Founder%20Detail%20Page.html' href regardless of which founder it was —
+// this component takes the destination as a prop instead.
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+export interface Props {
+  href: string;
+  /** A build-time-optimized local import when the founder's photo lives in src/assets/ (all but one currently do); a plain URL string for the one founder still on a remote placeholder photo. */
+  image: ImageMetadata | string;
+  name: string;
+  role: string;
+  education: string;
+}
+
+const { href, image, name, role, education } = Astro.props;
+const isLocalImage = typeof image !== "string";
+---
+
+<a
+  href={href}
+  class="group cursor-pointer rounded-2xl transition-all duration-300 md:hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:z-10 relative shrink-0 w-[85vw] md:w-auto aspect-[4/5] overflow-hidden bg-surface-variant snap-center block"
+>
+  <div class="relative w-full h-full">
+    {
+      isLocalImage ? (
+        <Image
+          src={image as ImageMetadata}
+          alt={name}
+          width={400}
+          class="w-full h-full object-cover object-top transition-all duration-500 group-hover:scale-110"
+        />
+      ) : (
+        <img
+          alt={name}
+          class="w-full h-full object-cover object-top transition-all duration-500 group-hover:scale-110"
+          src={image as string}
+        />
+      )
+    }
+    <div
+      class="absolute inset-x-0 bottom-0 px-3 pt-2 pb-1.5 group-hover:pb-3 transition-[padding] duration-500 bg-gradient-to-t from-[#1E63A0] from-0% via-[#1E63A0]/90 via-70% to-transparent to-100%"
+    >
+      <h4 class="font-headline-md font-semibold text-sm md:text-base text-white leading-snug truncate pr-10">{name}</h4>
+      <div class="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-500 ease-in-out">
+        <div class="overflow-hidden">
+          <p class="text-white/80 text-[10px] md:text-xs uppercase tracking-wide mt-1">{role}</p>
+          <p class="text-white/60 text-[10px] md:text-xs italic mt-1 pr-32">{education}</p>
+        </div>
+      </div>
+    </div>
+    <div
+      class="absolute bottom-0 right-0 z-10 flex items-center gap-1.5 bg-primary group-hover:bg-white rounded-tl-2xl px-2 py-1.5 group-hover:px-4 group-hover:py-2 transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap"
+    >
+      <span class="max-w-0 group-hover:max-w-[120px] overflow-hidden transition-all duration-300 ease-in-out text-primary font-cta-text text-xs md:text-sm">Read More</span>
+      <span class="material-symbols-outlined text-white group-hover:text-primary text-sm md:text-base transition-colors duration-300">arrow_forward</span>
+    </div>
+  </div>
+</a>

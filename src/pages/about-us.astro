@@ -1,0 +1,407 @@
+---
+// Ported from "About us.html". Founder cards and Mission/Vision use the
+// FounderCard/MissionVision components; the "Want to Know More?" banner
+// uses CtaBanner (Prompt 2). Carousel/reveal behaviors come from
+// /scripts/site-effects.js.
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import FounderCard from "../components/FounderCard.astro";
+import MissionVision from "../components/MissionVision.astro";
+import CtaBanner from "../components/CtaBanner.astro";
+import ourJourneyImage from "../assets/images/Our Journey.jpeg";
+import devPhoto from "../assets/images/Dev.png";
+import nitishPhoto from "../assets/images/Nitish.png";
+import nidhhiPhoto from "../assets/images/Nidhhi.png";
+
+const founderOrder = ["dev-piyush-rakhecha", "nidhhi-rakhecha", "nitish-rakhecha", "megha-rakhecha"];
+const founderEntries = await getCollection("founders");
+const founders = founderOrder
+  .map((slug) => founderEntries.find((f) => f.data.slug === slug))
+  .filter((f): f is NonNullable<typeof f> => Boolean(f));
+
+// Local, build-time-optimized photos for the founders whose photo actually
+// lives in src/assets/ — Megha's is still a remote placeholder (see her
+// founders/*.json entry) and falls back to the raw URL in FounderCard.
+const founderPhotos: Record<string, ImageMetadata> = {
+  "dev-piyush-rakhecha": devPhoto,
+  "nitish-rakhecha": nitishPhoto,
+  "nidhhi-rakhecha": nidhhiPhoto,
+};
+---
+
+<BaseLayout
+  title="About Us - Rakhecha Finserv"
+  description="Learn about Rakhecha Finserv's story, leadership, and long-term approach to wealth management — founded by two brothers to deliver tailored, risk-adjusted outcomes for clients."
+  bodyClass="bg-white text-on-surface font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container"
+>
+  <Header />
+
+  <main>
+    <!-- Company Story -->
+    <section class="py-14 bg-surface-yellow-light scroll-mt-24" id="our-story">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-6 text-center md:hidden">Our Story</h2>
+        <div class="flex flex-col md:flex-row items-start gap-16">
+          <div class="flex-1 w-full md:sticky md:top-28 aspect-[4/5] md:aspect-[3/4] relative rounded-2xl overflow-hidden shadow-xl">
+            <Image src={ourJourneyImage} alt="Dev Piyush Rakhecha, Founder of Rakhecha Finserv" width={800} class="w-full h-full object-cover object-top" />
+          </div>
+          <div class="flex-1 space-y-6">
+            <h2 class="hidden md:block font-headline-lg text-headline-lg text-primary mb-2">Our Story</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Rakhecha Finserv has been helping individuals and corporates manage and grow their wealth for nearly a decade. With over 100 Crore in Assets Under Management (AUM), we specialize in providing the best risk-adjusted returns for our clients.</p>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Starting as a mutual fund distributor, we have diversified our offerings to include a wide range of asset classes, detailed in our list of services. As a long-term oriented wealth management firm, we prioritize financial success over short-term gains.</p>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Founded by two brothers with MBA degrees, Rakhecha Finserv aspires to become one of India's leading wealth management firms. Their expertise allows them to thoroughly evaluate and recommend the best funds, ensuring an excellent client experience.</p>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">At Rakhecha Finserv, we provide tailored solutions because we understand that investments, like clothes, do not fit the same for everyone.</p>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Client satisfaction is our priority, as we believe that exceptional client experiences are the key to our success and growth through referrals.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Strip -->
+    <section class="bg-surface py-10 mt-8">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-outline-variant">
+          <div class="flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 first:pt-0 text-center sm:text-left">
+            <div class="flex items-center justify-center w-14 h-14 rounded-full border-2 border-primary text-primary shrink-0"><span class="material-symbols-outlined text-2xl">apartment</span></div>
+            <div class="text-center sm:text-left">
+              <span class="block font-display-lg text-headline-md md:text-display-lg text-primary">₹<span class="count-up" data-target="200">200</span> Cr+</span>
+              <span class="block font-label-bold text-label-bold uppercase tracking-widest text-on-surface-variant">Assets Under Management</span>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
+            <div class="flex items-center justify-center w-14 h-14 rounded-full border-2 border-primary text-primary shrink-0"><span class="material-symbols-outlined text-2xl">calendar_month</span></div>
+            <div class="text-center sm:text-left">
+              <span class="block font-display-lg text-headline-md md:text-display-lg text-primary"><span class="count-up" data-target="10">10</span>+</span>
+              <span class="block font-label-bold text-label-bold uppercase tracking-widest text-on-surface-variant">Years in Business</span>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
+            <div class="flex items-center justify-center w-14 h-14 rounded-full border-2 border-primary text-primary shrink-0"><span class="material-symbols-outlined text-2xl">groups</span></div>
+            <div class="text-center sm:text-left">
+              <span class="block font-display-lg text-headline-md md:text-display-lg text-primary"><span class="count-up" data-target="300">300</span>+</span>
+              <span class="block font-label-bold text-label-bold uppercase tracking-widest text-on-surface-variant">Clients Served Globally across Family Offices, UHNIs, NRIs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section class="py-14 bg-surface-yellow-light">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop space-y-32">
+        <MissionVision />
+      </div>
+    </section>
+
+    <!-- Core Values -->
+    <section id="core-values-section" class="py-14 bg-surface relative overflow-hidden scroll-mt-24">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
+        <div class="text-center mb-16">
+          <h3 class="font-headline-lg text-headline-lg text-primary mb-4">The Pillars of Our Practice</h3>
+        </div>
+        <div class="flex flex-col gap-5 md:grid md:grid-cols-[1fr_auto_1fr] md:grid-rows-[auto_auto] md:gap-x-14 md:gap-y-14 md:items-center">
+          <div class="values-badge hidden md:flex shrink-0 relative w-48 h-48 md:w-56 md:h-56 md:col-start-2 md:row-start-1 md:row-span-2 md:justify-self-center items-center justify-center">
+            <svg class="absolute inset-0 w-full h-full -rotate-90 z-0" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" fill="none" r="47" stroke="#123B5D" stroke-opacity="0.15" stroke-width="3"></circle>
+              <circle id="values-ring-progress" cx="50" cy="50" fill="none" r="47" stroke="#123B5D" stroke-dasharray="295.31" stroke-dashoffset="295.31" stroke-linecap="round" stroke-width="3" style="transition: stroke-dashoffset 1.2s ease-in-out;"></circle>
+            </svg>
+            <div class="absolute inset-[7px] z-10 rounded-full bg-surface-yellow-light border-2 border-primary/15 flex items-center justify-center text-center shadow-xl overflow-hidden p-6">
+              <img alt="Rakhecha Finserv" class="relative z-10 w-full h-full object-contain" src="/favicon.png" />
+            </div>
+          </div>
+          <div class="value-row flex items-center md:block md:relative md:col-start-1 md:row-start-1">
+            <div class="value-icon relative shrink-0 z-10 w-16 h-16 md:w-14 md:h-14 rounded-full bg-surface-container-lowest border border-outline-variant/40 shadow-md flex items-center justify-center transition-all duration-300 md:absolute md:-top-6 md:left-6">
+              <span class="material-symbols-outlined text-primary text-2xl md:text-2xl">shield_locked</span>
+            </div>
+            <div class="value-pill flex-1 -ml-8 pl-12 pr-6 py-4 rounded-full bg-surface-container-lowest border border-outline-variant/30 shadow-sm hover:shadow-md hover:border-primary-light transition-all duration-300 md:ml-0 md:pl-8 md:pr-8 md:pt-10 md:pb-6 md:rounded-2xl">
+              <h4 class="font-label-bold text-label-bold text-primary uppercase tracking-wide mb-1">Trust</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">The foundation of every relationship, earned daily through unwavering reliability.</p>
+            </div>
+          </div>
+          <div class="value-row flex items-center md:block md:relative md:col-start-3 md:row-start-1">
+            <div class="value-icon relative shrink-0 z-10 w-16 h-16 md:w-14 md:h-14 rounded-full bg-surface-container-lowest border border-outline-variant/40 shadow-md flex items-center justify-center transition-all duration-300 md:absolute md:-top-6 md:left-6">
+              <span class="material-symbols-outlined text-primary text-2xl md:text-2xl">visibility</span>
+            </div>
+            <div class="value-pill flex-1 -ml-8 pl-12 pr-6 py-4 rounded-full bg-surface-container-lowest border border-outline-variant/30 shadow-sm hover:shadow-md hover:border-primary-light transition-all duration-300 md:ml-0 md:pl-8 md:pr-8 md:pt-10 md:pb-6 md:rounded-2xl">
+              <h4 class="font-label-bold text-label-bold text-primary uppercase tracking-wide mb-1">Transparency</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Absolute clarity in our fees, strategies, and communication, with no hidden agendas.</p>
+            </div>
+          </div>
+          <div class="value-row flex items-center md:block md:relative md:col-start-1 md:row-start-2">
+            <div class="value-icon relative shrink-0 z-10 w-16 h-16 md:w-14 md:h-14 rounded-full bg-surface-container-lowest border border-outline-variant/40 shadow-md flex items-center justify-center transition-all duration-300 md:absolute md:-top-6 md:left-6">
+              <span class="material-symbols-outlined text-primary text-2xl md:text-2xl">verified</span>
+            </div>
+            <div class="value-pill flex-1 -ml-8 pl-12 pr-6 py-4 rounded-full bg-surface-container-lowest border border-outline-variant/30 shadow-sm hover:shadow-md hover:border-primary-light transition-all duration-300 md:ml-0 md:pl-8 md:pr-8 md:pt-10 md:pb-6 md:rounded-2xl">
+              <h4 class="font-label-bold text-label-bold text-primary uppercase tracking-wide mb-1">Integrity</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Holding ourselves to the highest ethical standards, especially when it's difficult.</p>
+            </div>
+          </div>
+          <div class="value-row flex items-center md:block md:relative md:col-start-3 md:row-start-2">
+            <div class="value-icon relative shrink-0 z-10 w-16 h-16 md:w-14 md:h-14 rounded-full bg-surface-container-lowest border border-outline-variant/40 shadow-md flex items-center justify-center transition-all duration-300 md:absolute md:-top-6 md:left-6">
+              <span class="material-symbols-outlined text-primary text-2xl md:text-2xl">workspace_premium</span>
+            </div>
+            <div class="value-pill flex-1 -ml-8 pl-12 pr-6 py-4 rounded-full bg-surface-container-lowest border border-outline-variant/30 shadow-sm hover:shadow-md hover:border-primary-light transition-all duration-300 md:ml-0 md:pl-8 md:pr-8 md:pt-10 md:pb-6 md:rounded-2xl">
+              <h4 class="font-label-bold text-label-bold text-primary uppercase tracking-wide mb-1">Excellence</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">A relentless pursuit of superior outcomes, refining our craft to deliver lasting value.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Leadership Team -->
+    <section class="py-14 bg-surface-yellow-light scroll-mt-24" id="our-leadership">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+        <div class="text-center mb-16">
+          <h3 class="font-headline-lg text-headline-lg text-primary mb-4">Our Leadership</h3>
+        </div>
+        <div class="relative">
+          <div class="founder-scroll no-scrollbar flex overflow-x-auto snap-x snap-mandatory scroll-smooth md:overflow-visible p-2 md:p-4 pb-8 md:pb-4 md:grid md:grid-cols-4 gap-4 md:gap-6" id="about-founder-cards">
+            {founders.map((f) => (
+              <FounderCard href={`/leadership/${f.data.slug}/`} image={founderPhotos[f.data.slug] ?? f.data.photo} name={f.data.name} role={f.data.role} education={f.data.education} />
+            ))}
+          </div>
+          <button aria-label="Scroll left" class="founder-scroll-btn md:hidden absolute left-1 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-primary/80 text-white shadow-md" data-scroll-dir="-1" data-scroll-target="about-founder-cards" type="button"><span class="material-symbols-outlined text-lg">chevron_left</span></button>
+          <button aria-label="Scroll right" class="founder-scroll-btn md:hidden absolute right-1 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-primary/80 text-white shadow-md" data-scroll-dir="1" data-scroll-target="about-founder-cards" type="button"><span class="material-symbols-outlined text-lg">chevron_right</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Awards & Recognitions -->
+    <section class="py-14 bg-surface scroll-mt-24" id="awards-recognition">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop text-center">
+        <h3 class="font-headline-lg text-headline-lg text-primary mb-4">Industry Recognition</h3>
+        <div class="auto-scroll-x flex overflow-x-auto gap-6 pb-8 no-scrollbar text-left mt-12">
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-8 rounded-2xl border border-surface-variant transition-all duration-300 hover:border-[#C9A84C] hover:shadow-lg flex flex-col items-start text-left space-y-4 group">
+            <div class="h-16 flex items-center justify-start mb-2">
+              <img alt="The Economic Times Logo" class="max-h-full max-w-[220px] object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDg9WNEbYoXK8-_82jDlY9nMlR18dcSxx_m9LK7lGYvRXq72XA6xNN0IcDNw2H3PLnTfQOWhX9q9MJsV_e68ttJSq9teHAlDjuKqj5CNPBqlLaga9-Nbp1aKcREWhRMcUeZr1Gs8fJDcJz1y9xATn0rEybDs660vstWzD4KROtzIh69KjOIh1w-RNcnyUTgrZfmUnwnrmQIRYiHEdKFkv1fR16R3Ule9l5a4P2S_mgaGciS7PCI4xeOxQ" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between items-start w-full">
+                <h4 class="font-headline-md text-headline-md text-primary">Top 100 Financial Advisors</h4>
+                <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-bold text-label-bold">2023</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant italic">The Economic Times</p>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Recognized for excellence in strategic wealth management and portfolio advisory.</p>
+          </div>
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-8 rounded-2xl border border-surface-variant transition-all duration-300 hover:border-[#C9A84C] hover:shadow-lg flex flex-col items-start text-left space-y-4 group">
+            <div class="h-16 flex items-center justify-start mb-2">
+              <img alt="PL Capital Logo" class="max-h-full max-w-[220px] object-contain" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between items-start w-full">
+                <h4 class="font-headline-md text-headline-md text-primary">80% of Excellence</h4>
+                <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-bold text-label-bold">2023</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant italic">PL Capital</p>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Honored for maintaining exceptional standards of client service and market integrity.</p>
+          </div>
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-8 rounded-2xl border border-surface-variant transition-all duration-300 hover:border-[#C9A84C] hover:shadow-lg flex flex-col items-start text-left space-y-4 group">
+            <div class="h-16 flex items-center justify-start mb-2">
+              <img alt="Edelweiss Logo" class="max-h-full max-w-[220px] object-contain" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between items-start w-full">
+                <h4 class="font-headline-md text-headline-md text-primary">Best Boutique Advisory</h4>
+                <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-bold text-label-bold">2023</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant italic">Edelweiss</p>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Awarded for bespoke investment solutions and meticulous financial stewardship.</p>
+          </div>
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-8 rounded-2xl border border-surface-variant transition-all duration-300 hover:border-[#C9A84C] hover:shadow-lg flex flex-col items-start text-left space-y-4 group">
+            <div class="h-16 flex items-center justify-start mb-2">
+              <img alt="CNBC-TV18 Logo" class="max-h-full max-w-[220px] object-contain" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between items-start w-full">
+                <h4 class="font-headline-md text-headline-md text-primary">Emerging Wealth Manager of the Year</h4>
+                <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-bold text-label-bold">2024</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant italic">CNBC-TV18</p>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Recognized for rapid, disciplined growth in assets under advisory and client trust.</p>
+          </div>
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-8 rounded-2xl border border-surface-variant transition-all duration-300 hover:border-[#C9A84C] hover:shadow-lg flex flex-col items-start text-left space-y-4 group">
+            <div class="h-16 flex items-center justify-start mb-2">
+              <img alt="Outlook Money Logo" class="max-h-full max-w-[220px] object-contain" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between items-start w-full">
+                <h4 class="font-headline-md text-headline-md text-primary">Excellence in Client Advisory</h4>
+                <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-bold text-label-bold">2024</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant italic">Outlook Money</p>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Honored for transparent, education-first engagement with retail and HNI clients alike.</p>
+          </div>
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-8 rounded-2xl border border-surface-variant transition-all duration-300 hover:border-[#C9A84C] hover:shadow-lg flex flex-col items-start text-left space-y-4 group">
+            <div class="h-16 flex items-center justify-start mb-2">
+              <img alt="AMFI Logo" class="max-h-full max-w-[220px] object-contain" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between items-start w-full">
+                <h4 class="font-headline-md text-headline-md text-primary">Top Regional Mutual Fund Distributor</h4>
+                <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-bold text-label-bold">2024</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant italic">AMFI</p>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Recognized for consistent, compliant, investor-first mutual fund distribution practices.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- News Mentions -->
+    <section class="py-14 bg-surface-yellow-light">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+        <div class="text-center mb-12">
+          <h3 class="font-headline-lg text-headline-lg text-primary mb-4">News Mentions</h3>
+        </div>
+        <div class="auto-scroll-x flex overflow-x-auto gap-6 pb-8 no-scrollbar">
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-variant flex flex-col justify-start space-y-4">
+            <div class="h-12 flex items-center justify-start mb-2">
+              <img alt="Telegraph India" class="max-h-full max-w-[150px] object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqSAf5wHQjmMTu0IbBX3GUgrZ3NWGilLkf5inrpg7yqInCnY-kEjYmFn888IrrEAHF_q4x0PeUEoTVRmS9ta1JIU60rg0fst93LS6rr5qOxiwVpLpVF_ALeLLQGb_mnNT08xd2KRc59k3fxItU8BwL7yibtCETJMqgJHJu1vi9YRw5o6gCYgnAJ2jkSIhrplnu5zGUlLhQ6xbAebouxteOxdR36G4-PjgJ5s1CyVQcCi932y4Wr6iSTQ" />
+            </div>
+            <hr class="border-t border-surface-variant w-full" />
+            <div class="font-body-sm text-body-sm text-on-surface-variant">Oct 24, 2026 &bull; Telegraph India</div>
+            <h4 class="font-headline-md text-[20px] leading-tight text-primary flex-grow">Vision Loss to Visionary: Piyush Rakhecha's Inspiring Career in Finance Triumphing Odds</h4>
+            <a class="mt-4 inline-flex items-center gap-2 text-surface-tint font-cta-text text-body-sm hover:text-primary transition-all" href="#">Read more <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+          </div>
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-variant flex flex-col justify-start space-y-4">
+            <div class="h-12 flex items-center justify-start mb-2">
+              <img alt="Cafemutual" class="max-h-full max-w-[150px] object-contain" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg" />
+            </div>
+            <hr class="border-t border-surface-variant w-full" />
+            <div class="font-body-sm text-body-sm text-on-surface-variant">Oct 24, 2026 &bull; Cafemutual</div>
+            <h4 class="font-headline-md text-[20px] leading-tight text-primary flex-grow">Meet visually challenged MFD who held a knowledge session for over 200 special individuals</h4>
+            <a class="mt-4 inline-flex items-center gap-2 text-surface-tint font-cta-text text-body-sm hover:text-primary transition-all" href="#">Read more <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+          </div>
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-variant flex flex-col justify-start space-y-4">
+            <div class="h-12 flex items-center justify-start mb-2">
+              <img alt="The Economic Times" class="max-h-full max-w-[150px] object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDg9WNEbYoXK8-_82jDlY9nMlR18dcSxx_m9LK7lGYvRXq72XA6xNN0IcDNw2H3PLnTfQOWhX9q9MJsV_e68ttJSq9teHAlDjuKqj5CNPBqlLaga9-Nbp1aKcREWhRMcUeZr1Gs8fJDcJz1y9xATn0rEybDs660vstWzD4KROtzIh69KjOIh1w-RNcnyUTgrZfmUnwnrmQIRYiHEdKFkv1fR16R3Ule9l5a4P2S_mgaGciS7PCI4xeOxQ" />
+            </div>
+            <hr class="border-t border-surface-variant w-full" />
+            <div class="font-body-sm text-body-sm text-on-surface-variant">Oct 24, 2026 &bull; The Economic Times</div>
+            <h4 class="font-headline-md text-[20px] leading-tight text-primary flex-grow">Rising medical costs? Here's how people with disabilities can build a strong financial safety net</h4>
+            <a class="mt-4 inline-flex items-center gap-2 text-surface-tint font-cta-text text-body-sm hover:text-primary transition-all" href="#">Read more <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+          </div>
+          <div class="flex-none w-[300px] md:w-[350px] snap-start bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-surface-variant flex flex-col justify-start space-y-4">
+            <div class="h-12 flex items-center justify-start mb-2">
+              <img alt="The Economic Times" class="max-h-full max-w-[150px] object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDg9WNEbYoXK8-_82jDlY9nMlR18dcSxx_m9LK7lGYvRXq72XA6xNN0IcDNw2H3PLnTfQOWhX9q9MJsV_e68ttJSq9teHAlDjuKqj5CNPBqlLaga9-Nbp1aKcREWhRMcUeZr1Gs8fJDcJz1y9xATn0rEybDs660vstWzD4KROtzIh69KjOIh1w-RNcnyUTgrZfmUnwnrmQIRYiHEdKFkv1fR16R3Ule9l5a4P2S_mgaGciS7PCI4xeOxQ" />
+            </div>
+            <hr class="border-t border-surface-variant w-full" />
+            <div class="font-body-sm text-body-sm text-on-surface-variant">Oct 24, 2026 &bull; The Economic Times</div>
+            <h4 class="font-headline-md text-[20px] leading-tight text-primary flex-grow">AIF returns explained: Why high alpha may exist on paper, not in cash returned to investors</h4>
+            <a class="mt-4 inline-flex items-center gap-2 text-surface-tint font-cta-text text-body-sm hover:text-primary transition-all" href="#">Read more <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deck CTA -->
+    <CtaBanner
+      heading="Want to Know More?"
+      description="Download our comprehensive company profile to explore our specialized strategies and client success stories."
+      buttonText="Download Company Deck"
+      icon="download"
+    />
+  </main>
+
+  <Footer />
+
+  <script is:inline src="/scripts/site-effects.js"></script>
+
+  <script>
+    // Cycles a highlight clockwise through the four value pills, and drives
+    // the circular progress ring alongside it. Ported verbatim from About us.html.
+    (function () {
+      const rows = document.querySelectorAll("#core-values-section .value-row");
+      if (!rows.length) return;
+      const ring = document.getElementById("values-ring-progress");
+      const circumference = 295.31;
+      const order = [0, 1, 3, 2];
+      let step = 0;
+
+      function highlight() {
+        const activeIdx = order[step];
+        rows.forEach((row, i) => {
+          const icon = row.querySelector(".value-icon");
+          const pill = row.querySelector(".value-pill");
+          if (i === activeIdx) {
+            icon?.classList.add("scale-110", "ring-4", "ring-primary/30", "shadow-lg");
+            pill?.classList.add("scale-[1.02]", "border-primary", "shadow-lg", "bg-primary-container/40");
+          } else {
+            icon?.classList.remove("scale-110", "ring-4", "ring-primary/30", "shadow-lg");
+            pill?.classList.remove("scale-[1.02]", "border-primary", "shadow-lg", "bg-primary-container/40");
+          }
+        });
+        if (ring) {
+          const frac = (step + 1) / rows.length;
+          if (step === 0) {
+            (ring as unknown as SVGElement).style.transition = "none";
+            (ring as unknown as SVGElement).style.strokeDashoffset = String(circumference);
+            ring.getBoundingClientRect();
+            (ring as unknown as SVGElement).style.transition = "stroke-dashoffset 1.2s ease-in-out";
+          }
+          requestAnimationFrame(function () {
+            (ring as unknown as SVGElement).style.strokeDashoffset = String(circumference * (1 - frac));
+          });
+        }
+        step = (step + 1) % rows.length;
+      }
+
+      highlight();
+      setInterval(highlight, 1500);
+    })();
+  </script>
+
+  <script>
+    // Animated count-up for the stats strip. Ported verbatim from Home Page.html.
+    document.addEventListener("DOMContentLoaded", () => {
+      const counters = document.querySelectorAll(".count-up");
+
+      const animateCountUp = (el: Element) => {
+        const target = +(el.getAttribute("data-target") || "0");
+        const duration = 2000;
+        const startTime = performance.now();
+
+        const step = (currentTime: number) => {
+          const elapsedTime = currentTime - startTime;
+          const progress = Math.min(elapsedTime / duration, 1);
+          const easeProgress = 1 - Math.pow(1 - progress, 4);
+          const currentValue = Math.floor(easeProgress * target);
+          (el as HTMLElement).innerText = String(currentValue);
+
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          } else {
+            (el as HTMLElement).innerText = String(target);
+          }
+        };
+
+        window.requestAnimationFrame(step);
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              animateCountUp(entry.target);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.5 },
+      );
+
+      counters.forEach((counter) => observer.observe(counter));
+    });
+  </script>
+</BaseLayout>

@@ -1,0 +1,62 @@
+---
+// Shared visual design for a post-submit success state — adapted from
+// "Application Success.html" and reused by both the careers application
+// flow (as a full standalone page) and the contact form (as an inline panel
+// swapped in client-side, no page reload). The old site's other "success"
+// page ("contact us success message.html") was an orphaned duplicate never
+// linked from anywhere and isn't carried forward.
+interface Props {
+  title: string;
+  titleTag?: "h1" | "h2";
+  message: string;
+  primaryHref: string;
+  primaryLabel: string;
+  secondaryHref: string;
+  secondaryLabel: string;
+  footnote?: string;
+}
+
+const {
+  title,
+  titleTag = "h2",
+  message,
+  primaryHref,
+  primaryLabel,
+  secondaryHref,
+  secondaryLabel,
+  footnote,
+} = Astro.props;
+const TitleTag = titleTag;
+---
+
+<div class="flex flex-col items-center text-center">
+  <div class="mb-8 w-24 h-24 rounded-full bg-secondary-container/20 flex items-center justify-center border border-secondary-container relative overflow-hidden">
+    <span class="material-symbols-outlined text-secondary-container text-[48px] icon-fill z-10" data-icon="check_circle">check_circle</span>
+    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-secondary-container/10 to-transparent animate-[spin_4s_linear_infinite]"></div>
+  </div>
+  <TitleTag class="font-display-lg text-display-lg text-primary mb-6">{title}</TitleTag>
+  <p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mb-12">{message}</p>
+  <div class="flex flex-col sm:flex-row gap-6 w-full sm:w-auto items-center">
+    <a
+      class="inline-flex items-center justify-center px-8 py-3 bg-secondary-container text-on-secondary-container font-cta-text text-cta-text rounded hover:bg-secondary-fixed transition-colors duration-300 w-full sm:w-auto shadow-sm"
+      href={primaryHref}
+    >
+      {primaryLabel}
+    </a>
+    <a
+      class="inline-flex items-center justify-center px-8 py-3 bg-transparent text-primary border border-outline-variant hover:border-primary hover:text-primary font-cta-text text-cta-text rounded transition-colors duration-300 w-full sm:w-auto group"
+      href={secondaryHref}
+    >
+      {secondaryLabel}
+      <span class="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+    </a>
+  </div>
+  {
+    footnote && (
+      <>
+        <div class="w-16 h-px bg-outline-variant mt-16 mb-8" />
+        <p class="font-body-sm text-body-sm text-on-surface-variant/70">{footnote}</p>
+      </>
+    )
+  }
+</div>

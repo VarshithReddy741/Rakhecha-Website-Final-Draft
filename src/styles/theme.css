@@ -1,0 +1,122 @@
+/* Shared visual utilities used across every page on the site.
+   Colors (including gold/gold-light), fonts and spacing tokens live in
+   tailwind-config.js — Tailwind generates .text-gold/.bg-gold/.border-gold
+   from that config automatically, so this file only holds the handful of
+   plain CSS rules Tailwind's config can't express. */
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-outlined.fill,
+.icon-fill {
+    font-variation-settings: 'FILL' 1;
+}
+
+.ambient-shadow,
+.custom-shadow {
+    box-shadow: 0 4px 24px rgba(18, 59, 93, 0.04);
+}
+
+/* Hides scrollbars on horizontally-scrolling rows (tab strips, card
+   carousels, mobile tag-pill rows) while keeping them scrollable. Was
+   duplicated as a per-page <style> block on IB.html and Knowledge
+   hub.html; centralized here since both pages use it identically. */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Smooth scroll hand-off for nested scrollable boxes (service detail
+   panels, mobile nav panel, scrollable tables, etc.) — without this,
+   iOS Safari scrolls these in a choppy, non-momentum way and doesn't
+   hand off cleanly to the page scroll once the box's content ends. */
+.overflow-y-auto,
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: auto;
+}
+
+/* ==========================================================================
+   Typography system — Public Sans, matched to the Spark Capital scale.
+   Font family/base sizes live in tailwind-config.js; the responsive and
+   context-specific overrides below extend the same named classes
+   (text-display-lg, text-headline-lg, text-headline-md, text-body-lg,
+   text-body-md) rather than introducing a parallel typography system.
+   Breakpoint: 767px, per spec.
+   ========================================================================== */
+
+/* Local alias so "Public Sans Fallback" (named in the font stack) always
+   resolves to a real font even before/without the Google Fonts request. */
+@font-face {
+    font-family: "Public Sans Fallback";
+    src: local("Arial");
+    ascent-override: 90%;
+    size-adjust: 105%;
+}
+
+body {
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Navigation (header nav + dropdowns + mobile menu): 14px/500 desktop,
+   20px/400 mobile — scoped to <header> so it never touches body copy that
+   also uses the body-md token elsewhere on the page. */
+header .text-body-md,
+header .font-body-md {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Knowledge Hub story/event card titles ("Featured Stories"): these are the
+   only text-headline-md elements site-wide that carry a line-clamp class,
+   so this scope reaches every research/blog/event card without touching
+   the team-bio and job-listing headings that share the same base class.
+   Same value at every breakpoint, so the selector is tripled (.x.x.x) —
+   one class higher than the mobile .text-headline-md.text-headline-md
+   override below — so it wins at both desktop and mobile regardless of
+   source order. */
+.text-headline-md.text-headline-md.line-clamp-2,
+.text-headline-md.text-headline-md.line-clamp-3 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* Tailwind's CDN build injects its utility stylesheet at runtime, so its
+   .text-* rules can end up after theme.css in the cascade regardless of
+   <link> order. A doubled class (.text-display-lg.text-display-lg) has
+   higher specificity than Tailwind's single-class utility, so these
+   overrides always win without relying on source order or !important. */
+@media (max-width: 767px) {
+    /* Hero H1 */
+    .text-display-lg.text-display-lg {
+        font-size: 26px;
+        font-weight: 700;
+    }
+    /* Major section H2 */
+    .text-headline-lg.text-headline-lg,
+    .text-headline-lg-mobile.text-headline-lg-mobile {
+        font-size: 26px;
+        font-weight: 700;
+    }
+    /* Card/service H3 */
+    .text-headline-md.text-headline-md {
+        font-size: 20px;
+        font-weight: 700;
+    }
+    /* Body/section paragraph */
+    .text-body-lg.text-body-lg {
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+    }
+    /* Mobile navigation/menu */
+    header .text-body-md,
+    header .font-body-md {
+        font-size: 20px;
+        font-weight: 400;
+    }
+}

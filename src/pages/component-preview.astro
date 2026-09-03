@@ -1,0 +1,175 @@
+---
+// TEMPORARY spot-check page for the shared components built in this prompt.
+// Not wired into real routes/content yet — that happens in a later prompt.
+// Sample data below is real copy taken from the live IB.html /
+// "About us.html" pages (not lorem ipsum), just not exhaustively ported.
+import { getCollection } from "astro:content";
+import { getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import FounderCard from "../components/FounderCard.astro";
+import MissionVision from "../components/MissionVision.astro";
+import CtaBanner from "../components/CtaBanner.astro";
+import ServicePanel from "../components/ServicePanel.astro";
+import devPhoto from "../assets/images/Dev.png";
+import nitishPhoto from "../assets/images/Nitish.png";
+import nidhhiPhoto from "../assets/images/Nidhhi.png";
+import fundraisingImage from "../assets/images/fundraising.jpg";
+import ipoImage from "../assets/images/IPO.jpg";
+import valuationImage from "../assets/images/Valuation.png";
+import maImage from "../assets/images/M&A.png";
+import secondaryDealsImage from "../assets/images/secondary deals.jpeg";
+import fpiHubImage from "../assets/images/FPI hub.jpeg";
+import creditPaperImage from "../assets/images/Credit paper.jpeg";
+import individualInsuranceImage from "../assets/images/individual insurance landscape.png";
+import businessInsuranceImage from "../assets/images/Busienss Insurance.jpeg";
+
+// Pulled live from the founders content collection (src/content/founders/)
+// instead of a hardcoded array, so this also proves out
+// FounderCard -> /leadership/[slug]/ end to end.
+const founderEntries = await getCollection("founders");
+const founderPhotos: Record<string, ImageMetadata> = {
+  "dev-piyush-rakhecha": devPhoto,
+  "nitish-rakhecha": nitishPhoto,
+  "nidhhi-rakhecha": nidhhiPhoto,
+};
+
+const [fundraisingOptimized, ipoOptimized, valuationOptimized, maOptimized, secondaryOptimized, fpiOptimized, creditOptimized, individualInsuranceOptimized, businessInsuranceOptimized] =
+  await Promise.all(
+    [fundraisingImage, ipoImage, valuationImage, maImage, secondaryDealsImage, fpiHubImage, creditPaperImage, individualInsuranceImage, businessInsuranceImage].map(
+      (src) => getImage({ src, width: 800, format: "webp" }),
+    ),
+  );
+
+// Real IB.html card data (title/desc/image), columns=3, expanded card
+// shrinks to h-[300px] with no scale — matches IB's original config.
+const ibItems = [
+  { id: "fundraising", title: "Fundraising", desc: "Strategic capital structuring across Equity & Debt markets.", image: fundraisingOptimized.src },
+  { id: "ipo", title: "IPO Listing Advisory", desc: "End-to-end guidance for public market debuts.", image: ipoOptimized.src },
+  { id: "valuation", title: "Valuation", desc: "Rigorous independent valuation services.", image: valuationOptimized.src },
+  { id: "ma", title: "Mergers & Acquisitions", desc: "Strategic advisory from identification to execution.", image: maOptimized.src },
+  { id: "secondary", title: "Secondary Deals", desc: "Navigating the unlisted space with discretion.", image: secondaryOptimized.src },
+  { id: "fpi", title: "FPI Hub", desc: "Streamlined access for Foreign Portfolio Investors.", image: fpiOptimized.src },
+  { id: "credit", title: "Credit Papers", desc: "Lender-ready credit papers for your financing needs.", image: creditOptimized.src },
+];
+---
+
+<BaseLayout
+  title="Component preview (temporary)"
+  description="Internal component preview page for the Rakhecha Finserv site build — not part of the public site."
+  noindex
+  bodyClass="bg-white text-on-surface font-body-md antialiased"
+>
+  <Header />
+
+  <main class="px-margin-mobile md:px-margin-desktop py-12 space-y-20 max-w-container-max mx-auto">
+    <section>
+      <h2 class="font-headline-md text-headline-md text-primary mb-6">FounderCard</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+        {founderEntries.map(({ data: f }) => (
+          <FounderCard href={`/leadership/${f.slug}/`} image={founderPhotos[f.slug] ?? f.photo} name={f.name} role={f.role} education={f.education} />
+        ))}
+      </div>
+    </section>
+
+    <section>
+      <h2 class="font-headline-md text-headline-md text-primary mb-6">MissionVision</h2>
+      <div class="space-y-16">
+        <MissionVision />
+      </div>
+    </section>
+
+    <section>
+      <h2 class="font-headline-md text-headline-md text-primary mb-6">CtaBanner</h2>
+      <CtaBanner
+        heading="Ready to Navigate Global Capital Markets?"
+        description="Speak with our team to discuss how our investment banking expertise can serve your goals."
+        buttonText="Contact Us"
+        buttonHref="/contact"
+      />
+      <CtaBanner
+        heading="Want to Know More?"
+        description="Download our comprehensive company profile to explore our specialized strategies and client success stories."
+        buttonText="Download Company Deck"
+        icon="download"
+      />
+    </section>
+
+    <section>
+      <h2 class="font-headline-md text-headline-md text-primary mb-6">ServicePanel (IB config: 3 cols, expandedHeight=h-[300px], expandedScale=false)</h2>
+      <ServicePanel items={ibItems} columns={3} expandedHeight="h-[300px]" expandedScale={false}>
+        <Fragment slot="panel-fundraising">
+          <h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Fundraising</h2>
+          <p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">We advise startups, growth-stage companies, and established businesses in raising capital across equity, quasi-equity, and structured debt instruments. Our end-to-end fundraising mandate covers everything from pitch preparation to investor outreach, term sheet negotiation, and deal closure.</p>
+          <div class="fund-anim fund-anim-3">
+            <h4 class="font-label-bold text-base font-bold text-primary-light mb-8 uppercase tracking-wider">Our Services</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+              <div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><div><p class="font-label-bold text-primary">Equity fundraising</p><p class="font-body-sm text-on-surface-variant mt-0.5">Seed, Series A to E, Pre-IPO</p></div></div>
+              <div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><div><p class="font-label-bold text-primary">Debt fundraising</p><p class="font-body-sm text-on-surface-variant mt-0.5">NCDs, venture debt, structured finance</p></div></div>
+              <div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">03</span><p class="font-label-bold text-primary">Strategic investor identification</p></div>
+              <div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">04</span><p class="font-label-bold text-primary">Business plan &amp; financial model review</p></div>
+            </div>
+          </div>
+        </Fragment>
+        <Fragment slot="panel-ipo">
+          <h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">IPO Listing Advisory</h2>
+          <p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">End-to-end advisory for your journey to the public markets.</p>
+          <div class="fund-anim fund-anim-3">
+            <h4 class="font-label-bold text-base font-bold text-primary-light mb-8 uppercase tracking-wider">Our Services</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+              <div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">01</span><div><p class="font-label-bold text-primary">IPO readiness</p></div></div>
+              <div class="fund-point flex items-center gap-4 rounded-lg -mx-3 px-3 py-2"><span class="hidden md:block text-3xl font-bold text-on-surface-variant leading-none flex-shrink-0">02</span><div><p class="font-label-bold text-primary">Pre-IPO structuring</p></div></div>
+            </div>
+          </div>
+        </Fragment>
+        <Fragment slot="panel-valuation">
+          <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Valuation</h2>
+          <p class="font-body-md text-on-surface-variant max-w-2xl leading-relaxed">Rigorous independent valuation services.</p>
+        </Fragment>
+        <Fragment slot="panel-ma">
+          <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Mergers &amp; Acquisitions</h2>
+          <p class="font-body-md text-on-surface-variant max-w-2xl leading-relaxed">Strategic advisory from identification to execution.</p>
+        </Fragment>
+        <Fragment slot="panel-secondary">
+          <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Secondary Deals</h2>
+          <p class="font-body-md text-on-surface-variant max-w-2xl leading-relaxed">Navigating the unlisted space with discretion.</p>
+        </Fragment>
+        <Fragment slot="panel-fpi">
+          <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">FPI Hub</h2>
+          <p class="font-body-md text-on-surface-variant max-w-2xl leading-relaxed">Streamlined access for Foreign Portfolio Investors.</p>
+        </Fragment>
+        <Fragment slot="panel-credit">
+          <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Credit Papers</h2>
+          <p class="font-body-md text-on-surface-variant max-w-2xl leading-relaxed">Lender-ready credit papers for your financing needs.</p>
+        </Fragment>
+      </ServicePanel>
+    </section>
+
+    <section>
+      <h2 class="font-headline-md text-headline-md text-primary mb-6">ServicePanel (Insurance config: 2 cols, expandedHeight=h-[440px], expandedScale=true, collapsedSpanFull=true)</h2>
+      <ServicePanel
+        items={[
+          { id: "individual", title: "Individual Insurance", desc: "Life and Health insurance solutions meticulously tailored for UHNW individuals.", image: individualInsuranceOptimized.src, imagePosition: "right" },
+          { id: "business", title: "Business Insurance", desc: "Strategic risk management and comprehensive coverage for corporate entities.", image: businessInsuranceOptimized.src },
+        ]}
+        columns={2}
+        expandedHeight="h-[440px]"
+        expandedScale={true}
+        collapsedSpanFull={true}
+      >
+        <Fragment slot="panel-individual">
+          <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-4">Individual Insurance</h2>
+          <p class="font-body-md text-on-surface-variant mb-3">Life and Health insurance solutions meticulously tailored for UHNW individuals.</p>
+        </Fragment>
+        <Fragment slot="panel-business">
+          <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-4">Business Insurance</h2>
+          <p class="font-body-md text-on-surface-variant mb-3">Strategic risk management and comprehensive coverage for corporate entities.</p>
+        </Fragment>
+      </ServicePanel>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

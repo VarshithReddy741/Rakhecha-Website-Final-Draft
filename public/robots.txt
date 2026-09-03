@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rakhechafinserv.com/sitemap-index.xml

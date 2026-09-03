@@ -1,0 +1,137 @@
+---
+// Ported from "Client Login page.html". Structural port only — content and
+// design preserved exactly, including the page's own (unfixed) quirks like
+// the unloaded "Bricolage Grotesque" font-family reference, which was
+// already a no-op on the live site (falls back to sans-serif) and isn't in
+// this migration's fix list.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<BaseLayout
+  title="Rakhecha Finserv - Client Login"
+  description="Log in to your Rakhecha Finserv client account to access your portfolio and investment details."
+  noindex
+  bodyClass="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col"
+>
+  <Fragment slot="meta">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  </Fragment>
+
+  <Header />
+
+  <main class="login-backdrop flex-grow w-full flex items-center justify-center p-4 sm:p-8">
+    <div class="w-full max-w-md mx-auto">
+      <div class="login-container bg-white rounded-card overflow-hidden">
+        <div class="pt-8 pb-4 px-8 text-center bg-brand-surface border-b border-gray-100">
+          <img
+            alt="Rakhecha Finserv Logo"
+            class="h-16 mx-auto object-contain mb-2"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdGFqQPsqzyLkDrA2y3yxodtW4TkQqpp1eMIu9Z2CkrLGvFEbqALOVdBMRAO3D7p9hcfdOFo8dGyGzAHD-wg0tVxy415DQYi4lt09ZrjBpi3kY1cQVIsa53QeZWWFifWmxTc3YEu5-CqPFVhIQVmYDZ_sB_BXeKAJV39m6hN1l9O8r28q6MJ-enyO9c5l7VNXaCJG-BuFctw8z0IKdJ8iFCVm84UTki-deXRQnM-32Ny4Vqf4gxEbbPNXmLXAud-zWz50"
+          />
+          <p class="text-sm text-brand-muted mt-2 font-medium">Invest today for a better tomorrow</p>
+        </div>
+        <div class="p-8">
+          <h1 class="text-2xl font-semibold text-brand-text mb-6 text-center">Welcome back</h1>
+          <form action="#" class="space-y-5" method="POST">
+            <div>
+              <label class="block text-sm font-medium text-brand-text mb-1" for="username">Username or Email</label>
+              <div class="relative">
+                <input class="form-input w-full rounded-input border-gray-300 py-2.5 px-3 text-brand-text placeholder-gray-400 focus:ring-0 transition-colors" id="username" name="username" placeholder="Enter your username" type="text" />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+                  <i class="fa-regular fa-user"></i>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-brand-text mb-1" for="password">Password</label>
+              <div class="relative">
+                <input class="form-input w-full rounded-input border-gray-300 py-2.5 px-3 text-brand-text placeholder-gray-400 focus:ring-0 transition-colors" id="password" name="password" placeholder="Enter your password" type="password" />
+                <button class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-brand-navy focus:outline-none" type="button">
+                  <i class="fa-regular fa-eye-slash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-4">
+              <div class="flex items-center">
+                <input class="h-4 w-4 text-brand-navy focus:ring-brand-gold border-gray-300 rounded" id="remember-me" name="remember-me" type="checkbox" />
+                <label class="ml-2 block text-sm text-brand-muted cursor-pointer hover:text-brand-text transition-colors" for="remember-me">Remember me</label>
+              </div>
+              <div class="text-sm">
+                <a class="font-medium text-brand-gold hover:text-yellow-600 transition-colors" href="#">Forgot password?</a>
+              </div>
+            </div>
+            <button class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-btn shadow-sm text-sm font-semibold text-white bg-brand-gold hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-gold transition-colors mt-6" type="submit">Log in</button>
+            <p class="text-xs text-center text-brand-muted mt-3">
+              By logging in, you confirm acceptance of our <a class="text-brand-gold hover:underline" href="#">Terms of Use</a>.
+            </p>
+          </form>
+          <div class="divider my-6">OR</div>
+          <div class="space-y-3">
+            <button class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-btn shadow-sm bg-white text-sm font-medium text-brand-text hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-navy transition-colors" type="button">
+              <i class="fa-solid fa-mobile-screen-button text-gray-500 mr-2"></i>
+              Log in with OTP
+            </button>
+            <button class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-btn shadow-sm bg-white text-sm font-medium text-brand-text hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-navy transition-colors" type="button">
+              <img alt="Google Logo" class="h-4 w-4 mr-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhSRnE-szYjo-5d9n2_r5uBKUVaqxYdrZmAYhGTp92uGWkBwzF64DnyG9G0EyeSWdJQJHM8lUGdrSSTdb3pUBQ9qkx4jyPSqRy9LbJwzt0IEAdRl7JCeNBowW3CoUk_bgvyE20xV4vDZ0NVloRDL4StfWeaEYYY8kyToLqQO8uFs_WzJmEKsp79Njh6AFQXF4w5oFsBZFgxeSuqOWb1_ruB4SmA9tKbjKnktdswA27F1d9Qn28bLqdVA" />
+              Sign in with Google
+            </button>
+          </div>
+        </div>
+        <div class="px-8 pb-8 pt-4 text-center bg-gray-50 border-t border-gray-100">
+          <p class="text-sm text-brand-text mb-4">Got a question? <a class="text-brand-gold font-medium hover:underline" href="/contact-us/">Contact us</a></p>
+          <p class="text-xs text-brand-muted mb-3 font-medium uppercase tracking-wider">Download the App</p>
+          <div class="flex justify-center space-x-3">
+            <a class="inline-block transition-transform hover:scale-105" href="#">
+              <img alt="Download on the App Store" class="h-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzB513T-kA6iioyWxWW_G9fJkGGSOsId8NcJzZji_gvvdh7fpLGLbcTV2cxmT1vBAP3W5Ny8HkSj4O8NJWapKhFDIxOq-B03a0-tSQYnHmdxGCiUMOWBak_xDzJ1tkngZsEMiw3Gfy42z9J5XKBjFlgV3aezUISA4LzTlynQViwoTg_tu7JZBmu5vDSF9C62jypPJ6zwoYZ70_AHb0iEw-yZ5O6LhWhQH5wf_Mzk2urFN_T8QGRa39Lg" />
+            </a>
+            <a class="inline-block transition-transform hover:scale-105" href="#">
+              <img alt="Get it on Google Play" class="h-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDClMuFJdk94h6aQqNaheH0YLHFNy9iW6i52JnnDjU_tDRulHHi_T2wJK5BqJG85nlAq99pKQ1UKeQGV2wqYps1VEJYQ37gtJNIuwcMzRXsorrWa66vdhc_Kb_fv_7tVKHh3_GjOrgMjHV9xzvXKNDKB0_yvT7zBZeT4dC4NM_KvWf8PI5lpDxi8ppYJDftW6EH3Jx_CtDuiB52TRGbAyn5jgJmsYZ_Iqe3LBCJ5eqlSKZX9w3FNdWMFA" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .login-backdrop {
+    background: linear-gradient(135deg, #123b5d 0%, #0b2a45 100%);
+  }
+
+  .login-container {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .form-input:focus {
+    border-color: #c9a84c;
+    box-shadow: 0 0 0 1px #c9a84c;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.875rem;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .divider:not(:empty)::before {
+    margin-right: 0.5em;
+  }
+
+  .divider:not(:empty)::after {
+    margin-left: 0.5em;
+  }
+</style>

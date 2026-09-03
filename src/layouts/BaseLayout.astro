@@ -1,0 +1,89 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  /** ~150-160 char summary of THIS page's actual content, rendered as <meta name="description"> and reused for og:description/twitter:description. */
+  description: string;
+  /** Matches each source page's own <body class="..."> (bg/text color, antialiasing, sticky-footer flex layout, selection color) — pages differed here, so there's no one sensible default. */
+  bodyClass: string;
+  /** Absolute URL this page should canonicalize to. Defaults to the current URL (without query/hash) resolved against astro.config's `site`. */
+  canonicalUrl?: string;
+  /** Absolute image URL for og:image/twitter:image. Falls back to the homepage hero image — most pages don't have a purpose-built 1200x630 social card yet. */
+  ogImage?: string;
+  /** Set true for transactional/utility pages (forms, login, thank-you) that shouldn't be indexed. */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  bodyClass,
+  canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString(),
+  ogImage = new URL("/images/Homepage image web.png", Astro.site).toString(),
+  noindex = false,
+} = Astro.props;
+
+// Organization details pulled from the live footer markup (Footer.astro) —
+// the only place this contact info exists on the site. No social profile
+// links exist anywhere on the site, so `sameAs` is intentionally omitted
+// rather than invented.
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Rakhecha Finserv",
+  url: Astro.site?.toString(),
+  logo: new URL("/favicon.png", Astro.site).toString(),
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "13th Floor (1303) 8, Camac Street Shantiniketan Building",
+    addressLocality: "Kolkata",
+    postalCode: "700071",
+    addressCountry: "IN",
+  },
+  telephone: ["+91-9748976371", "+91-9836233380"],
+  email: "customer.service@rakhechafinserv.com",
+};
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Rakhecha Finserv" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} is:inline />
+
+    <!-- Additional per-page <head> content (page-specific <style>/<link> tags) -->
+    <slot name="meta" />
+
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class={bodyClass}>
+    <slot />
+  </body>
+</html>

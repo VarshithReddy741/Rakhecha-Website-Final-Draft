@@ -1,0 +1,378 @@
+---
+// Consolidates the THREE separate copies of the panel-toggle JavaScript
+// previously duplicated in IB.html (toggleIBPanel/toggleIBMobile),
+// "Wealth Management.html" (toggleWMPanel/toggleWMMobile), and
+// "Insurance Page.html" (toggleInsurancePanel/toggleInsuranceMobile) into
+// one generic, data-driven component. The three copies differed only in:
+//   - number of grid columns (3 for IB/WM, 2 for Insurance)
+//   - the clicked card's expanded size (IB: h-[300px] no scale;
+//     WM/Insurance: h-[440px] + scale-105)
+//   - whether the collapsed sibling card also spans full width
+//     (Insurance only, since it has just one sibling left over)
+// those differences are now props instead of copy-pasted functions.
+//
+// Accessibility fix: the original trigger elements were `<div onclick="">`
+// with no keyboard support. They're real <button> elements here, which
+// gives native keyboard (Enter/Space) and focus support for free, plus
+// aria-expanded/aria-controls wired to the panel/accordion state.
+export interface ServicePanelItem {
+  id: string;
+  title: string;
+  desc: string;
+  /** A ready-to-use URL — callers pass astro:assets' getImage().src, which is already correctly encoded. Do NOT run this through encodeURI() below; that double-encodes it and breaks the image. */
+  image: string;
+  imagePosition?: "center" | "right";
+}
+
+export interface Props {
+  items: ServicePanelItem[];
+  columns?: 2 | 3;
+  capabilitiesHeading?: string;
+  /** Tailwind height class applied to the clicked/expanded card, e.g. "h-[300px]" or "h-[440px]". */
+  expandedHeight?: string;
+  /** Whether the expanded card also gets `scale-105` (WM/Insurance did; IB didn't). */
+  expandedScale?: boolean;
+  /** Whether collapsed sibling cards also get `md:col-span-2` (Insurance's 2-card layout only). */
+  collapsedSpanFull?: boolean;
+}
+
+const {
+  items,
+  columns = 3,
+  capabilitiesHeading = "Capabilities",
+  expandedHeight = "h-[440px]",
+  expandedScale = true,
+  collapsedSpanFull = false,
+} = Astro.props;
+
+const panelId = `sp-${Math.random().toString(36).slice(2, 9)}`;
+const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
+---
+
+<h3 id={`${panelId}-capabilities-heading`} class="font-headline-lg text-headline-lg text-primary mb-4">
+  {capabilitiesHeading}
+</h3>
+<div
+  class="relative md:min-h-[600px] w-full"
+  data-service-panel={panelId}
+  data-expanded-height={expandedHeight}
+  data-expanded-scale={String(expandedScale)}
+  data-collapsed-span-full={String(collapsedSpanFull)}
+  data-heading-id={`${panelId}-capabilities-heading`}
+>
+  <!-- Active card + detail panel: its own isolated grid, separate from
+       the card grid below, so its sticky freeze/release is bounded by
+       this row's own content height and never bleeds into other cards. -->
+  <div class="mb-8" data-active-row style="display:none; gap:1.5rem;">
+    <div class="hidden md:col-span-2" data-desktop-panel>
+      <div class="rounded-xl p-8 relative">
+        <button
+          type="button"
+          class="absolute top-6 right-6 text-on-surface-variant hover:text-primary"
+          data-close-btn
+          aria-label="Close"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div id={`${panelId}-desktop-panel-content`} data-desktop-panel-content>
+          {
+            items.map((item) => (
+              <div class="hidden" data-desktop-content={item.id}>
+                <slot name={`panel-${item.id}`} />
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop Grid View -->
+  <div class:list={["hidden md:grid gap-6 mb-8", colsClass]} data-desktop-grid>
+    {
+      items.map((item) => (
+        <button
+          type="button"
+          class="relative overflow-hidden rounded-xl group h-[400px] border border-outline-variant/30 transition-all duration-300 text-left w-full appearance-none p-0"
+          data-card={item.id}
+          aria-expanded="false"
+          aria-controls={`${panelId}-desktop-panel-content`}
+        >
+          <div
+            class:list={[
+              "absolute inset-0 bg-cover transition-transform duration-700 group-hover:scale-105",
+              item.imagePosition === "right" ? "bg-right" : "bg-center",
+            ]}
+            style={`background-image:url("${item.image}")`}
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/75 from-0% to-transparent to-55%" />
+          <div class="absolute inset-0 p-8 flex flex-col justify-end">
+            <h3 class="font-headline-md text-[24px] leading-[32px] text-on-primary mb-2">{item.title}</h3>
+            <p class="font-body-sm text-body-sm text-surface-dim">{item.desc}</p>
+            <div class="absolute bottom-8 right-8 flex items-center gap-2 text-on-primary">
+              <span class="opacity-0 group-hover:opacity-100 transition-opacity font-cta-text text-sm">Learn more</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </div>
+          </div>
+        </button>
+      ))
+    }
+  </div>
+
+  <!-- Mobile Accordion View -->
+  <div class="md:hidden flex flex-col gap-4" data-mobile-accordion>
+    {
+      items.map((item) => (
+        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden" style="overflow-anchor: none;">
+          <button
+            type="button"
+            class="flex items-stretch w-full text-left min-h-24 appearance-none p-0 bg-transparent"
+            data-mobile-trigger={item.id}
+            aria-expanded="false"
+            aria-controls={`${panelId}-mobile-content-${item.id}`}
+          >
+            <img
+              class:list={["w-24 h-24 object-cover flex-shrink-0 self-stretch", item.imagePosition === "right" && "object-right"]}
+              src={item.image}
+              alt={item.title}
+            />
+            <span class="flex items-center flex-grow min-w-0 gap-2 p-4">
+              <span class="flex-grow min-w-0 text-left">
+                <span class="block font-headline-md text-base text-primary truncate">{item.title}</span>
+                <span class="block text-sm text-on-surface-variant truncate">{item.desc}</span>
+              </span>
+              <span class="material-symbols-outlined text-primary flex-shrink-0" data-mobile-icon={item.id}>add</span>
+            </span>
+          </button>
+          <div
+            class="hidden px-4 pt-4 pb-6 animate-fade-in"
+            id={`${panelId}-mobile-content-${item.id}`}
+            data-mobile-content={item.id}
+          >
+            <slot name={`panel-${item.id}`} />
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style is:global>
+  /* Staggered entrance for panel body content — ported from IB.html's
+     .fund-anim/.fund-point rules (only IB used them; harmless no-op for
+     panel content that doesn't include these classes). Any body content
+     passed into a `panel-*` slot can opt in by using them. Marked
+     is:global because slotted content keeps the parent page's scope, not
+     this component's. */
+  .fund-anim {
+    opacity: 0;
+    transform: translateY(36px) scale(0.97);
+    filter: blur(4px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .fund-anim.in-view {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  .fund-anim-1 { transition-delay: 0.05s; }
+  .fund-anim-2 { transition-delay: 0.2s; }
+  .fund-anim-3 { transition-delay: 0.35s; }
+  .fund-anim-4 { transition-delay: 0.5s; }
+
+  .fund-point {
+    transition: background-color 0.2s ease-out;
+  }
+  .fund-point:hover {
+    background-color: rgba(43, 88, 122, 0.06);
+  }
+
+  /* animate-fade-in is applied by this component's own script (to the
+     desktop panel and each mobile accordion body on open) — ported from
+     IB.html's copy since all three source pages defined it identically. */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+</style>
+
+<script>
+  const COLLAPSED_HEIGHT = "h-[400px]";
+  const SHRUNK_HEIGHT = "h-[260px]";
+  const EXPANDED_EXTRA_CLASSES = ["border-primary-light", "shadow-lg", "z-10", "sticky", "top-24", "self-start"];
+  const ALL_VARIABLE_CLASSES = [
+    COLLAPSED_HEIGHT,
+    SHRUNK_HEIGHT,
+    "h-[300px]",
+    "h-[440px]",
+    "opacity-60",
+    "scale-105",
+    "md:col-span-2",
+    ...EXPANDED_EXTRA_CLASSES,
+  ];
+
+  function triggerFundAnim(root: Element) {
+    const els = root.querySelectorAll(".fund-anim");
+    if (!els.length) return;
+    els.forEach((el) => el.classList.remove("in-view"));
+    void (root as HTMLElement).offsetWidth;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        els.forEach((el) => el.classList.add("in-view"));
+      });
+    });
+  }
+
+  function initServicePanel(root: HTMLElement) {
+    const grid = root.querySelector<HTMLElement>("[data-desktop-grid]");
+    const activeRow = root.querySelector<HTMLElement>("[data-active-row]");
+    const desktopPanel = root.querySelector<HTMLElement>("[data-desktop-panel]");
+    const closeBtn = root.querySelector<HTMLElement>("[data-close-btn]");
+    const headingId = root.dataset.headingId;
+    const heading = headingId ? document.getElementById(headingId) : null;
+    if (!grid || !activeRow || !desktopPanel || !closeBtn) return;
+
+    const expandedHeight = root.dataset.expandedHeight || "h-[440px]";
+    const expandedScale = root.dataset.expandedScale === "true";
+    const collapsedSpanFull = root.dataset.collapsedSpanFull === "true";
+
+    let activeType: string | null = null;
+    let activeCardAnchor: ChildNode | null = null;
+    let activeMobile: string | null = null;
+
+    function restoreActiveCardToGrid() {
+      const activeCard = activeRow!.querySelector("[data-card]");
+      if (activeCard) {
+        const anchor = activeCardAnchor;
+        if (anchor && anchor.parentNode === grid) {
+          grid!.insertBefore(activeCard, anchor);
+        } else {
+          grid!.appendChild(activeCard);
+        }
+      }
+      activeCardAnchor = null;
+    }
+
+    function setDesktopContent(type: string) {
+      desktopPanel!.querySelectorAll("[data-desktop-content]").forEach((el) => {
+        el.classList.toggle("hidden", el.getAttribute("data-desktop-content") !== type);
+      });
+      const shown = desktopPanel!.querySelector(`[data-desktop-content="${type}"]`);
+      if (shown) triggerFundAnim(shown);
+    }
+
+    function openPanel(type: string) {
+      const clickedCard =
+        grid!.querySelector<HTMLElement>(`[data-card="${type}"]`) ||
+        activeRow!.querySelector<HTMLElement>(`[data-card="${type}"]`);
+      if (!clickedCard) return;
+
+      restoreActiveCardToGrid();
+      setDesktopContent(type);
+
+      const cards = Array.from(grid!.children).filter((el) => el.hasAttribute("data-card"));
+      cards.forEach((c) => {
+        c.classList.remove(...ALL_VARIABLE_CLASSES);
+        const desc = c.querySelector("p");
+        if (c === clickedCard) {
+          c.classList.add(expandedHeight, ...EXPANDED_EXTRA_CLASSES);
+          if (expandedScale) c.classList.add("scale-105");
+          desc?.classList.remove("hidden");
+          c.setAttribute("aria-expanded", "true");
+        } else {
+          c.classList.add(SHRUNK_HEIGHT, "opacity-60");
+          if (collapsedSpanFull) c.classList.add("md:col-span-2");
+          desc?.classList.add("hidden");
+          c.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      activeCardAnchor = clickedCard.nextSibling;
+      activeRow!.insertBefore(clickedCard, activeRow!.firstElementChild);
+      activeRow!.style.display = "grid";
+      activeRow!.style.gridTemplateColumns = "0.75fr 1.125fr 1.125fr";
+
+      desktopPanel!.classList.remove("hidden");
+      desktopPanel!.classList.add("animate-fade-in");
+
+      activeType = type;
+      heading?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function closePanel() {
+      restoreActiveCardToGrid();
+
+      const cards = Array.from(grid!.children).filter((el) => el.hasAttribute("data-card"));
+      cards.forEach((c) => {
+        c.classList.remove(...ALL_VARIABLE_CLASSES);
+        c.classList.add(COLLAPSED_HEIGHT);
+        c.querySelector("p")?.classList.remove("hidden");
+        c.setAttribute("aria-expanded", "false");
+      });
+
+      activeRow!.style.display = "none";
+      desktopPanel!.classList.add("hidden");
+      desktopPanel!.classList.remove("animate-fade-in");
+      activeType = null;
+    }
+
+    root.querySelectorAll<HTMLElement>("[data-card]").forEach((card) => {
+      card.addEventListener("click", () => {
+        const type = card.dataset.card!;
+        if (activeType === type) {
+          closePanel();
+        } else {
+          openPanel(type);
+        }
+      });
+    });
+
+    closeBtn.addEventListener("click", closePanel);
+
+    root.querySelectorAll<HTMLElement>("[data-mobile-trigger]").forEach((trigger) => {
+      trigger.addEventListener("click", () => {
+        const type = trigger.dataset.mobileTrigger!;
+        const beforeY = trigger.getBoundingClientRect().top;
+        const content = root.querySelector<HTMLElement>(`[data-mobile-content="${type}"]`);
+        const icon = root.querySelector<HTMLElement>(`[data-mobile-icon="${type}"]`);
+        if (!content || !icon) return;
+
+        if (activeMobile === type) {
+          content.classList.add("hidden");
+          icon.textContent = "add";
+          trigger.setAttribute("aria-expanded", "false");
+          activeMobile = null;
+        } else {
+          if (activeMobile) {
+            root.querySelector(`[data-mobile-content="${activeMobile}"]`)?.classList.add("hidden");
+            const prevIcon = root.querySelector(`[data-mobile-icon="${activeMobile}"]`);
+            if (prevIcon) prevIcon.textContent = "add";
+            root.querySelector(`[data-mobile-trigger="${activeMobile}"]`)?.setAttribute("aria-expanded", "false");
+          }
+          content.classList.remove("hidden");
+          icon.textContent = "remove";
+          trigger.setAttribute("aria-expanded", "true");
+          activeMobile = type;
+          triggerFundAnim(content);
+        }
+
+        const afterY = trigger.getBoundingClientRect().top;
+        window.scrollBy(0, afterY - beforeY);
+      });
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-service-panel]").forEach(initServicePanel);
+</script>

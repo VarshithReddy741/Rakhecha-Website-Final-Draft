@@ -1,0 +1,203 @@
+---
+// Ported verbatim from the header markup as it actually appears in
+// "Home Page.html" / "About us.html" (identical on both) — NOT from the
+// stale partials/header.html, which no longer matches the live pages.
+---
+
+<header
+  class="sticky top-0 w-full flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 z-50 bg-surface-container-lowest dark:bg-surface-dim shadow-sm dark:shadow-none"
+>
+  <button
+    class="md:hidden text-primary order-2"
+    id="mobile-nav-toggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="mobile-nav-panel"
+  >
+    <span class="material-symbols-outlined text-3xl" id="mobile-nav-icon">menu</span>
+  </button>
+
+  <div class="flex-shrink-0 w-64 md:w-64 order-1 md:order-none">
+    <a href="/">
+      <img
+        alt="Rakhecha Finserv"
+        class="w-full h-auto"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjCB1d4MUkOZYdq6TnWLDlbaNlkJiznVdFxQUyJLGJQXqp7wuFpGTYRMQtOWkM-S58Nspjm8zDG5sQT51xnt8QlxkiskJfT11JyPO4fR0yB-rJpf9ihbTOJetIoG2gMBYeQSkqdgAk7TeX9DJwjjZLLSh0ChOwH8hLCHjoDaXtK5RLuCNQ4mGhN6Tka3_VJxQpzKfkW6wHM_F18BSDRyVMurwxEiuDaLrUXxuVh-FFCvx18bqU_SziUpmDZ2uWszAU0ZA"
+      />
+    </a>
+  </div>
+
+  <nav class="hidden md:flex gap-8 items-center">
+    <div class="relative group">
+      <a
+        class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md flex items-center gap-1"
+        href="/about-us"
+      >
+        About Us <span class="material-symbols-outlined text-sm">expand_more</span>
+      </a>
+      <div
+        class="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 w-64"
+      >
+        <div class="bg-white rounded-lg shadow-xl border border-outline-variant overflow-hidden p-6">
+          <ul class="space-y-4">
+            <li><a class="text-primary hover:text-primary-light transition-colors cursor-pointer font-body-md block" href="/about-us#our-story">Our Story</a></li>
+            <li><a class="text-primary hover:text-primary-light transition-colors cursor-pointer font-body-md block" href="/about-us#core-values-section">Our Values</a></li>
+            <li><a class="text-primary hover:text-primary-light transition-colors cursor-pointer font-body-md block" href="/about-us#our-leadership">Our Leadership</a></li>
+            <li><a class="text-primary hover:text-primary-light transition-colors cursor-pointer font-body-md block" href="/about-us#awards-recognition">Awards and Recognition</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md" href="/investment-banking">Investment Banking</a>
+    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md" href="/wealth-management">Wealth Management</a>
+    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md" href="/insurance">Insurance</a>
+    <div class="relative group">
+      <a
+        class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md flex items-center gap-1"
+        href="/knowledge-hub"
+      >
+        Knowledge Hub <span class="material-symbols-outlined text-sm">expand_more</span>
+      </a>
+      <div
+        class="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 w-64"
+      >
+        <div class="bg-white rounded-lg shadow-xl border border-outline-variant overflow-hidden p-6">
+          <ul class="space-y-4">
+            <li><a class="text-primary hover:text-primary-light transition-colors cursor-pointer font-body-md block" href="/knowledge-hub#upcoming-events">Upcoming Events</a></li>
+            <li><a class="text-primary hover:text-primary-light transition-colors cursor-pointer font-body-md block" href="/knowledge-hub#past-events">Past Events</a></li>
+            <li><a class="text-primary hover:text-primary-light transition-colors cursor-pointer font-body-md block" href="/knowledge-hub#reports">Insights</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md" href="/careers">Careers</a>
+  </nav>
+
+  <div class="hidden md:block">
+    <div class="flex items-center gap-6">
+      <button class="text-on-surface-variant hover:text-primary transition-colors" type="button" aria-label="Search">
+        <span class="material-symbols-outlined">search</span>
+      </button>
+      <a href="/client-login" class="bg-white border border-secondary text-primary font-cta-text px-6 py-2 rounded hover:bg-surface-container-low transition-colors inline-block text-center">Client Login</a>
+      <a href="/contact-us" class="bg-primary text-white border border-secondary font-cta-text px-6 py-2 rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center">Contact Us</a>
+    </div>
+  </div>
+
+  <!-- Mobile Nav Panel -->
+  <div
+    class="hidden md:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
+    id="mobile-nav-panel"
+  >
+    <div class="flex flex-col divide-y divide-outline-variant px-margin-mobile">
+      <div>
+        <button
+          class="w-full flex justify-between items-center py-5 text-left"
+          id="mobile-section-toggle-about"
+          type="button"
+          aria-expanded="false"
+          aria-controls="mobile-section-about"
+        >
+          <span class="text-headline-md font-headline-md text-primary">About Us</span>
+          <span class="material-symbols-outlined text-primary transition-transform duration-300" id="mobile-arrow-about">expand_more</span>
+        </button>
+        <div class="hidden pb-4 space-y-3" id="mobile-section-about">
+          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/about-us#our-story">Our Story</a>
+          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/about-us#core-values-section">Our Values</a>
+          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/about-us#our-leadership">Our Leadership</a>
+          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/about-us#awards-recognition">Awards and Recognition</a>
+        </div>
+      </div>
+      <a class="py-5 text-headline-md font-headline-md text-primary block" href="/investment-banking">Investment Banking</a>
+      <a class="py-5 text-headline-md font-headline-md text-primary block" href="/wealth-management">Wealth Management</a>
+      <a class="py-5 text-headline-md font-headline-md text-primary block" href="/insurance">Insurance</a>
+      <div>
+        <button
+          class="w-full flex justify-between items-center py-5 text-left"
+          id="mobile-section-toggle-knowledge"
+          type="button"
+          aria-expanded="false"
+          aria-controls="mobile-section-knowledge"
+        >
+          <span class="text-headline-md font-headline-md text-primary">Knowledge Hub</span>
+          <span class="material-symbols-outlined text-primary transition-transform duration-300" id="mobile-arrow-knowledge">expand_more</span>
+        </button>
+        <div class="hidden pb-4 space-y-3" id="mobile-section-knowledge">
+          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/knowledge-hub#upcoming-events">Upcoming Events</a>
+          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/knowledge-hub#past-events">Past Events</a>
+          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/knowledge-hub#reports">Insights</a>
+        </div>
+      </div>
+      <a class="py-5 text-headline-md font-headline-md text-primary block" href="/careers">Careers</a>
+    </div>
+    <div class="px-margin-mobile py-6 flex flex-col gap-3 border-t border-outline-variant">
+      <a href="/client-login" class="bg-white border border-secondary text-primary font-cta-text px-6 py-3 rounded hover:bg-surface-container-low transition-colors inline-block text-center">Client Login</a>
+      <a href="/contact-us" class="bg-primary text-white border border-secondary font-cta-text px-6 py-3 rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center">Contact Us</a>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Mobile nav toggle + accordion sections, ported from main.js's
+  // toggleMobileNav()/toggleMobileSection() (previously global functions
+  // invoked via inline onclick=""). Only one Header exists per page, so
+  // plain ids are safe here — same assumption the original markup made.
+  function initHeader() {
+    const navToggle = document.getElementById("mobile-nav-toggle");
+    const panel = document.getElementById("mobile-nav-panel");
+    const icon = document.getElementById("mobile-nav-icon");
+    if (!navToggle || !panel || !icon) return;
+
+    navToggle.addEventListener("click", () => {
+      const opening = panel.classList.contains("hidden");
+      panel.classList.toggle("hidden");
+      icon.textContent = opening ? "close" : "menu";
+      navToggle.setAttribute("aria-expanded", String(opening));
+    });
+
+    let activeSection: string | null = null;
+    const sectionKeys = ["about", "knowledge"];
+
+    function toggleSection(key: string) {
+      const section = document.getElementById("mobile-section-" + key);
+      const arrow = document.getElementById("mobile-arrow-" + key);
+      const trigger = document.getElementById("mobile-section-toggle-" + key);
+      if (!section || !arrow || !trigger) return;
+
+      if (activeSection === key) {
+        section.classList.add("hidden");
+        arrow.style.transform = "rotate(0deg)";
+        trigger.setAttribute("aria-expanded", "false");
+        activeSection = null;
+        return;
+      }
+
+      if (activeSection) {
+        document.getElementById("mobile-section-" + activeSection)?.classList.add("hidden");
+        document.getElementById("mobile-arrow-" + activeSection)?.style.setProperty("transform", "rotate(0deg)");
+        document.getElementById("mobile-section-toggle-" + activeSection)?.setAttribute("aria-expanded", "false");
+      }
+
+      section.classList.remove("hidden");
+      arrow.style.transform = "rotate(180deg)";
+      trigger.setAttribute("aria-expanded", "true");
+      activeSection = key;
+    }
+
+    sectionKeys.forEach((key) => {
+      document.getElementById("mobile-section-toggle-" + key)?.addEventListener("click", () => toggleSection(key));
+    });
+
+    // Close the mobile nav panel whenever a link inside it is tapped —
+    // same-page anchor links don't trigger a full navigation, so without
+    // this the panel would stay open on top of the page after it scrolls.
+    panel.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest("a")) {
+        panel.classList.add("hidden");
+        icon.textContent = "menu";
+        navToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  initHeader();
+</script>

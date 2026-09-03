@@ -1,0 +1,118 @@
+---
+// Styled to match "Article Page.html" in the repo root. That source file's
+// own hardcoded content ("What the Rise of SIFs Signals for Indian
+// Wealth") didn't match ANY of the article cards linking to it on
+// Knowledge hub.html — every card there pointed to this one shared,
+// unrelated page (same bug as the founder cards). Ported as its own real
+// article entry (rise-of-sifs-signals-for-indian-wealth) rather than
+// force-matched to a card; the 4 actual cards get real title/date/image
+// with placeholder body content, since no body copy exists for them
+// anywhere on the live site.
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { truncateDescription } from "../../lib/seo";
+
+export async function getStaticPaths() {
+  const articles = await getCollection("articles");
+  return articles.map((article) => ({
+    params: { slug: article.data.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const { title, category, date, image, authorName, authorRole, authorPhoto, excerpt, body } = article.data;
+
+// Most articles were ported with a placeholder "TODO: excerpt pending" body
+// (see the articles/*.json source comments) — use the real excerpt only
+// when one actually exists, otherwise fall back to the fields that are real.
+const metaDescription = excerpt.startsWith("TODO:")
+  ? `${title} — a ${category} from Rakhecha Finserv's Knowledge Hub, published ${date}.`
+  : truncateDescription(excerpt);
+---
+
+<BaseLayout
+  title={`${title} | Rakhecha Finserv Insights`}
+  description={metaDescription}
+  bodyClass="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased"
+>
+  <Header />
+  <main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-20 flex flex-col lg:flex-row gap-gutter">
+    <article class="w-full lg:w-8/12 flex flex-col gap-8">
+      <div class="mt-8 flex flex-col gap-6 border-t border-outline-variant pt-12">
+        <div class="flex items-center gap-4">
+          <span class="bg-surface-container text-primary px-3 py-1 rounded-full font-label-bold uppercase tracking-wider text-[10px]">{category}</span>
+          <span class="text-on-surface-variant font-body-sm">{date}</span>
+        </div>
+        <h1 class="font-headline-lg-mobile md:font-display-lg text-primary">{title}</h1>
+        {
+          authorName && (
+            <div class="flex items-center gap-4 mt-2">
+              {authorPhoto && <img class="w-12 h-12 rounded-full object-cover border border-outline-variant" alt={authorName} src={authorPhoto} />}
+              <div>
+                <div class="font-cta-text text-on-surface">{authorName}</div>
+                <div class="font-body-sm text-on-surface-variant">{authorRole}</div>
+              </div>
+            </div>
+          )
+        }
+        <div class="w-full h-64 md:h-96 rounded-xl overflow-hidden my-6">
+          <img class="w-full h-full object-cover" alt={title} src={image} />
+        </div>
+        <div class="prose max-w-none font-body-lg text-on-surface-variant leading-relaxed flex flex-col gap-6">
+          <p class="text-xl text-on-surface font-body-lg">{excerpt}</p>
+          {
+            body.map((block) => {
+              if (block.type === "heading") {
+                return <h3 class="font-headline-md text-primary mt-8 mb-4">{block.text}</h3>;
+              }
+              if (block.type === "quote") {
+                return (
+                  <blockquote class="border-l-4 border-secondary pl-6 py-2 my-8 bg-surface-container-lowest shadow-sm rounded-r">
+                    <p class="font-display-lg text-[24px] leading-tight text-primary italic mb-0">"{block.text}"</p>
+                  </blockquote>
+                );
+              }
+              return <p>{block.text}</p>;
+            })
+          }
+          <div class="mt-12 pt-8 border-t border-outline-variant/30 flex flex-col gap-4">
+            <span class="font-label-bold uppercase tracking-wider text-on-surface-variant text-[10px]">Share this Insight</span>
+            <div class="flex gap-4">
+              <button type="button" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-colors duration-300"><span class="material-symbols-outlined text-[20px]">share</span></button>
+              <button type="button" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-colors duration-300"><span class="material-symbols-outlined text-[20px]">mail</span></button>
+              <button type="button" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-colors duration-300"><span class="material-symbols-outlined text-[20px]">link</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+    <aside class="w-full lg:w-4/12 flex flex-col gap-8 lg:pl-12 lg:border-l border-outline-variant">
+      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_4px_24px_rgba(27,58,107,0.04)] border border-outline-variant/30 flex flex-col gap-6">
+        <h3 class="font-headline-md text-primary border-b border-outline-variant/50 pb-4">Recommended Insights</h3>
+        <div class="flex flex-col gap-6">
+          <a class="group flex flex-col gap-2" href="#">
+            <span class="text-secondary font-label-bold uppercase text-[10px]">Legacy Planning</span>
+            <h4 class="font-cta-text text-on-surface group-hover:text-primary transition-colors">Structuring Family Offices for the Next Decade</h4>
+            <span class="font-body-sm text-on-surface-variant">5 min read</span>
+          </a>
+          <div class="h-px w-full bg-outline-variant/30"></div>
+          <a class="group flex flex-col gap-2" href="#">
+            <span class="text-secondary font-label-bold uppercase text-[10px]">Market Outlook</span>
+            <h4 class="font-cta-text text-on-surface group-hover:text-primary transition-colors">Navigating Yield Curves in Q4</h4>
+            <span class="font-body-sm text-on-surface-variant">8 min read</span>
+          </a>
+          <div class="h-px w-full bg-outline-variant/30"></div>
+          <a class="group flex flex-col gap-2" href="#">
+            <span class="text-secondary font-label-bold uppercase text-[10px]">Taxation</span>
+            <h4 class="font-cta-text text-on-surface group-hover:text-primary transition-colors">Implications of the New Capital Gains Regime</h4>
+            <span class="font-body-sm text-on-surface-variant">12 min read</span>
+          </a>
+        </div>
+      </div>
+    </aside>
+  </main>
+  <Footer />
+</BaseLayout>

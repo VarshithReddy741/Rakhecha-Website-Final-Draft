@@ -1,0 +1,177 @@
+---
+// Ported from "Insurance Page.html". The panel-toggle JS is now the shared
+// ServicePanel component (Prompt 3); this page reproduces
+// generateInsuranceContent()'s exact template logic at build time.
+import { Picture, getImage } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import ServicePanel from "../components/ServicePanel.astro";
+import insuranceHeroDesktop from "../assets/images/Insurance hero card.png";
+import insuranceHeroMobile from "../assets/images/Insurance mobile.png";
+import individualInsuranceImage from "../assets/images/individual insurance landscape.png";
+import businessInsuranceImage from "../assets/images/Busienss Insurance.jpeg";
+
+// ServicePanel uses `image` both as a CSS background-image (desktop cards)
+// and as a plain <img src> (mobile accordion) — see ServicePanel.astro — so
+// there's no single <img>/<Image> call site to swap there. Instead we
+// pre-optimize through Astro's image pipeline here and hand ServicePanel an
+// already-hashed, already-WebP URL string, same as it always received.
+const individualInsuranceOptimized = await getImage({ src: individualInsuranceImage, width: 800, format: "webp" });
+const businessInsuranceOptimized = await getImage({ src: businessInsuranceImage, width: 800, format: "webp" });
+
+interface InsuranceServiceItem {
+  name: string;
+  desc: string;
+}
+
+interface InsuranceService {
+  id: string;
+  title: string;
+  desc: string;
+  image: string;
+  imagePosition?: "center" | "right";
+  items: InsuranceServiceItem[];
+}
+
+const insuranceServices: InsuranceService[] = [
+  {
+    id: "individual",
+    title: "Individual Insurance",
+    desc: "Life and Health insurance solutions meticulously tailored for UHNW individuals.",
+    image: individualInsuranceOptimized.src,
+    imagePosition: "right",
+    items: [
+      { name: "Life Insurance, Term Life", desc: "Comprehensive life cover for long-term financial security." },
+      { name: "Individual Health Plans", desc: "Personalized medical coverage for high-net-worth individuals." },
+      { name: "Family Floater Plans", desc: "Unified health protection for the entire household." },
+      { name: "Critical Illness Cover", desc: "Lump-sum benefits for major medical contingencies." },
+      { name: "Super Top-up Plans", desc: "Additional coverage beyond base health limits at low cost." },
+      { name: "Senior Citizen Health Plans", desc: "Tailored medical coverage for elderly family members." },
+      { name: "Cancer & Cardiac Specific Plans", desc: "Focused protection against major cancer and cardiac diagnoses." },
+    ],
+  },
+  {
+    id: "business",
+    title: "Business Insurance",
+    desc: "Strategic risk management and comprehensive coverage for corporate entities.",
+    image: businessInsuranceOptimized.src,
+    items: [
+      { name: "Employee Group Health Insurance (GMC)", desc: "Comprehensive medical benefits for your entire workforce." },
+      { name: "Group Personal Accident Cover", desc: "24/7 worldwide protection against accidental risks." },
+      { name: "Group Term Life Insurance", desc: "Life cover for employees as an added retention benefit." },
+      { name: "Workmen's Compensation Policy", desc: "Statutory cover for employee injury or death at work." },
+      { name: "Directors & Officers (D&O) Liability", desc: "Protection for management against personal liability claims." },
+      { name: "Professional Indemnity Insurance", desc: "Coverage against errors and omissions in professional services." },
+      { name: "Commercial General Liability (CGL)", desc: "Broad protection against third-party bodily injury and property damage claims." },
+    ],
+  },
+];
+
+// Ported 1:1 from generateInsuranceContent() in the source's inline <script>.
+function generateInsuranceContent(service: InsuranceService): string {
+  const rows: InsuranceServiceItem[][] = [];
+  for (let i = 0; i < service.items.length; i += 2) rows.push(service.items.slice(i, i + 2));
+  return `
+        <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-4">${service.title}</h2>
+        <p class="font-body-md text-on-surface-variant mb-3">${service.desc}</p>
+        <hr class="border-outline-variant/30 mb-8">
+        <div class="grid grid-cols-1 gap-6">
+            <div>
+                <h4 class="font-label-bold text-base font-bold text-primary-light mb-6 uppercase tracking-wider">Our Services</h4>
+                <div class="divide-y divide-outline-variant/30">
+                    ${rows
+                      .map(
+                        (row) => `
+                    <div class="grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-outline-variant/30 py-3">
+                        ${row
+                          .map(
+                            (item, cIdx) => `
+                        <div class="flex items-start gap-4${cIdx === 1 ? " mt-4 md:mt-0 md:pl-8" : ""}"><svg class="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+                            <div>
+                                <p class="font-label-bold text-primary">${item.name}</p>
+                                <p class="font-body-sm text-on-surface-variant mt-0.5">${item.desc}</p>
+                            </div>
+                        </div>
+                        `,
+                          )
+                          .join("")}
+                    </div>
+                    `,
+                      )
+                      .join("")}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+const insuranceItems = insuranceServices.map((svc) => ({ id: svc.id, title: svc.title, desc: svc.desc, image: svc.image, imagePosition: svc.imagePosition }));
+const insuranceBodies: Record<string, string> = Object.fromEntries(insuranceServices.map((svc) => [svc.id, generateInsuranceContent(svc)]));
+---
+
+<BaseLayout
+  title="Insurance - Rakhecha Finserv"
+  description="Comprehensive individual and business insurance solutions from Rakhecha Finserv, designed to protect your assets, manage risk, and provide long-term peace of mind."
+  bodyClass="bg-white text-on-surface font-body-md antialiased min-h-screen flex flex-col"
+>
+  <Header />
+
+  <main class="flex-grow flex flex-col">
+    <!-- Hero Section -->
+    <section class="relative h-screen min-h-[600px] flex items-start md:items-center justify-start overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <Picture
+          src={insuranceHeroDesktop}
+          alt="Insurance hero"
+          class="hidden md:block w-full h-full object-cover"
+          widths={[768, 1280, 1920]}
+          sizes="100vw"
+          formats={["webp"]}
+          fallbackFormat="webp"
+          loading="eager"
+        />
+        <Picture
+          src={insuranceHeroMobile}
+          alt="Wooden figures of a family sheltered under an umbrella"
+          class="md:hidden w-full h-full object-cover object-bottom"
+          widths={[480, 768]}
+          sizes="100vw"
+          formats={["webp"]}
+          fallbackFormat="webp"
+          loading="eager"
+        />
+      </div>
+      <div class="relative z-10 w-full max-w-container-max px-margin-mobile md:px-margin-desktop pt-[18vh] md:pt-0">
+        <h1 class="text-display-lg font-display-lg text-white mb-6 max-w-4xl">Comprehensive Protection and Risk Stewardship</h1>
+      </div>
+    </section>
+    <!-- Services Interactive Section -->
+    <section class="py-section-gap bg-white relative z-20 -mt-20">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+        <ServicePanel items={insuranceItems} columns={2} expandedHeight="h-[440px]" expandedScale={true} collapsedSpanFull={true}>
+          <Fragment slot="panel-individual">
+            <div set:html={insuranceBodies.individual} />
+          </Fragment>
+          <Fragment slot="panel-business">
+            <div set:html={insuranceBodies.business} />
+          </Fragment>
+        </ServicePanel>
+      </div>
+    </section>
+    <!-- Contact CTA -->
+    <section class="py-14 md:py-20 px-margin-mobile md:px-margin-desktop">
+      <div class="max-w-container-max mx-auto">
+        <div class="bg-primary text-on-primary rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div class="max-w-xl">
+            <h2 class="font-headline-lg text-headline-lg mb-2">Ready to Protect What Matters Most?</h2>
+            <p class="font-body-md text-body-md text-primary-fixed opacity-90">Speak with our advisory team to find the right coverage for your needs.</p>
+          </div>
+          <a href="/contact-us/" class="bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap inline-block text-center">Contact Us</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

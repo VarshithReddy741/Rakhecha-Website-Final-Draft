@@ -1,0 +1,118 @@
+---
+// Shared event-registration popup. Any element anywhere on the page with a
+// `data-register-event="<Event Title>"` attribute opens this same modal,
+// pre-filled with that event's title — instead of each "Register" button
+// having its own separate flow (previously: the featured event on
+// /knowledge-hub/ opened this dialog, while the "Upcoming Sessions" cards
+// there transformed their own card content inline, and the homepage's
+// "Register Now"/"Register Interest" buttons did nothing at all).
+// Include this component once per page; it self-wires via event delegation
+// so no per-button JS is needed at the call site.
+---
+
+<dialog class="bg-transparent m-auto p-4 w-full max-w-2xl backdrop:bg-on-background/60 backdrop:backdrop-blur-sm" id="registrationModal">
+  <div class="bg-surface-container-lowest rounded-xl shadow-2xl overflow-hidden border border-outline-variant">
+    <div class="flex justify-between items-center p-6 border-b border-outline-variant">
+      <h3 class="font-headline-md text-headline-md text-primary">Event Registration</h3>
+      <button class="text-outline-variant hover:text-primary transition-colors" id="close-registration-modal"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <div class="p-6 md:p-8">
+      <div class="bg-surface p-4 rounded-lg mb-6 border border-outline-variant">
+        <p class="font-label-bold text-label-bold text-primary uppercase mb-1">Registering for</p>
+        <p class="font-body-md text-body-md font-bold text-primary" id="registration-event-title">&nbsp;</p>
+      </div>
+      <form class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="space-y-1">
+            <label class="font-label-bold text-label-bold text-on-surface-variant">Full Name *</label>
+            <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" type="text" />
+          </div>
+          <div class="space-y-1">
+            <label class="font-label-bold text-label-bold text-on-surface-variant">Corporate Email *</label>
+            <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" type="email" />
+          </div>
+          <div class="space-y-1">
+            <label class="font-label-bold text-label-bold text-on-surface-variant">Phone Number</label>
+            <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" type="tel" />
+          </div>
+          <div class="space-y-1">
+            <label class="font-label-bold text-label-bold text-on-surface-variant">City / Location *</label>
+            <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" type="text" />
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label class="font-label-bold text-label-bold text-on-surface-variant">Investor Category *</label>
+          <select class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm">
+            <option>Select Category...</option>
+            <option>Institutional Investor</option>
+            <option>Family Office</option>
+            <option>High Net Worth Individual</option>
+            <option>Financial Advisor</option>
+          </select>
+        </div>
+        <div class="space-y-1">
+          <label class="font-label-bold text-label-bold text-on-surface-variant">How did you hear about us?</label>
+          <select class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm">
+            <option>Select Source...</option>
+            <option>Direct Invitation</option>
+            <option>LinkedIn</option>
+            <option>Newsletter</option>
+            <option>Colleague / Referral</option>
+          </select>
+        </div>
+        <div class="pt-4 flex justify-end gap-4">
+          <button class="px-6 py-2 border border-outline-variant text-on-surface-variant font-cta-text rounded hover:bg-surface transition-colors" id="cancel-registration-modal" type="button">Cancel</button>
+          <button class="px-6 py-2 bg-primary text-on-primary font-cta-text rounded hover:bg-on-primary-fixed transition-colors" id="confirm-registration-modal" type="button">Secure Spot</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  dialog::backdrop {
+    background-color: rgba(11, 42, 69, 0.6);
+    backdrop-filter: blur(4px);
+  }
+</style>
+
+<script>
+  const modal = document.getElementById("registrationModal") as HTMLDialogElement;
+  const eventTitleEl = document.getElementById("registration-event-title") as HTMLParagraphElement;
+
+  function openModal(eventTitle: string) {
+    eventTitleEl.textContent = eventTitle;
+    modal.showModal();
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    modal.close();
+    document.body.style.overflow = "";
+  }
+
+  // Delegated so any current or future `data-register-event` trigger on the
+  // page works without needing its own listener wired up.
+  document.addEventListener("click", (e) => {
+    const trigger = (e.target as Element).closest<HTMLElement>("[data-register-event]");
+    if (!trigger) return;
+    e.preventDefault();
+    openModal(trigger.dataset.registerEvent ?? "");
+  });
+
+  document.getElementById("close-registration-modal")?.addEventListener("click", closeModal);
+  document.getElementById("cancel-registration-modal")?.addEventListener("click", closeModal);
+  document.getElementById("confirm-registration-modal")?.addEventListener("click", closeModal);
+
+  modal.addEventListener("click", (e) => {
+    const dialogDimensions = modal.getBoundingClientRect();
+    if (
+      e.clientX < dialogDimensions.left ||
+      e.clientX > dialogDimensions.right ||
+      e.clientY < dialogDimensions.top ||
+      e.clientY > dialogDimensions.bottom
+    ) {
+      closeModal();
+    }
+  });
+</script>

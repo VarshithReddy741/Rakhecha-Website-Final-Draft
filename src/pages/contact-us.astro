@@ -56,6 +56,22 @@ import FormSuccessState from "../components/FormSuccessState.astro";
               <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="queryDetails">Query / Requirement Details</label>
               <textarea class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none" id="queryDetails" name="queryDetails" placeholder="How can we help you?" rows="4"></textarea>
             </div>
+            <div>
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input
+                  class="mt-0.5 h-4 w-4 shrink-0 rounded border border-outline-variant/30 text-primary focus:ring-primary"
+                  id="consentGiven"
+                  name="consentGiven"
+                  required
+                  type="checkbox"
+                />
+                <span class="text-sm text-on-surface-variant leading-relaxed">
+                  I consent to Rakhecha Finserv collecting and using my personal data to process this inquiry,
+                  in accordance with the
+                  <a class="text-primary underline hover:no-underline" href="/privacy-policy/">Privacy Policy</a>.
+                </span>
+              </label>
+            </div>
             <div class="pt-6 border-t border-outline-variant/30 flex justify-end">
               <button id="contactSubmitButton" class="bg-primary text-on-primary px-8 py-3 rounded-4 font-cta-text text-cta-text hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed" type="submit">Submit Request</button>
             </div>

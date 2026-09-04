@@ -166,6 +166,22 @@ import Footer from "../../components/Footer.astro";
           />
           <p id="resumeError" class="hidden text-sm text-error mt-2" role="alert"></p>
         </div>
+        <div>
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input
+              class="mt-0.5 h-4 w-4 shrink-0 rounded border border-outline-variant/30 text-primary focus:ring-primary"
+              id="consentGiven"
+              name="consentGiven"
+              required
+              type="checkbox"
+            />
+            <span class="text-sm text-on-surface-variant leading-relaxed">
+              I consent to Rakhecha Finserv collecting and using my personal data (including the uploaded resume)
+              for recruitment purposes, in accordance with the
+              <a class="text-primary underline hover:no-underline" href="/privacy-policy/">Privacy Policy</a>.
+            </span>
+          </label>
+        </div>
         <div class="pt-6 border-t border-outline-variant/30 flex justify-end">
           <button id="submitButton" class="bg-black text-white px-8 py-3 rounded-4 font-medium hover:bg-gray-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed" type="submit">Submit Application</button>
         </div>

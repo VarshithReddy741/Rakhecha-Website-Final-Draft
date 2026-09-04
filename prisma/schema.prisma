@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model ContactSubmission {
+  id               String    @id @default(cuid())
+  fullName         String
+  serviceSelection String
+  contactNumber    String
+  email            String
+  queryDetails     String    @default("")
+  consentGiven     Boolean
+  ipHash           String
+  submittedAt      DateTime  @default(now())
+  exportedAt       DateTime?
+
+  @@map("contact_submissions")
+}
+
+model JobApplication {
+  id               String    @id @default(cuid())
+  jobId            String
+  jobTitleSnapshot String
+  firstName        String
+  lastName         String
+  countryCode      String    @default("+91")
+  contactNumber    String
+  email            String
+  currentLocation  String
+  isFresher        Boolean   @default(false)
+  experienceYears  String    @default("")
+  experienceMonths String    @default("")
+  currentCtc       String    @default("")
+  expectedCtc      String    @default("")
+  resumeKey        String
+  resumeFileName   String
+  consentGiven     Boolean
+  ipHash           String
+  submissionId     String    @unique @default(cuid())
+  submittedAt      DateTime  @default(now())
+  exportedAt       DateTime?
+
+  @@map("job_applications")
+}

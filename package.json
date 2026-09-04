@@ -7,15 +7,22 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "prisma generate && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@astrojs/node": "^11.1.5",
     "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/vercel": "^11.0.10",
+    "@aws-sdk/client-s3": "^3.835.0",
+    "@aws-sdk/s3-request-presigner": "^3.835.0",
+    "@prisma/client": "^6.10.1",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "7.2.10",
+    "exceljs": "^4.4.0",
+    "prisma": "^6.10.1",
+    "resend": "^4.6.0",
     "tailwindcss": "^4.3.3",
     "zod": "^4.5.4"
   },
@@ -24,6 +31,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@astrojs/node": "^11.1.5",
+    "tsx": "^4.20.3",
     "typescript": "^6.0.3"
   }
 }

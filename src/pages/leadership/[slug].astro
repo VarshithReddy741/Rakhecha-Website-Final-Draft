@@ -1,15 +1,16 @@
 ---
-import { sanityClient, queries } from "../../lib/sanity";
+import { sanityClient, queries, type Founder } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 
 export async function getStaticPaths() {
-  const slugs = await sanityClient.fetch(queries.allFounderSlugs);
-  return slugs.map((item: { slug: string }) => ({ params: { slug: item.slug } }));
+  const slugs = await sanityClient.fetch<{ slug: string }[]>(queries.allFounderSlugs);
+  return slugs.map((item) => ({ params: { slug: item.slug } }));
 }
 
-const founder = await sanityClient.fetch(queries.founderBySlug, { slug: Astro.params.slug });
+const { slug } = Astro.params;
+const founder = await sanityClient.fetch<Founder | null>(queries.founderBySlug, { slug });
 if (!founder) return Astro.redirect("/404");
 
 const { name, role, photoUrl: photo, education, shortBio, extendedBio, linkedinUrl } = founder;
@@ -70,7 +71,7 @@ const metaDescription = `${name} — ${role} at Rakhecha Finserv. ${(shortBio ??
         <div class="flex-grow max-w-3xl prose prose-lg prose-slate prose-headings:font-headline-md prose-headings:text-primary prose-a:text-primary prose-a:font-semibold">
           <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-8">{shortBio}</p>
           {
-            extendedParagraphs.map((paragraph) => (
+            extendedParagraphs.map((paragraph: string) => (
               <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-6">{paragraph}</p>
             ))
           }

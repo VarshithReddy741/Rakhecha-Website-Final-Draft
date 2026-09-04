@@ -1,4 +1,7 @@
-// Migrates existing JSON content collections into Sanity.
+// One-off migration of the old src/content/{articles,founders,jobs} JSON
+// collections into Sanity. Already run — those source files were deleted
+// once every page moved to Sanity queries, so this script is a historical
+// record only and won't run again without restoring them.
 // Requires an EDITOR-level Sanity token in SANITY_MIGRATION_TOKEN env var.
 import { createClient } from "@sanity/client";
 import { readFileSync, readdirSync } from "node:fs";

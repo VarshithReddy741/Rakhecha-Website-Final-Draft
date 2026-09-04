@@ -1,18 +1,19 @@
 ---
-import { sanityClient, queries } from "../../lib/sanity";
+import { sanityClient, queries, type Article, type ArticleBlock } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 
 export async function getStaticPaths() {
-  const slugs = await sanityClient.fetch(queries.allArticleSlugs);
-  return slugs.map((item: { slug: string }) => ({ params: { slug: item.slug } }));
+  const slugs = await sanityClient.fetch<{ slug: string }[]>(queries.allArticleSlugs);
+  return slugs.map((item) => ({ params: { slug: item.slug } }));
 }
 
-const article = await sanityClient.fetch(queries.articleBySlug, { slug: Astro.params.slug });
+const { slug } = Astro.params;
+const article = await sanityClient.fetch<Article | null>(queries.articleBySlug, { slug });
 if (!article) return Astro.redirect("/404");
 
-const { title, category, date, readTime, imageUrl: image, authorName, authorRole, authorPhotoUrl: authorPhoto, excerpt, body } = article;
+const { title, category, date, imageUrl: image, authorName, authorRole, authorPhotoUrl: authorPhoto, excerpt, body } = article;
 const metaDescription = excerpt ?? `${title} — Insights from Rakhecha Finserv`;
 ---
 
@@ -47,7 +48,7 @@ const metaDescription = excerpt ?? `${title} — Insights from Rakhecha Finserv`
         <div class="prose max-w-none font-body-lg text-on-surface-variant leading-relaxed flex flex-col gap-6">
           <p class="text-xl text-on-surface font-body-lg">{excerpt}</p>
           {
-            body.map((block) => {
+            body.map((block: ArticleBlock) => {
               if (block.blockType === "heading") {
                 return <h3 class="font-headline-md text-primary mt-8 mb-4">{block.text}</h3>;
               }

@@ -7,6 +7,80 @@ export const sanityClient = createClient({
   useCdn: true,
 });
 
+export interface ArticleBlock {
+  blockType: "paragraph" | "heading" | "quote";
+  text: string;
+}
+
+export interface Article {
+  slug: string;
+  title: string;
+  category: string;
+  date: string;
+  readTime: string;
+  imageUrl?: string;
+  authorName?: string;
+  authorRole?: string;
+  authorPhotoUrl?: string;
+  excerpt?: string;
+  body: ArticleBlock[];
+}
+
+export interface Founder {
+  slug: string;
+  name: string;
+  role: string;
+  photoUrl?: string;
+  education: string;
+  shortBio: string;
+  extendedBio?: string;
+  linkedinUrl?: string;
+}
+
+export interface Job {
+  slug: string;
+  title: string;
+  jobId: string;
+  location: string;
+  employmentType: string;
+  experience: string;
+  description: string;
+  responsibilities: string[];
+  qualifications: string[];
+}
+
+export interface UpcomingEvent {
+  _id: string;
+  title: string;
+  date: string;
+  time?: string;
+  type?: string;
+  format?: string;
+  location?: string;
+  description?: string;
+  imageUrl?: string;
+  isFeatured?: boolean;
+}
+
+export interface PastEvent {
+  _id: string;
+  title: string;
+  date: string;
+  type?: string;
+  tags?: string[];
+  imageUrl?: string;
+  recordingUrl?: string;
+}
+
+export interface VideoItem {
+  _id: string;
+  title: string;
+  date: string;
+  duration?: string;
+  thumbnailUrl?: string;
+  embedUrl?: string;
+}
+
 export const queries = {
   reportArticles: `*[_type == "article" && category == "Report"] | order(date desc) { "slug": slug.current, title, category, date, readTime, imageUrl, authorName, authorRole, authorPhotoUrl, excerpt, body }`,
   blogArticles:   `*[_type == "article" && category == "Blog"] | order(date desc) { "slug": slug.current, title, category, date, readTime, imageUrl, authorName, authorRole, authorPhotoUrl, excerpt, body }`,

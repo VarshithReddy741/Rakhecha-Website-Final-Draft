@@ -1,16 +1,17 @@
 ---
 // Ported from "Job detail.html".
-import { sanityClient, queries } from "../../lib/sanity";
+import { sanityClient, queries, type Job } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 
 export async function getStaticPaths() {
-  const slugs = await sanityClient.fetch(queries.allJobSlugs);
-  return slugs.map((j: { slug: string }) => ({ params: { slug: j.slug } }));
+  const slugs = await sanityClient.fetch<{ slug: string }[]>(queries.allJobSlugs);
+  return slugs.map((j) => ({ params: { slug: j.slug } }));
 }
 
-const job = await sanityClient.fetch(queries.jobBySlug, { slug: Astro.params.slug });
+const { slug } = Astro.params;
+const job = await sanityClient.fetch<Job | null>(queries.jobBySlug, { slug });
 if (!job) return Astro.redirect("/404");
 
 const { title, jobId, location, employmentType, experience, description, responsibilities, qualifications } = job;
@@ -61,7 +62,7 @@ const metaDescription = `${title} — a ${employmentType.toLowerCase()} role at 
               <>
                 <h3 class="text-lg font-semibold text-primary mt-8 mb-4">Responsibilities</h3>
                 <ul class="list-disc pl-5 space-y-3">
-                  {responsibilities.map((item) => <li>{item}</li>)}
+                  {responsibilities.map((item: string) => <li>{item}</li>)}
                 </ul>
               </>
             )
@@ -71,7 +72,7 @@ const metaDescription = `${title} — a ${employmentType.toLowerCase()} role at 
               <>
                 <h3 class="text-lg font-semibold text-primary mt-8 mb-4">Qualifications</h3>
                 <ul class="list-disc pl-5 space-y-3">
-                  {qualifications.map((item) => <li>{item}</li>)}
+                  {qualifications.map((item: string) => <li>{item}</li>)}
                 </ul>
               </>
             )

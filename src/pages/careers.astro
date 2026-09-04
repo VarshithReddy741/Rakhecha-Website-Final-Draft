@@ -108,21 +108,47 @@ const careersHeroOptimized = await getImage({ src: careersHeroImage, width: 1920
         </div>
         <div id="resumeFormCard">
           <p id="resumeFormError" class="hidden mb-6 text-sm text-error" role="alert"></p>
+          <!-- Posts to the same /api/careers-apply endpoint and job_applications
+               table as /careers/apply/, with a fixed jobId sentinel marking it
+               as a general (not role-specific) submission — so all applicants,
+               job-specific or not, land in one place. -->
           <form id="resumeForm" class="space-y-8 bg-surface-container-lowest p-8 md:p-12 rounded-xl border border-surface-container-low shadow-[0_8px_32px_rgba(0,36,82,0.04)]">
+            <input type="hidden" name="jobId" value="general-interest" />
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <label class="block font-label-bold text-label-bold text-primary mb-2 uppercase tracking-wide" for="fullName">Full Name<span class="text-error ml-1">*</span></label>
-                <input class="w-full border-b border-outline-variant py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:outline-none bg-transparent transition-all" id="fullName" name="fullName" placeholder="Enter your full name" required type="text" />
+                <label class="block font-label-bold text-label-bold text-primary mb-2 uppercase tracking-wide" for="firstName">First Name<span class="text-error ml-1">*</span></label>
+                <input class="w-full border-b border-outline-variant py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:outline-none bg-transparent transition-all" id="firstName" name="firstName" placeholder="Enter your first name" required type="text" />
+              </div>
+              <div>
+                <label class="block font-label-bold text-label-bold text-primary mb-2 uppercase tracking-wide" for="lastName">Last Name<span class="text-error ml-1">*</span></label>
+                <input class="w-full border-b border-outline-variant py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:outline-none bg-transparent transition-all" id="lastName" name="lastName" placeholder="Enter your last name" required type="text" />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label class="block font-label-bold text-label-bold text-primary mb-2 uppercase tracking-wide" for="contactNumber">Contact Number<span class="text-error ml-1">*</span></label>
+                <input class="w-full border-b border-outline-variant py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:outline-none bg-transparent transition-all" id="contactNumber" name="contactNumber" placeholder="Enter your contact number" required type="tel" />
               </div>
               <div>
                 <label class="block font-label-bold text-label-bold text-primary mb-2 uppercase tracking-wide" for="email">Email Address<span class="text-error ml-1">*</span></label>
                 <input class="w-full border-b border-outline-variant py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:outline-none bg-transparent transition-all" id="email" name="email" placeholder="Enter your email address" required type="email" />
               </div>
             </div>
-            <div>
-              <label class="block font-label-bold text-label-bold text-primary mb-2 uppercase tracking-wide" for="areaOfInterest">Area of Interest<span class="text-error ml-1">*</span></label>
-              <div class="relative">
-                <input class="w-full border-b border-outline-variant py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:outline-none bg-transparent transition-all" id="areaOfInterest" name="areaOfInterest" placeholder="Enter your area of interest" required type="text" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label class="block font-label-bold text-label-bold text-primary mb-2 uppercase tracking-wide" for="currentLocation">Current Location<span class="text-error ml-1">*</span></label>
+                <select class="w-full border-b border-outline-variant py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:outline-none bg-transparent transition-all" id="currentLocation" name="currentLocation" required>
+                  <option disabled selected value="">Select your city</option>
+                  <option value="kolkata">Kolkata</option>
+                  <option value="mumbai">Mumbai</option>
+                  <option value="delhi">Delhi</option>
+                  <option value="bangalore">Bangalore</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-label-bold text-label-bold text-primary mb-2 uppercase tracking-wide" for="jobTitle">Area of Interest<span class="text-error ml-1">*</span></label>
+                <input class="w-full border-b border-outline-variant py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:outline-none bg-transparent transition-all" id="jobTitle" name="jobTitle" placeholder="Enter your area of interest" required type="text" />
               </div>
             </div>
             <div>
@@ -214,7 +240,7 @@ const careersHeroOptimized = await getImage({ src: careersHeroImage, width: 1920
     resumeSubmitButton.textContent = "Submitting...";
 
     try {
-      const response = await fetch("/api/resume-submit", {
+      const response = await fetch("/api/careers-apply", {
         method: "POST",
         body: new FormData(resumeForm),
       });

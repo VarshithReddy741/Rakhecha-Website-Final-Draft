@@ -1,7 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import crypto from "node:crypto";
 
-const GUARDED = new Set(["/api/contact", "/api/careers-apply", "/api/resume-submit"]);
+const GUARDED = new Set(["/api/contact", "/api/careers-apply"]);
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX = 5;
 const store = new Map<string, { count: number; windowStart: number }>();

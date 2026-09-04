@@ -1,0 +1,32 @@
+name: Apply Prisma Migrations
+
+on:
+  workflow_dispatch:
+    inputs:
+      resolve_applied:
+        description: "Migration name to mark as already-applied without running it (use when its tables already exist outside Prisma's tracking) — leave blank to skip"
+        required: false
+        default: ""
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm install
+      - name: Resolve pre-existing migration
+        if: ${{ inputs.resolve_applied != '' }}
+        run: npx prisma migrate resolve --applied "${{ inputs.resolve_applied }}"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      - name: Deploy pending migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}

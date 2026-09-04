@@ -3,7 +3,7 @@
 // FounderCard/MissionVision components; the "Want to Know More?" banner
 // uses CtaBanner (Prompt 2). Carousel/reveal behaviors come from
 // /scripts/site-effects.js.
-import { sanityClient, queries } from "../lib/sanity";
+import { sanityClient, queries, type Founder } from "../lib/sanity";
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -18,10 +18,10 @@ import nitishPhoto from "../assets/images/Nitish.png";
 import nidhhiPhoto from "../assets/images/Nidhhi.png";
 
 const founderOrder = ["dev-piyush-rakhecha", "nidhhi-rakhecha", "nitish-rakhecha", "megha-rakhecha"];
-const founderEntries = await sanityClient.fetch(queries.allFounders);
+const founderEntries = await sanityClient.fetch<Founder[]>(queries.allFounders);
 const founders = founderOrder
-  .map((slug) => founderEntries.find((f: any) => f.slug === slug))
-  .filter((f: any) => Boolean(f));
+  .map((slug) => founderEntries.find((f) => f.slug === slug))
+  .filter((f): f is Founder => Boolean(f));
 
 // Local, build-time-optimized photos for the founders whose photo actually
 // lives in src/assets/ — Megha's is still a remote placeholder (see her

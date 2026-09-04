@@ -7,21 +7,28 @@
 // The Reports and Blog tab cards now link to their own /knowledge-hub/[slug]/
 // page (from the articles collection, Prompt 4) instead of the single
 // shared "Article Page.html" every card pointed to.
-import { sanityClient, queries } from "../lib/sanity";
+import { sanityClient, queries, type Article, type UpcomingEvent, type PastEvent, type VideoItem } from "../lib/sanity";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import EventRegistrationModal from "../components/EventRegistrationModal.astro";
 
 const [reports, blogs, upcomingEvents, pastEvents, videos] = await Promise.all([
-  sanityClient.fetch(queries.reportArticles),
-  sanityClient.fetch(queries.blogArticles),
-  sanityClient.fetch(queries.upcomingEvents),
-  sanityClient.fetch(queries.pastEvents),
-  sanityClient.fetch(queries.videos),
+  sanityClient.fetch<Article[]>(queries.reportArticles),
+  sanityClient.fetch<Article[]>(queries.blogArticles),
+  sanityClient.fetch<UpcomingEvent[]>(queries.upcomingEvents),
+  sanityClient.fetch<PastEvent[]>(queries.pastEvents),
+  sanityClient.fetch<VideoItem[]>(queries.videos),
 ]);
-const featuredEvent = upcomingEvents.find((e: any) => e.isFeatured) ?? upcomingEvents[0] ?? null;
-const sessionEvents = (featuredEvent ? upcomingEvents.filter((e: any) => e !== featuredEvent) : upcomingEvents).slice(0, 3);
+const featuredEvent = upcomingEvents.find((e) => e.isFeatured) ?? upcomingEvents[0] ?? null;
+const sessionEvents = (featuredEvent ? upcomingEvents.filter((e) => e !== featuredEvent) : upcomingEvents).slice(0, 3);
+
+function formatEventDate(dateStr?: string) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
 ---
 
 <BaseLayout
@@ -83,47 +90,54 @@ const sessionEvents = (featuredEvent ? upcomingEvents.filter((e: any) => e !== f
     <!-- View 1: Upcoming Events Tab -->
     <div class="tab-content block animate-fade-in" id="upcoming-events">
       <section class="mb-section-gap">
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden ambient-shadow flex flex-col md:flex-row border border-outline-variant">
-          <div class="w-full md:w-1/2 relative h-64 md:h-auto">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3IxSWjlmhSNWObBh0S2jp4qCJY-0FbKF9xT7HajjMwHYqB9GXuKrO1iza1TpsZIYSEE1fraUVAoHqGoLSMCYXCGEOfTuUvXh4apQeHQnq5qdYRtEkJUTz-AJJ6AlYcEnhPwAlWsqsafSLmbsyn9yDrhPy8-BzLizWKC2ZTR19rG8pyLbyV4IuCN3qyb4yFyz6izPHjATMXMTquRouUmzkZXIOWh-QfOYfZ4wXDmBEeMKjaSTWGVFOw')"></div>
-            <div class="absolute top-6 left-6 bg-surface-container-lowest text-primary font-label-bold text-label-bold uppercase px-3 py-1 rounded shadow-sm flex items-center gap-1">
-              <span class="material-symbols-outlined text-[16px]">videocam</span> Online Exclusive
-            </div>
-          </div>
-          <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface-container-lowest z-10 relative">
-            <div class="flex items-center gap-3 text-secondary mb-4 font-label-bold text-label-bold tracking-widest uppercase">
-              <span>Next Event</span>
-              <span class="w-8 h-px bg-secondary"></span>
-            </div>
-            <h2 class="font-headline-lg text-headline-lg text-primary mb-2 md:text-headline-lg text-headline-lg-mobile">Global Market Outlook 2024: Navigating Volatility</h2>
-            <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-on-surface-variant mb-6 font-body-sm text-body-sm">
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">calendar_today</span> October 24, 2024</div>
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">schedule</span> 10:00 AM - 11:30 AM (EST)</div>
-            </div>
-            <p class="font-body-md text-body-md text-on-surface-variant mb-8 line-clamp-3">
-              Join Rakhecha Finserv's Chief Investment Officers for an exclusive virtual roundtable. We will dissect emerging market trends, strategic asset allocation shifts, and defensive maneuvers required to protect and grow wealth in an increasingly complex geopolitical landscape.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center gap-6 mt-auto">
-              <button class="w-full sm:w-auto bg-primary text-on-primary font-cta-text text-cta-text px-8 py-3 rounded-lg hover:bg-on-primary-fixed transition-colors flex items-center justify-center gap-2" data-register-event="Global Market Outlook 2024: Navigating Volatility">Register Now <span class="material-symbols-outlined">arrow_forward</span></button>
-              <div class="flex items-center gap-4 text-center">
-                <div class="flex flex-col">
-                  <span class="font-headline-md text-headline-md text-primary">12</span>
-                  <span class="font-label-bold text-label-bold text-on-surface-variant uppercase text-[10px]">Days</span>
+        {featuredEvent ? (
+          <div class="bg-surface-container-lowest rounded-xl overflow-hidden ambient-shadow flex flex-col md:flex-row border border-outline-variant">
+            <div class="w-full md:w-1/2 relative h-64 md:h-auto">
+              <div class="absolute inset-0 bg-cover bg-center" style={`background-image: url('${featuredEvent.imageUrl ?? ""}')`}></div>
+              {featuredEvent.format && (
+                <div class="absolute top-6 left-6 bg-surface-container-lowest text-primary font-label-bold text-label-bold uppercase px-3 py-1 rounded shadow-sm flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">videocam</span> {featuredEvent.format}
                 </div>
-                <span class="text-outline-variant text-xl">:</span>
-                <div class="flex flex-col">
-                  <span class="font-headline-md text-headline-md text-primary">08</span>
-                  <span class="font-label-bold text-label-bold text-on-surface-variant uppercase text-[10px]">Hrs</span>
-                </div>
-                <span class="text-outline-variant text-xl">:</span>
-                <div class="flex flex-col">
-                  <span class="font-headline-md text-headline-md text-primary">45</span>
-                  <span class="font-label-bold text-label-bold text-on-surface-variant uppercase text-[10px]">Min</span>
+              )}
+            </div>
+            <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface-container-lowest z-10 relative">
+              <div class="flex items-center gap-3 text-secondary mb-4 font-label-bold text-label-bold tracking-widest uppercase">
+                <span>Next Event</span>
+                <span class="w-8 h-px bg-secondary"></span>
+              </div>
+              <h2 class="font-headline-lg text-headline-lg text-primary mb-2 md:text-headline-lg text-headline-lg-mobile">{featuredEvent.title}</h2>
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-on-surface-variant mb-6 font-body-sm text-body-sm">
+                <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">calendar_today</span> {formatEventDate(featuredEvent.date)}</div>
+                {featuredEvent.time && <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">schedule</span> {featuredEvent.time}</div>}
+                {featuredEvent.location && <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">location_on</span> {featuredEvent.location}</div>}
+              </div>
+              {featuredEvent.description && (
+                <p class="font-body-md text-body-md text-on-surface-variant mb-8 line-clamp-3">{featuredEvent.description}</p>
+              )}
+              <div class="flex flex-col sm:flex-row items-center gap-6 mt-auto">
+                <button class="w-full sm:w-auto bg-primary text-on-primary font-cta-text text-cta-text px-8 py-3 rounded-lg hover:bg-on-primary-fixed transition-colors flex items-center justify-center gap-2" data-register-event={featuredEvent.title}>Register Now <span class="material-symbols-outlined">arrow_forward</span></button>
+                <div class="event-countdown flex items-center gap-4 text-center" data-event-date={featuredEvent.date}>
+                  <div class="flex flex-col">
+                    <span class="font-headline-md text-headline-md text-primary countdown-days">--</span>
+                    <span class="font-label-bold text-label-bold text-on-surface-variant uppercase text-[10px]">Days</span>
+                  </div>
+                  <span class="text-outline-variant text-xl">:</span>
+                  <div class="flex flex-col">
+                    <span class="font-headline-md text-headline-md text-primary countdown-hours">--</span>
+                    <span class="font-label-bold text-label-bold text-on-surface-variant uppercase text-[10px]">Hrs</span>
+                  </div>
+                  <span class="text-outline-variant text-xl">:</span>
+                  <div class="flex flex-col">
+                    <span class="font-headline-md text-headline-md text-primary countdown-mins">--</span>
+                    <span class="font-label-bold text-label-bold text-on-surface-variant uppercase text-[10px]">Min</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div class="bg-surface-container-lowest rounded-xl ambient-shadow border border-outline-variant p-12 text-center text-on-surface-variant">No upcoming events scheduled right now — check back soon.</div>
+        )}
       </section>
       <section class="mb-section-gap">
         <div class="flex justify-between items-end mb-8">
@@ -131,45 +145,23 @@ const sessionEvents = (featuredEvent ? upcomingEvents.filter((e: any) => e !== f
           <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">View Calendar <span class="material-symbols-outlined text-[18px]">calendar_month</span></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-6 flex flex-col h-full ambient-shadow hover:-translate-y-1 transition-transform duration-300">
-            <div class="flex justify-between items-start mb-4">
-              <span class="bg-surface-variant text-primary font-label-bold text-label-bold uppercase px-2 py-1 rounded text-[10px]">Roundtable</span>
-              <span class="material-symbols-outlined text-outline-variant">bookmark_border</span>
+          {sessionEvents.length > 0 ? sessionEvents.map((e) => (
+            <div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-6 flex flex-col h-full ambient-shadow hover:-translate-y-1 transition-transform duration-300">
+              <div class="flex justify-between items-start mb-4">
+                {e.type && <span class="bg-surface-variant text-primary font-label-bold text-label-bold uppercase px-2 py-1 rounded text-[10px]">{e.type}</span>}
+                <span class="material-symbols-outlined text-outline-variant">bookmark_border</span>
+              </div>
+              <h4 class="font-headline-md text-headline-md text-primary mb-2 line-clamp-2">{e.title}</h4>
+              <div class="text-on-surface-variant font-body-sm text-body-sm mb-4 space-y-1">
+                <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">event</span> {formatEventDate(e.date)}</div>
+                {e.location && <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">location_on</span> {e.location}</div>}
+              </div>
+              {e.description && <p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2 flex-grow">{e.description}</p>}
+              <button class="w-full border border-primary text-primary font-cta-text text-cta-text px-4 py-2 rounded hover:bg-primary hover:text-on-primary transition-colors mt-auto" data-register-event={e.title}>Register Interest</button>
             </div>
-            <h4 class="font-headline-md text-headline-md text-primary mb-2 line-clamp-2">Private Equity Masterclass: Sourcing Alpha</h4>
-            <div class="text-on-surface-variant font-body-sm text-body-sm mb-4 space-y-1">
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">event</span> Nov 05, 2024</div>
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">location_on</span> New York, NY (In-Person)</div>
-            </div>
-            <p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2 flex-grow">An intimate session focusing on proprietary deal sourcing and value creation strategies in the middle market private equity sector.</p>
-            <button class="w-full border border-primary text-primary font-cta-text text-cta-text px-4 py-2 rounded hover:bg-primary hover:text-on-primary transition-colors" data-register-event="Private Equity Masterclass: Sourcing Alpha">Register Interest</button>
-          </div>
-          <div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-6 flex flex-col h-full ambient-shadow hover:-translate-y-1 transition-transform duration-300">
-            <div class="flex justify-between items-start mb-4">
-              <span class="bg-secondary-fixed text-on-secondary-fixed-variant font-label-bold text-label-bold uppercase px-2 py-1 rounded text-[10px]">Webinar</span>
-              <span class="material-symbols-outlined text-outline-variant">bookmark_border</span>
-            </div>
-            <h4 class="font-headline-md text-headline-md text-primary mb-2 line-clamp-2">Sustainable Investing: Beyond ESG Metrics</h4>
-            <div class="text-on-surface-variant font-body-sm text-body-sm mb-4 space-y-1">
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">event</span> Nov 12, 2024</div>
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">videocam</span> Online Broadcast</div>
-            </div>
-            <p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2 flex-grow">Deciphering the next wave of sustainable investments focusing on measurable impact rather than superficial compliance.</p>
-            <button class="w-full border border-primary text-primary font-cta-text text-cta-text px-4 py-2 rounded hover:bg-primary hover:text-on-primary transition-colors" data-register-event="Sustainable Investing: Beyond ESG Metrics">Register</button>
-          </div>
-          <div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-6 flex flex-col h-full ambient-shadow hover:-translate-y-1 transition-transform duration-300">
-            <div class="flex justify-between items-start mb-4">
-              <span class="bg-surface-variant text-primary font-label-bold text-label-bold uppercase px-2 py-1 rounded text-[10px]">Workshop</span>
-              <span class="material-symbols-outlined text-outline-variant">bookmark_border</span>
-            </div>
-            <h4 class="font-headline-md text-headline-md text-primary mb-2 line-clamp-2">Legacy Planning &amp; Tax Optimization Seminar</h4>
-            <div class="text-on-surface-variant font-body-sm text-body-sm mb-4 space-y-1">
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">event</span> Nov 20, 2024</div>
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">location_on</span> London, UK (In-Person)</div>
-            </div>
-            <p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2 flex-grow">Structuring multi-generational wealth transfer strategies to mitigate risk and optimize tax exposure across jurisdictions.</p>
-            <button class="w-full border border-primary text-primary font-cta-text text-cta-text px-4 py-2 rounded hover:bg-primary hover:text-on-primary transition-colors" data-register-event="Legacy Planning & Tax Optimization Seminar">Register Interest</button>
-          </div>
+          )) : (
+            <p class="text-on-surface-variant col-span-full">No additional sessions scheduled at the moment.</p>
+          )}
         </div>
       </section>
       <section class="bg-primary text-on-primary rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
@@ -199,58 +191,39 @@ const sessionEvents = (featuredEvent ? upcomingEvents.filter((e: any) => e !== f
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <article class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden ambient-shadow group cursor-pointer">
-          <div class="relative h-48 overflow-hidden">
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAkw2aKSqPcdbUuJxguWna_mrnXS7uigf1gx49UPpWMiqkwYvB6ISXiFM0LN2qqRU6KLwv5ITJNPrEi4C8IcL5rntKf4w0pO_VYRZJa9VlJSWSdBmHmAdeLI3gB0hVHEjzP599g31BBGSmCr4_OwvPaZinZ9mnRiVVGuxIgVXhLfv0Kflb3FimC4hWeWgs58PiMA7-JNaBT34dRDFmKJg23lW0fZ9pXnd7hjPwem3UY_FR4DOrc4BDM_g')"></div>
-            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary rounded-full w-12 h-12 flex items-center justify-center"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span></div>
+        {pastEvents.length > 0 ? pastEvents.map((e) => (
+          <article class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden ambient-shadow group cursor-pointer">
+            <div class="relative h-48 overflow-hidden">
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style={`background-image: url('${e.imageUrl ?? ""}')`}></div>
+              {e.recordingUrl && (
+                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary rounded-full w-12 h-12 flex items-center justify-center"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span></div>
+                </div>
+              )}
             </div>
-          </div>
-          <div class="p-6">
-            <div class="flex justify-between items-start mb-3">
-              <span class="text-outline font-body-sm text-body-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_today</span> Sep 15, 2024</span>
-              <span class="text-xs font-label-bold text-primary bg-surface-variant px-2 py-0.5 rounded">Panel</span>
-            </div>
-            <h4 class="font-headline-md text-headline-md text-primary mb-3 line-clamp-2 group-hover:text-secondary transition-colors">Q3 Macroeconomic Review &amp; Fixed Income Strategies</h4>
-            <div class="flex gap-2 mb-6 flex-wrap">
-              <span class="text-[11px] font-label-bold text-on-surface-variant bg-white border border-outline-variant px-2 py-1 rounded">Fixed Income</span>
-              <span class="text-[11px] font-label-bold text-on-surface-variant bg-white border border-outline-variant px-2 py-1 rounded">Macro</span>
-            </div>
-            <div class="flex justify-between items-center border-t border-outline-variant pt-4 mt-auto">
-              <a class="text-primary font-cta-text text-cta-text text-sm hover:underline flex items-center gap-1" href="#">Watch Recording <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
-              <div class="flex gap-2 text-outline-variant">
-                <button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">share</span></button>
-                <button class="hover:text-[#0a66c2] transition-colors font-bold text-sm">IN</button>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-3">
+                <span class="text-outline font-body-sm text-body-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_today</span> {formatEventDate(e.date)}</span>
+                {e.type && <span class="text-xs font-label-bold text-primary bg-surface-variant px-2 py-0.5 rounded">{e.type}</span>}
+              </div>
+              <h4 class="font-headline-md text-headline-md text-primary mb-3 line-clamp-2 group-hover:text-secondary transition-colors">{e.title}</h4>
+              {e.tags && e.tags.length > 0 && (
+                <div class="flex gap-2 mb-6 flex-wrap">
+                  {e.tags.map((tag) => (
+                    <span class="text-[11px] font-label-bold text-on-surface-variant bg-white border border-outline-variant px-2 py-1 rounded">{tag}</span>
+                  ))}
+                </div>
+              )}
+              <div class="flex justify-between items-center border-t border-outline-variant pt-4 mt-auto">
+                {e.recordingUrl ? (
+                  <a class="text-primary font-cta-text text-cta-text text-sm hover:underline flex items-center gap-1" href={e.recordingUrl} target="_blank" rel="noopener noreferrer">Watch Recording <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+                ) : <span></span>}
               </div>
             </div>
-          </div>
-        </article>
-        <article class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden ambient-shadow group cursor-pointer">
-          <div class="relative h-48 overflow-hidden">
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBj5uWUt95q-Fh3KM9dqOuy0ZqtGax2Jp6ZxFlm5sAnjYwaMEsUiwK_vtn-Iypo8Uy7CfEVLHGEiDh783UHx6ft1m-pYXm4-XH5KfSifiyEmvoxAEhHy5sT2W9MJuX7GZcmV4E_qyBwMYKffoodUWSp3z0Cj8uT8-jj25Aj-CzoaefK9U9oc36PIDvFvvqPUkDtuJkoeQQjtPUoACRwZEef9LJ_c66TdViKSg973VMDgUJKjiHhQ7YFqA')"></div>
-            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary rounded-full w-12 h-12 flex items-center justify-center"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span></div>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex justify-between items-start mb-3">
-              <span class="text-outline font-body-sm text-body-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_today</span> Aug 28, 2024</span>
-              <span class="text-xs font-label-bold text-primary bg-surface-variant px-2 py-0.5 rounded">Webinar</span>
-            </div>
-            <h4 class="font-headline-md text-headline-md text-primary mb-3 line-clamp-2 group-hover:text-secondary transition-colors">AI Implementation in Portfolio Management</h4>
-            <div class="flex gap-2 mb-6 flex-wrap">
-              <span class="text-[11px] font-label-bold text-on-surface-variant bg-white border border-outline-variant px-2 py-1 rounded">Technology</span>
-              <span class="text-[11px] font-label-bold text-on-surface-variant bg-white border border-outline-variant px-2 py-1 rounded">Innovation</span>
-            </div>
-            <div class="flex justify-between items-center border-t border-outline-variant pt-4 mt-auto">
-              <a class="text-primary font-cta-text text-cta-text text-sm hover:underline flex items-center gap-1" href="#">Watch Recording <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
-              <div class="flex gap-2 text-outline-variant">
-                <button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">share</span></button>
-                <button class="hover:text-[#0a66c2] transition-colors font-bold text-sm">IN</button>
-              </div>
-            </div>
-          </div>
-        </article>
+          </article>
+        )) : (
+          <p class="text-on-surface-variant col-span-full">No past events to show yet.</p>
+        )}
       </div>
     </div>
 
@@ -262,7 +235,7 @@ const sessionEvents = (featuredEvent ? upcomingEvents.filter((e: any) => e !== f
           <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">View All Reports <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reports.map((a: any) => (
+          {reports.map((a) => (
             <a href={`/knowledge-hub/${a.slug}/`} class="contents">
               <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
                 <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.imageUrl ?? ""}')`}></div>
@@ -289,17 +262,29 @@ const sessionEvents = (featuredEvent ? upcomingEvents.filter((e: any) => e !== f
           <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">Browse Videos <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
-            <div class="bg-surface-container-high w-full h-56 relative flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[64px] opacity-20">play_circle</span></div>
-            <div class="p-6 flex flex-col flex-grow">
-              <span class="bg-surface-container-high text-primary font-label-bold text-label-bold px-2 py-1 rounded-sm w-max mb-4 uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">play_arrow</span> Video</span>
-              <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors line-clamp-3">Webinar: Wealth Preservation Strategies for UHNWIs</h3>
-              <div class="mt-auto flex items-center justify-between border-t border-outline-variant/20 pt-4 font-body-sm text-body-sm text-on-surface-variant">
-                <span>Sep 28, 2024</span>
-                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 45 min watch</span>
-              </div>
-            </div>
-          </article>
+          {videos.length > 0 ? videos.map((v) => (
+            <a href={v.embedUrl ?? "#"} target={v.embedUrl ? "_blank" : undefined} rel={v.embedUrl ? "noopener noreferrer" : undefined} class="contents">
+              <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
+                {v.thumbnailUrl ? (
+                  <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${v.thumbnailUrl}')`}>
+                    <div class="absolute inset-0 bg-black/20 flex items-center justify-center"><span class="material-symbols-outlined text-white text-[64px]" style="font-variation-settings: 'FILL' 1;">play_circle</span></div>
+                  </div>
+                ) : (
+                  <div class="bg-surface-container-high w-full h-56 relative flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[64px] opacity-20">play_circle</span></div>
+                )}
+                <div class="p-6 flex flex-col flex-grow">
+                  <span class="bg-surface-container-high text-primary font-label-bold text-label-bold px-2 py-1 rounded-sm w-max mb-4 uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">play_arrow</span> Video</span>
+                  <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors line-clamp-3">{v.title}</h3>
+                  <div class="mt-auto flex items-center justify-between border-t border-outline-variant/20 pt-4 font-body-sm text-body-sm text-on-surface-variant">
+                    <span>{formatEventDate(v.date)}</span>
+                    {v.duration && <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> {v.duration}</span>}
+                  </div>
+                </div>
+              </article>
+            </a>
+          )) : (
+            <p class="text-on-surface-variant col-span-full">No videos published yet.</p>
+          )}
         </div>
       </section>
     </div>
@@ -311,7 +296,7 @@ const sessionEvents = (featuredEvent ? upcomingEvents.filter((e: any) => e !== f
           <h3 class="font-headline-lg text-headline-lg text-primary">Editorial Insights</h3>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blogs.map((a: any) => (
+          {blogs.map((a) => (
             <a href={`/knowledge-hub/${a.slug}/`} class="contents">
               <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
                 <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.imageUrl ?? ""}')`}></div>
@@ -377,5 +362,30 @@ const sessionEvents = (featuredEvent ? upcomingEvents.filter((e: any) => e !== f
     }
     activateTabFromHash();
     window.addEventListener("hashchange", activateTabFromHash);
+  </script>
+
+  <script>
+    // Live countdown to the featured upcoming event's date.
+    const countdownEl = document.querySelector<HTMLElement>(".event-countdown");
+    const eventDate = countdownEl?.dataset.eventDate ? new Date(countdownEl.dataset.eventDate) : null;
+    if (countdownEl && eventDate && !isNaN(eventDate.getTime())) {
+      const daysEl = countdownEl.querySelector<HTMLElement>(".countdown-days");
+      const hoursEl = countdownEl.querySelector<HTMLElement>(".countdown-hours");
+      const minsEl = countdownEl.querySelector<HTMLElement>(".countdown-mins");
+
+      function update() {
+        const diffMs = eventDate!.getTime() - Date.now();
+        const clamped = Math.max(diffMs, 0);
+        const days = Math.floor(clamped / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((clamped / (1000 * 60 * 60)) % 24);
+        const mins = Math.floor((clamped / (1000 * 60)) % 60);
+        if (daysEl) daysEl.textContent = String(days);
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, "0");
+        if (minsEl) minsEl.textContent = String(mins).padStart(2, "0");
+      }
+
+      update();
+      setInterval(update, 60000);
+    }
   </script>
 </BaseLayout>

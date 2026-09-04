@@ -4,7 +4,7 @@
 // founders collection (Prompt 3) instead of main.js's client-rendered
 // innerHTML. Carousel/reveal behaviors (auto-scroll-x, founder-scroll-btn,
 // hero-card-anim) come from /scripts/site-effects.js (see Prompt 4 notes).
-import { getCollection } from "astro:content";
+import { sanityClient, queries, type Founder, type UpcomingEvent } from "../lib/sanity";
 import { Image, Picture } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -25,10 +25,21 @@ import nitishPhoto from "../assets/images/Nitish.png";
 import nidhhiPhoto from "../assets/images/Nidhhi.png";
 
 const founderOrder = ["dev-piyush-rakhecha", "nidhhi-rakhecha", "nitish-rakhecha", "megha-rakhecha"];
-const founderEntries = await getCollection("founders");
+const [founderEntries, allUpcomingEvents] = await Promise.all([
+  sanityClient.fetch<Founder[]>(queries.allFounders),
+  sanityClient.fetch<UpcomingEvent[]>(queries.upcomingEvents),
+]);
 const founders = founderOrder
-  .map((slug) => founderEntries.find((f) => f.data.slug === slug))
-  .filter((f): f is NonNullable<typeof f> => Boolean(f));
+  .map((slug) => founderEntries.find((f) => f.slug === slug))
+  .filter((f): f is Founder => Boolean(f));
+const homeUpcomingEvents = allUpcomingEvents.slice(0, 2);
+
+function formatEventDate(dateStr?: string) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+}
 
 // Local, build-time-optimized photos for the founders whose photo actually
 // lives in src/assets/ — Megha's is still a remote placeholder (see her
@@ -271,7 +282,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
       <div class="relative">
         <div class="founder-scroll no-scrollbar flex overflow-x-auto snap-x snap-mandatory scroll-smooth md:overflow-visible p-2 md:p-4 pb-8 md:pb-4 md:grid md:grid-cols-4 gap-4 md:gap-6" id="home-founder-cards">
           {founders.map((f) => (
-            <FounderCard href={`/leadership/${f.data.slug}/`} image={founderPhotos[f.data.slug] ?? f.data.photo} name={f.data.name} role={f.data.role} education={f.data.education} />
+            <FounderCard href={`/leadership/${f.slug}/`} image={founderPhotos[f.slug] ?? f.photoUrl} name={f.name} role={f.role} education={f.education} />
           ))}
         </div>
         <button aria-label="Scroll left" class="founder-scroll-btn md:hidden absolute left-1 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-primary/80 text-white shadow-md" data-scroll-dir="-1" data-scroll-target="home-founder-cards" type="button"><span class="material-symbols-outlined text-lg">chevron_left</span></button>
@@ -468,34 +479,28 @@ const founderPhotos: Record<string, ImageMetadata> = {
         <a href="/knowledge-hub/#upcoming-events" class="hidden md:inline-block border border-primary text-primary px-6 py-2 rounded font-cta-text text-cta-text hover:bg-primary hover:text-white transition-colors">Explore All Events</a>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="glass-card rounded-lg p-8 ambient-shadow flex flex-col md:flex-row gap-8">
-          <div class="w-full md:w-1/3 h-48 rounded overflow-hidden">
-            <img alt="Event" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3IxSWjlmhSNWObBh0S2jp4qCJY-0FbKF9xT7HajjMwHYqB9GXuKrO1iza1TpsZIYSEE1fraUVAoHqGoLSMCYXCGEOfTuUvXh4apQeHQnq5qdYRtEkJUTz-AJJ6AlYcEnhPwAlWsqsafSLmbsyn9yDrhPy8-BzLizWKC2ZTR19rG8pyLbyV4IuCN3qyb4yFyz6izPHjATMXMTquRouUmzkZXIOWh-QfOYfZ4wXDmBEeMKjaSTWGVFOw" />
-          </div>
-          <div class="flex-grow flex flex-col">
-            <span class="bg-primary text-white font-label-bold text-[10px] uppercase px-2 py-1 rounded w-max mb-4">Online Exclusive</span>
-            <h3 class="text-headline-md font-headline-md text-primary mb-4">Global Market Outlook 2024: Navigating Volatility</h3>
-            <div class="text-on-surface-variant text-body-sm mb-6">
-              <div class="flex items-center gap-2 mb-1"><span class="material-symbols-outlined text-sm">calendar_today</span> Oct 24, 2024</div>
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">schedule</span> 10:00 AM EST</div>
+        {homeUpcomingEvents.length > 0 ? homeUpcomingEvents.map((e) => (
+          <div class="glass-card rounded-lg p-8 ambient-shadow flex flex-col md:flex-row gap-8">
+            <div class="w-full md:w-1/3 h-48 rounded overflow-hidden">
+              <img alt={e.title} class="w-full h-full object-cover" src={e.imageUrl ?? ""} />
             </div>
-            <button class="mt-auto bg-primary text-white px-6 py-2 rounded font-cta-text text-cta-text hover:bg-primary-dark transition-colors" data-register-event="Global Market Outlook 2024: Navigating Volatility">Register Now</button>
-          </div>
-        </div>
-        <div class="glass-card rounded-lg p-8 ambient-shadow flex flex-col md:flex-row gap-8">
-          <div class="w-full md:w-1/3 h-48 rounded overflow-hidden">
-            <img alt="Event" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkCEsNptm3XmgeglQc72P-czi62pePLGeM8ONx7mnbMx49e0yDY-7wzr8JAro8lQWH2zYw74G3KcGyr2YgCf2KU8ArvGX9GsWeAF3gcsiTGVJhLVcX4c5bJXFbgtXxsHJMnHJlsvL92MXbUKQCQD6v7y5b68HuUmNC5PKISZ3AkiKmD2IuWN45iZH3PPseUqZzQJj8Fqz8ugSN9bESnW-rWYk3vT5-tG3qdBggbFukl2FJclDqnX2G0w" />
-          </div>
-          <div class="flex-grow flex flex-col">
-            <span class="bg-gold text-primary font-label-bold text-[10px] uppercase px-2 py-1 rounded w-max mb-4">Roundtable</span>
-            <h3 class="text-headline-md font-headline-md text-primary mb-4">Private Equity Masterclass: Sourcing Alpha</h3>
-            <div class="text-on-surface-variant text-body-sm mb-6">
-              <div class="flex items-center gap-2 mb-1"><span class="material-symbols-outlined text-sm">calendar_today</span> Nov 05, 2024</div>
-              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">location_on</span> New York, NY</div>
+            <div class="flex-grow flex flex-col">
+              {e.format && <span class="bg-primary text-white font-label-bold text-[10px] uppercase px-2 py-1 rounded w-max mb-4">{e.format}</span>}
+              <h3 class="text-headline-md font-headline-md text-primary mb-4">{e.title}</h3>
+              <div class="text-on-surface-variant text-body-sm mb-6">
+                <div class="flex items-center gap-2 mb-1"><span class="material-symbols-outlined text-sm">calendar_today</span> {formatEventDate(e.date)}</div>
+                {e.time ? (
+                  <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">schedule</span> {e.time}</div>
+                ) : e.location ? (
+                  <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">location_on</span> {e.location}</div>
+                ) : null}
+              </div>
+              <button class="mt-auto bg-primary text-white px-6 py-2 rounded font-cta-text text-cta-text hover:bg-primary-dark transition-colors" data-register-event={e.title}>Register Now</button>
             </div>
-            <button class="mt-auto border border-primary text-primary px-6 py-2 rounded font-cta-text text-cta-text hover:bg-primary hover:text-white transition-colors" data-register-event="Private Equity Masterclass: Sourcing Alpha">Register Interest</button>
           </div>
-        </div>
+        )) : (
+          <p class="text-on-surface-variant col-span-full text-center">No upcoming events scheduled right now — check back soon.</p>
+        )}
       </div>
       <a href="/knowledge-hub/#upcoming-events" class="md:hidden mt-8 mx-auto block border border-primary text-primary px-6 py-2 rounded font-cta-text text-cta-text hover:bg-primary hover:text-white transition-colors">Explore All Events</a>
     </div>

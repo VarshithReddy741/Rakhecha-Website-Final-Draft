@@ -3,7 +3,7 @@
 // Not wired into real routes/content yet — that happens in a later prompt.
 // Sample data below is real copy taken from the live IB.html /
 // "About us.html" pages (not lorem ipsum), just not exhaustively ported.
-import { getCollection } from "astro:content";
+import { sanityClient, queries, type Founder } from "../lib/sanity";
 import { getImage } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -26,10 +26,9 @@ import creditPaperImage from "../assets/images/Credit paper.jpeg";
 import individualInsuranceImage from "../assets/images/individual insurance landscape.png";
 import businessInsuranceImage from "../assets/images/Busienss Insurance.jpeg";
 
-// Pulled live from the founders content collection (src/content/founders/)
-// instead of a hardcoded array, so this also proves out
-// FounderCard -> /leadership/[slug]/ end to end.
-const founderEntries = await getCollection("founders");
+// Pulled live from Sanity instead of a hardcoded array, so this also
+// proves out FounderCard -> /leadership/[slug]/ end to end.
+const founderEntries = await sanityClient.fetch<Founder[]>(queries.allFounders);
 const founderPhotos: Record<string, ImageMetadata> = {
   "dev-piyush-rakhecha": devPhoto,
   "nitish-rakhecha": nitishPhoto,
@@ -68,8 +67,8 @@ const ibItems = [
     <section>
       <h2 class="font-headline-md text-headline-md text-primary mb-6">FounderCard</h2>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
-        {founderEntries.map(({ data: f }) => (
-          <FounderCard href={`/leadership/${f.slug}/`} image={founderPhotos[f.slug] ?? f.photo} name={f.name} role={f.role} education={f.education} />
+        {founderEntries.map((f) => (
+          <FounderCard href={`/leadership/${f.slug}/`} image={founderPhotos[f.slug] ?? f.photoUrl} name={f.name} role={f.role} education={f.education} />
         ))}
       </div>
     </section>

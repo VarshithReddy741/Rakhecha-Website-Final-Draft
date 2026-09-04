@@ -11,6 +11,9 @@ export async function getStaticPaths() {
 
 const article = await sanityClient.fetch(queries.articleBySlug, { slug: Astro.params.slug });
 if (!article) return Astro.redirect("/404");
+
+const { title, category, date, readTime, imageUrl: image, authorName, authorRole, authorPhotoUrl: authorPhoto, excerpt, body } = article;
+const metaDescription = excerpt ?? `${title} — Insights from Rakhecha Finserv`;
 ---
 
 <BaseLayout
@@ -45,10 +48,10 @@ if (!article) return Astro.redirect("/404");
           <p class="text-xl text-on-surface font-body-lg">{excerpt}</p>
           {
             body.map((block) => {
-              if (block.type === "heading") {
+              if (block.blockType === "heading") {
                 return <h3 class="font-headline-md text-primary mt-8 mb-4">{block.text}</h3>;
               }
-              if (block.type === "quote") {
+              if (block.blockType === "quote") {
                 return (
                   <blockquote class="border-l-4 border-secondary pl-6 py-2 my-8 bg-surface-container-lowest shadow-sm rounded-r">
                     <p class="font-display-lg text-[24px] leading-tight text-primary italic mb-0">"{block.text}"</p>

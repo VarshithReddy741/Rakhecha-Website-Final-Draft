@@ -23,11 +23,8 @@
     "astro": "7.2.10",
     "exceljs": "^4.4.0",
     "prisma": "^6.10.1",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
     "resend": "^4.6.0",
     "sanity": "^3.0.0",
-    "styled-components": "^6.5.3",
     "tailwindcss": "^4.3.3",
     "zod": "^4.5.4"
   },

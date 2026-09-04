@@ -1,0 +1,141 @@
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { db } from "../../lib/db";
+import { uploadFile, getSignedDownloadUrl } from "../../lib/storage";
+import { sendResumeNotification } from "../../lib/email";
+import crypto from "node:crypto";
+
+export const prerender = false;
+
+const MAX_RESUME_BYTES = 5 * 1024 * 1024;
+const ALLOWED_EXTENSIONS = [".pdf", ".doc", ".docx"];
+const ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+
+const resumeSubmitSchema = z.object({
+  fullName: z.string().trim().min(2, "Enter your full name").max(200),
+  email: z.email("Enter a valid email address").trim(),
+  areaOfInterest: z.string().trim().min(2, "Enter your area of interest").max(200),
+  consentGiven: z
+    .unknown()
+    .refine((v) => v === "on" || v === true, {
+      message: "You must accept the privacy policy to proceed.",
+    }),
+});
+
+function hashIp(ip: string): string {
+  return crypto
+    .createHmac("sha256", process.env.IP_HASH_SALT ?? "rakhecha-default-salt")
+    .update(ip)
+    .digest("hex")
+    .slice(0, 16);
+}
+
+export const POST: APIRoute = async ({ request }) => {
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return json({ success: false, errors: { _form: "Invalid form submission." } }, 400);
+  }
+
+  const fields = Object.fromEntries(
+    Array.from(formData.keys())
+      .filter((k) => k !== "resume")
+      .map((k) => [k, formData.get(k)]),
+  );
+
+  const result = resumeSubmitSchema.safeParse(fields);
+  const resumeFile = formData.get("resume");
+  const resumeError = validateResume(resumeFile);
+
+  if (!result.success || resumeError) {
+    const errors = result.success ? {} : flattenErrors(result.error);
+    if (resumeError) errors.resume = resumeError;
+    return json({ success: false, errors }, 400);
+  }
+
+  const file = resumeFile as File;
+  const submissionId = crypto.randomUUID();
+  const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+  const resumeKey = "resumes/" + submissionId + ext;
+
+  const rawIp =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    "unknown";
+
+  try {
+    await uploadFile(
+      resumeKey,
+      Buffer.from(await file.arrayBuffer()),
+      file.type || "application/octet-stream",
+      file.name,
+    );
+
+    const row = await db.resumeSubmission.create({
+      data: {
+        fullName: result.data.fullName,
+        email: result.data.email,
+        areaOfInterest: result.data.areaOfInterest,
+        resumeKey,
+        resumeFileName: file.name,
+        consentGiven: true,
+        ipHash: hashIp(rawIp),
+        submissionId,
+      },
+    });
+
+    const resumeSignedUrl = await getSignedDownloadUrl(resumeKey, 3600);
+
+    try {
+      await sendResumeNotification({
+        fullName: row.fullName,
+        email: row.email,
+        areaOfInterest: row.areaOfInterest,
+        resumeSignedUrl,
+        submittedAt: row.submittedAt.toISOString(),
+      });
+    } catch (err) {
+      console.error("[resume-submit] Email failed:", err);
+    }
+
+    return json({ success: true });
+  } catch (err) {
+    console.error("[resume-submit] Submission failed:", err);
+    return json(
+      { success: false, errors: { _form: "We couldn't submit your resume. Please try again." } },
+      500,
+    );
+  }
+};
+
+function validateResume(value: FormDataEntryValue | null): string | null {
+  if (!value || typeof value === "string") return "Attach your resume.";
+  const ext = value.name.slice(value.name.lastIndexOf(".")).toLowerCase();
+  if (!ALLOWED_EXTENSIONS.includes(ext)) return "Resume must be a .pdf, .doc, or .docx file.";
+  if (value.type !== "" && !ALLOWED_MIME_TYPES.has(value.type))
+    return "Resume must be a .pdf, .doc, or .docx file.";
+  if (value.size === 0) return "Attach your resume.";
+  if (value.size > MAX_RESUME_BYTES) return "Resume must be 5MB or smaller.";
+  return null;
+}
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+function flattenErrors(error: z.ZodError): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const issue of error.issues) {
+    const key = issue.path.join(".") || "_form";
+    if (!out[key]) out[key] = issue.message;
+  }
+  return out;
+}

@@ -48,3 +48,19 @@ model JobApplication {
 
   @@map("job_applications")
 }
+
+model ResumeSubmission {
+  id             String    @id @default(cuid())
+  fullName       String
+  email          String
+  areaOfInterest String
+  resumeKey      String
+  resumeFileName String
+  consentGiven   Boolean
+  ipHash         String
+  submissionId   String    @unique @default(cuid())
+  submittedAt    DateTime  @default(now())
+  exportedAt     DateTime?
+
+  @@map("resume_submissions")
+}

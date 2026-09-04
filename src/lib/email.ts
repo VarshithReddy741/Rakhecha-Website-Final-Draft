@@ -94,3 +94,41 @@ export async function sendCareersNotification(data: {
     }),
   ]);
 }
+
+export async function sendResumeNotification(data: {
+  fullName: string;
+  email: string;
+  areaOfInterest: string;
+  resumeSignedUrl: string;
+  submittedAt: string;
+}): Promise<void> {
+  const ta = toList(
+    process.env.EMAIL_INTERNAL_TA ?? process.env.EMAIL_INTERNAL_TEAM,
+    "team@rakhechafinserv.com",
+  );
+  await Promise.all([
+    resend.emails.send({
+      from: FROM,
+      to: ta,
+      subject: "New Resume Submission — " + data.areaOfInterest,
+      html:
+        "<h2>New General Resume Submission</h2><table cellpadding='6'>" +
+        "<tr><td><b>Name</b></td><td>" + data.fullName + "</td></tr>" +
+        "<tr><td><b>Area of Interest</b></td><td>" + data.areaOfInterest + "</td></tr>" +
+        "<tr><td><b>Email</b></td><td>" + data.email + "</td></tr>" +
+        "<tr><td><b>Submitted</b></td><td>" + data.submittedAt + "</td></tr>" +
+        "</table>" +
+        "<p><a href='" + data.resumeSignedUrl + "'>Download Resume (1hr link)</a></p>" +
+        "<p style='font-size:11px;color:#888'>Do not forward — signed URL contains credentials.</p>",
+    }),
+    resend.emails.send({
+      from: FROM,
+      to: [data.email],
+      subject: "Resume Received — Rakhecha Finserv",
+      html:
+        "<p>Dear " + data.fullName + ",</p>" +
+        "<p>Thank you for sharing your resume with Rakhecha Finserv. We'll keep it on file and reach out if a role matching your interest in <b>" + data.areaOfInterest + "</b> opens up.</p>" +
+        "<p>Best regards,<br/><b>Rakhecha Finserv Team</b></p>",
+    }),
+  ]);
+}

@@ -29,12 +29,13 @@ function toList(env: string | undefined, fallback: string) {
 async function run() {
   const exportDate = new Date().toISOString().slice(0, 10);
 
-  const [contacts, applications] = await Promise.all([
+  const [contacts, applications, resumes] = await Promise.all([
     db.contactSubmission.findMany({ where: { exportedAt: null } }),
     db.jobApplication.findMany({ where: { exportedAt: null } }),
+    db.resumeSubmission.findMany({ where: { exportedAt: null } }),
   ]);
 
-  if (!contacts.length && !applications.length) {
+  if (!contacts.length && !applications.length && !resumes.length) {
     console.log("[export] " + exportDate + ": No new submissions.");
     return;
   }
@@ -77,6 +78,18 @@ async function run() {
     );
   }
 
+  if (resumes.length) {
+    const ws = wb.addWorksheet("Resume Submissions");
+    ws.columns = [
+      { header: "Submission ID", key: "submissionId" },
+      { header: "Name", key: "fullName" },
+      { header: "Email", key: "email" },
+      { header: "Area of Interest", key: "areaOfInterest" },
+      { header: "Submitted At", key: "submittedAt" },
+    ];
+    resumes.forEach((r) => ws.addRow({ ...r, submittedAt: r.submittedAt.toISOString() }));
+  }
+
   const buffer = Buffer.from(await wb.xlsx.writeBuffer());
   const exportKey = "exports/leads-" + exportDate + ".xlsx";
   const store = s3();
@@ -105,6 +118,7 @@ async function run() {
       "<h2>Daily Lead Export — " + exportDate + "</h2>" +
       "<p><b>" + contacts.length + "</b> consultation request(s)</p>" +
       "<p><b>" + applications.length + "</b> job application(s)</p>" +
+      "<p><b>" + resumes.length + "</b> resume submission(s)</p>" +
       "<p><a href='" + signedUrl + "'><b>Download Export (XLSX)</b></a></p>" +
       "<p style='font-size:11px;color:#888'>Expires: " + expiresAt + ". Do not forward.</p>",
   });
@@ -121,9 +135,14 @@ async function run() {
         where: { id: { in: applications.map((a) => a.id) } },
         data: { exportedAt: now },
       }),
+    resumes.length &&
+      db.resumeSubmission.updateMany({
+        where: { id: { in: resumes.map((r) => r.id) } },
+        data: { exportedAt: now },
+      }),
   ]);
 
-  console.log("[export] " + exportDate + ": " + contacts.length + " contacts, " + applications.length + " applications exported.");
+  console.log("[export] " + exportDate + ": " + contacts.length + " contacts, " + applications.length + " applications, " + resumes.length + " resumes exported.");
 }
 
 run()

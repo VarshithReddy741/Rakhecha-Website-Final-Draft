@@ -113,16 +113,20 @@ export const POST: APIRoute = async ({ request }) => {
 
     const resumeSignedUrl = await getSignedDownloadUrl(resumeKey, 3600);
 
-    sendCareersNotification({
-      firstName: row.firstName,
-      lastName: row.lastName,
-      email: row.email,
-      contactNumber: row.contactNumber,
-      jobTitleSnapshot: row.jobTitleSnapshot,
-      jobId: row.jobId,
-      resumeSignedUrl,
-      submittedAt: row.submittedAt.toISOString(),
-    }).catch((err) => console.error("[careers-apply] Email failed:", err));
+    try {
+      await sendCareersNotification({
+        firstName: row.firstName,
+        lastName: row.lastName,
+        email: row.email,
+        contactNumber: row.contactNumber,
+        jobTitleSnapshot: row.jobTitleSnapshot,
+        jobId: row.jobId,
+        resumeSignedUrl,
+        submittedAt: row.submittedAt.toISOString(),
+      });
+    } catch (err) {
+      console.error("[careers-apply] Email failed:", err);
+    }
 
     return json({ success: true });
   } catch (err) {

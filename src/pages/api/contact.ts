@@ -60,14 +60,18 @@ export const POST: APIRoute = async ({ request }) => {
       },
     });
 
-    sendContactNotification({
-      fullName: row.fullName,
-      email: row.email,
-      contactNumber: row.contactNumber,
-      serviceSelection: row.serviceSelection,
-      queryDetails: row.queryDetails,
-      submittedAt: row.submittedAt.toISOString(),
-    }).catch((err) => console.error("[contact] Email failed:", err));
+    try {
+      await sendContactNotification({
+        fullName: row.fullName,
+        email: row.email,
+        contactNumber: row.contactNumber,
+        serviceSelection: row.serviceSelection,
+        queryDetails: row.queryDetails,
+        submittedAt: row.submittedAt.toISOString(),
+      });
+    } catch (err) {
+      console.error("[contact] Email failed:", err);
+    }
 
     return json({ success: true });
   } catch (err) {

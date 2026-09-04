@@ -11,6 +11,10 @@ export async function getStaticPaths() {
 
 const founder = await sanityClient.fetch(queries.founderBySlug, { slug: Astro.params.slug });
 if (!founder) return Astro.redirect("/404");
+
+const { name, role, photoUrl: photo, education, shortBio, extendedBio, linkedinUrl } = founder;
+const extendedParagraphs = (extendedBio ?? "").split("\n\n").filter(Boolean);
+const metaDescription = `${name} — ${role} at Rakhecha Finserv. ${(shortBio ?? "").slice(0, 100)}`;
 ---
 
 <BaseLayout
@@ -26,11 +30,7 @@ if (!founder) return Astro.redirect("/404");
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop relative z-10 flex flex-col md:flex-row items-end md:items-center gap-8 md:gap-16">
         <div class="hidden md:block w-48 h-48 md:w-80 md:h-80 lg:w-96 lg:h-96 shrink-0 relative mt-8 md:mt-0 md:-mb-64 z-20">
           {
-            localPhoto ? (
-              <Image src={localPhoto} alt={name} width={480} class="w-full h-full object-cover rounded-lg shadow-2xl ring-4 ring-surface/10" />
-            ) : (
-              <img class="w-full h-full object-cover rounded-lg shadow-2xl ring-4 ring-surface/10" alt={name} src={photo} />
-            )
+              <img class="w-full h-full object-cover rounded-lg shadow-2xl ring-4 ring-surface/10" alt={name} src={photo ?? ""} />
           }
         </div>
         <div class="text-on-primary flex-grow pb-8 md:pb-0">
@@ -59,11 +59,7 @@ if (!founder) return Astro.redirect("/404");
     <!-- Mobile Portrait -->
     <div class="md:hidden max-w-container-max mx-auto px-margin-mobile pt-8">
       {
-        localPhoto ? (
-          <Image src={localPhoto} alt={name} width={800} class="w-full h-auto rounded-lg shadow-lg" />
-        ) : (
-          <img alt={name} class="w-full h-auto rounded-lg shadow-lg" src={photo} />
-        )
+          <img alt={name} class="w-full h-auto rounded-lg shadow-lg" src={photo ?? ""} />
       }
     </div>
 

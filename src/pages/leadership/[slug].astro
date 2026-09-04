@@ -1,50 +1,16 @@
 ---
-// Styled to match the layout of "Founder Detail Page.html" in the repo
-// root (hero with overlapping portrait + prose bio section). That source
-// page hardcoded Dev Piyush Rakhecha's content and an "Areas of Expertise"
-// grid that isn't part of the founders collection schema — the grid is
-// intentionally left out here since inventing per-founder expertise tags
-// wasn't part of this task; the hero/bio layout is what's ported.
 import { sanityClient, queries } from "../../lib/sanity";
-import { Image } from "astro:assets";
-import type { ImageMetadata } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
-import { truncateDescription } from "../../lib/seo";
-import devPhoto from "../../assets/images/Dev.png";
-import nitishPhoto from "../../assets/images/Nitish.png";
-import nidhhiPhoto from "../../assets/images/Nidhhi.png";
-
-// Local, build-time-optimized photos for the founders whose photo actually
-// lives in src/assets/ — Megha's is still a remote placeholder (see her
-// founders/*.json entry) and falls back to a plain <img> below.
-const founderPhotos: Record<string, ImageMetadata> = {
-  "dev-piyush-rakhecha": devPhoto,
-  "nitish-rakhecha": nitishPhoto,
-  "nidhhi-rakhecha": nidhhiPhoto,
-};
 
 export async function getStaticPaths() {
   const slugs = await sanityClient.fetch(queries.allFounderSlugs);
-  return slugs.map((f: { slug: string }) => ({ params: { slug: f.slug } }));
-},
-    props: { founder },
-  }));
+  return slugs.map((item: { slug: string }) => ({ params: { slug: item.slug } }));
 }
 
-const { founder } = Astro.props;
-const { name, role, photo, education, shortBio, extendedBio, linkedinUrl } = founder.data;
-const extendedParagraphs = extendedBio.split(/\n\n+/);
-
-// Three of the four founders were ported with a placeholder
-// "TODO: short bio pending" (see founders/*.json source comments) — use the
-// real bio only when one actually exists.
-const metaDescription = shortBio.startsWith("TODO:")
-  ? `Meet ${name}, ${role} at Rakhecha Finserv.`
-  : truncateDescription(shortBio);
-
-const localPhoto = founderPhotos[founder.slug];
+const founder = await sanityClient.fetch(queries.founderBySlug, { slug: Astro.params.slug });
+if (!founder) return Astro.redirect("/404");
 ---
 
 <BaseLayout

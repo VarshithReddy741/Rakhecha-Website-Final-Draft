@@ -1,12 +1,4 @@
 ---
-// Styled to match "Job detail.html" in the repo root. That source file's
-// own hardcoded content ("Senior Manager - Legal & Compliance") didn't
-// match ANY of the three job listings on careers.html — every "View"
-// button pointed to this one shared, unrelated page (same bug as the
-// founder cards). The three real listings only ever carried title/job
-// ID/location/type/experience on careers.html — no description or
-// requirements exist for them anywhere on the live site, so those fields
-// are placeholders here (flagged in the migration summary).
 import { sanityClient, queries } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
@@ -15,17 +7,13 @@ import Footer from "../../components/Footer.astro";
 export async function getStaticPaths() {
   const slugs = await sanityClient.fetch(queries.allJobSlugs);
   return slugs.map((j: { slug: string }) => ({ params: { slug: j.slug } }));
-},
-    props: { job },
-  }));
 }
 
-const { job } = Astro.props;
-const { title, jobId, location, employmentType, experience, description, responsibilities, qualifications } = job.data;
+const job = await sanityClient.fetch(queries.jobBySlug, { slug: Astro.params.slug });
+if (!job) return Astro.redirect("/404");
 
-// careers.html never carried a real job description for any listing, so we
-// summarize from the fields that ARE real (title/location/type/experience)
-// rather than pulling from the TODO-placeholder `description` field.
+const { title, jobId, location, employmentType, experience, description, responsibilities, qualifications } = job;
+
 const metaDescription = `${title} — a ${employmentType.toLowerCase()} role at Rakhecha Finserv in ${location}, requiring ${experience} of experience. View details and apply.`;
 ---
 

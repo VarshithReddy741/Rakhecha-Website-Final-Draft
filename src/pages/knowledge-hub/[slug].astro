@@ -1,36 +1,16 @@
 ---
-// Styled to match "Article Page.html" in the repo root. That source file's
-// own hardcoded content ("What the Rise of SIFs Signals for Indian
-// Wealth") didn't match ANY of the article cards linking to it on
-// Knowledge hub.html — every card there pointed to this one shared,
-// unrelated page (same bug as the founder cards). Ported as its own real
-// article entry (rise-of-sifs-signals-for-indian-wealth) rather than
-// force-matched to a card; the 4 actual cards get real title/date/image
-// with placeholder body content, since no body copy exists for them
-// anywhere on the live site.
 import { sanityClient, queries } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
-import { truncateDescription } from "../../lib/seo";
 
 export async function getStaticPaths() {
   const slugs = await sanityClient.fetch(queries.allArticleSlugs);
-  return slugs.map((a: { slug: string }) => ({ params: { slug: a.slug } }));
-},
-    props: { article },
-  }));
+  return slugs.map((item: { slug: string }) => ({ params: { slug: item.slug } }));
 }
 
-const { article } = Astro.props;
-const { title, category, date, image, authorName, authorRole, authorPhoto, excerpt, body } = article.data;
-
-// Most articles were ported with a placeholder "TODO: excerpt pending" body
-// (see the articles/*.json source comments) — use the real excerpt only
-// when one actually exists, otherwise fall back to the fields that are real.
-const metaDescription = excerpt.startsWith("TODO:")
-  ? `${title} — a ${category} from Rakhecha Finserv's Knowledge Hub, published ${date}.`
-  : truncateDescription(excerpt);
+const article = await sanityClient.fetch(queries.articleBySlug, { slug: Astro.params.slug });
+if (!article) return Astro.redirect("/404");
 ---
 
 <BaseLayout

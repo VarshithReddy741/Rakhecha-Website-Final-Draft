@@ -18,10 +18,10 @@ import nitishPhoto from "../assets/images/Nitish.png";
 import nidhhiPhoto from "../assets/images/Nidhhi.png";
 
 const founderOrder = ["dev-piyush-rakhecha", "nidhhi-rakhecha", "nitish-rakhecha", "megha-rakhecha"];
-const founderEntries = await getCollection("founders");
+const founderEntries = await sanityClient.fetch(queries.allFounders);
 const founders = founderOrder
-  .map((slug) => founderEntries.find((f) => f.slug === slug))
-  .filter((f): f is NonNullable<typeof f> => Boolean(f));
+  .map((slug) => founderEntries.find((f: any) => f.slug === slug))
+  .filter((f: any) => Boolean(f));
 
 // Local, build-time-optimized photos for the founders whose photo actually
 // lives in src/assets/ — Megha's is still a remote placeholder (see her
@@ -162,7 +162,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
         <div class="relative">
           <div class="founder-scroll no-scrollbar flex overflow-x-auto snap-x snap-mandatory scroll-smooth md:overflow-visible p-2 md:p-4 pb-8 md:pb-4 md:grid md:grid-cols-4 gap-4 md:gap-6" id="about-founder-cards">
             {founders.map((f) => (
-              <FounderCard href={`/leadership/${f.slug}/`} image={founderPhotos[f.slug] ?? f.photoUrl} name={f.name} role={f.role} education={f.data.education} />
+              <FounderCard href={`/leadership/${f.slug}/`} image={founderPhotos[f.slug] ?? f.photoUrl} name={f.name} role={f.role} education={f.education} />
             ))}
           </div>
           <button aria-label="Scroll left" class="founder-scroll-btn md:hidden absolute left-1 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-primary/80 text-white shadow-md" data-scroll-dir="-1" data-scroll-target="about-founder-cards" type="button"><span class="material-symbols-outlined text-lg">chevron_left</span></button>

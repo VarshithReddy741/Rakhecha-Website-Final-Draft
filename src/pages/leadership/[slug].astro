@@ -5,7 +5,7 @@
 // grid that isn't part of the founders collection schema — the grid is
 // intentionally left out here since inventing per-founder expertise tags
 // wasn't part of this task; the hero/bio layout is what's ported.
-import { getCollection } from "astro:content";
+import { sanityClient, queries } from "../../lib/sanity";
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -26,9 +26,9 @@ const founderPhotos: Record<string, ImageMetadata> = {
 };
 
 export async function getStaticPaths() {
-  const founders = await getCollection("founders");
-  return founders.map((founder) => ({
-    params: { slug: founder.data.slug },
+  const slugs = await sanityClient.fetch(queries.allFounderSlugs);
+  return slugs.map((f: { slug: string }) => ({ params: { slug: f.slug } }));
+},
     props: { founder },
   }));
 }
@@ -44,7 +44,7 @@ const metaDescription = shortBio.startsWith("TODO:")
   ? `Meet ${name}, ${role} at Rakhecha Finserv.`
   : truncateDescription(shortBio);
 
-const localPhoto = founderPhotos[founder.data.slug];
+const localPhoto = founderPhotos[founder.slug];
 ---
 
 <BaseLayout

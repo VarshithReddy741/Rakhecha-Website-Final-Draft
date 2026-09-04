@@ -8,16 +8,16 @@
 // force-matched to a card; the 4 actual cards get real title/date/image
 // with placeholder body content, since no body copy exists for them
 // anywhere on the live site.
-import { getCollection } from "astro:content";
+import { sanityClient, queries } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { truncateDescription } from "../../lib/seo";
 
 export async function getStaticPaths() {
-  const articles = await getCollection("articles");
-  return articles.map((article) => ({
-    params: { slug: article.data.slug },
+  const slugs = await sanityClient.fetch(queries.allArticleSlugs);
+  return slugs.map((a: { slug: string }) => ({ params: { slug: a.slug } }));
+},
     props: { article },
   }));
 }

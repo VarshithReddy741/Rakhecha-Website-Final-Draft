@@ -7,15 +7,15 @@
 // ID/location/type/experience on careers.html — no description or
 // requirements exist for them anywhere on the live site, so those fields
 // are placeholders here (flagged in the migration summary).
-import { getCollection } from "astro:content";
+import { sanityClient, queries } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 
 export async function getStaticPaths() {
-  const jobs = await getCollection("jobs");
-  return jobs.map((job) => ({
-    params: { slug: job.data.slug },
+  const slugs = await sanityClient.fetch(queries.allJobSlugs);
+  return slugs.map((j: { slug: string }) => ({ params: { slug: j.slug } }));
+},
     props: { job },
   }));
 }

@@ -3,7 +3,7 @@
 // FounderCard/MissionVision components; the "Want to Know More?" banner
 // uses CtaBanner (Prompt 2). Carousel/reveal behaviors come from
 // /scripts/site-effects.js.
-import { getCollection } from "astro:content";
+import { sanityClient, queries } from "../lib/sanity";
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -20,7 +20,7 @@ import nidhhiPhoto from "../assets/images/Nidhhi.png";
 const founderOrder = ["dev-piyush-rakhecha", "nidhhi-rakhecha", "nitish-rakhecha", "megha-rakhecha"];
 const founderEntries = await getCollection("founders");
 const founders = founderOrder
-  .map((slug) => founderEntries.find((f) => f.data.slug === slug))
+  .map((slug) => founderEntries.find((f) => f.slug === slug))
   .filter((f): f is NonNullable<typeof f> => Boolean(f));
 
 // Local, build-time-optimized photos for the founders whose photo actually
@@ -162,7 +162,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
         <div class="relative">
           <div class="founder-scroll no-scrollbar flex overflow-x-auto snap-x snap-mandatory scroll-smooth md:overflow-visible p-2 md:p-4 pb-8 md:pb-4 md:grid md:grid-cols-4 gap-4 md:gap-6" id="about-founder-cards">
             {founders.map((f) => (
-              <FounderCard href={`/leadership/${f.data.slug}/`} image={founderPhotos[f.data.slug] ?? f.data.photo} name={f.data.name} role={f.data.role} education={f.data.education} />
+              <FounderCard href={`/leadership/${f.slug}/`} image={founderPhotos[f.slug] ?? f.photoUrl} name={f.name} role={f.role} education={f.data.education} />
             ))}
           </div>
           <button aria-label="Scroll left" class="founder-scroll-btn md:hidden absolute left-1 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-primary/80 text-white shadow-md" data-scroll-dir="-1" data-scroll-target="about-founder-cards" type="button"><span class="material-symbols-outlined text-lg">chevron_left</span></button>

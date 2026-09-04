@@ -7,16 +7,21 @@
 // The Reports and Blog tab cards now link to their own /knowledge-hub/[slug]/
 // page (from the articles collection, Prompt 4) instead of the single
 // shared "Article Page.html" every card pointed to.
-import { getCollection } from "astro:content";
+import { sanityClient, queries } from "../lib/sanity";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import EventRegistrationModal from "../components/EventRegistrationModal.astro";
 
-const articles = await getCollection("articles");
-const bySlug = (slug: string) => articles.find((a) => a.data.slug === slug)!;
-const reportsArticles = [bySlug("navigating-secondary-markets"), bySlug("analyzing-global-fpi-inflows")];
-const blogArticles = [bySlug("future-of-family-offices"), bySlug("demystifying-private-credit")];
+const [reports, blogs, upcomingEvents, pastEvents, videos] = await Promise.all([
+  sanityClient.fetch(queries.reportArticles),
+  sanityClient.fetch(queries.blogArticles),
+  sanityClient.fetch(queries.upcomingEvents),
+  sanityClient.fetch(queries.pastEvents),
+  sanityClient.fetch(queries.videos),
+]);
+const featuredEvent = upcomingEvents.find((e: any) => e.isFeatured) ?? upcomingEvents[0] ?? null;
+const sessionEvents = (featuredEvent ? upcomingEvents.filter((e: any) => e !== featuredEvent) : upcomingEvents).slice(0, 3);
 ---
 
 <BaseLayout
@@ -257,10 +262,10 @@ const blogArticles = [bySlug("future-of-family-offices"), bySlug("demystifying-p
           <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">View All Reports <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reportsArticles.map(({ data: a }) => (
+          {reports.map((a: any) => (
             <a href={`/knowledge-hub/${a.slug}/`} class="contents">
               <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
-                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.image}')`}></div>
+                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.imageUrl ?? ""}')`}></div>
                 <div class="p-6 flex flex-col flex-grow">
                   <span class="bg-surface-container-high text-primary font-label-bold text-label-bold px-2 py-1 rounded-sm w-max mb-4 uppercase tracking-wider">{a.category}</span>
                   <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors line-clamp-3">{a.title}</h3>
@@ -306,10 +311,10 @@ const blogArticles = [bySlug("future-of-family-offices"), bySlug("demystifying-p
           <h3 class="font-headline-lg text-headline-lg text-primary">Editorial Insights</h3>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blogArticles.map(({ data: a }) => (
+          {blogs.map((a: any) => (
             <a href={`/knowledge-hub/${a.slug}/`} class="contents">
               <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
-                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.image}')`}></div>
+                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.imageUrl ?? ""}')`}></div>
                 <div class="p-6 flex flex-col flex-grow">
                   <span class="bg-surface-container-high text-primary font-label-bold text-label-bold px-2 py-1 rounded-sm w-max mb-4 uppercase tracking-wider">{a.category}</span>
                   <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors line-clamp-3">{a.title}</h3>

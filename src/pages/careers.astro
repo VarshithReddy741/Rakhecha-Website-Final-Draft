@@ -2,14 +2,14 @@
 // Ported from "careers.html". The three job cards now link to their own
 // /careers/[slug]/ page (pulled from the jobs collection) instead of the
 // single shared "Job detail.html" every card pointed to.
-import { getCollection } from "astro:content";
+import { sanityClient, queries } from "../lib/sanity";
 import { getImage } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import careersHeroImage from "../assets/images/Careers.jpg";
 
-const jobs = await getCollection("jobs");
+const jobs = await sanityClient.fetch(queries.allJobs);
 
 // Used as a CSS background-image, not an <img>/<Image> — pre-optimized
 // through Astro's image pipeline here so the page still gets a hashed,
@@ -77,7 +77,7 @@ const careersHeroOptimized = await getImage({ src: careersHeroImage, width: 1920
           </div>
           <div class="space-y-6">
             {
-              jobs.map(({ data: job }) => (
+              jobs.map((job) => (
                 <div class="bg-surface-container-lowest rounded-lg border border-surface-variant p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 hover:shadow-md transition-all">
                   <div class="flex-grow">
                     <div class="flex items-center gap-3 mb-2">

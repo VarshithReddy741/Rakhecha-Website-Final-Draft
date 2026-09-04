@@ -9,8 +9,8 @@ function client(): S3Client {
       accessKeyId: process.env.S3_ACCESS_KEY_ID!,
       secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
     },
-    requestChecksumCalculation: "when_required",
-    responseChecksumValidation: "when_required",
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
 }
 

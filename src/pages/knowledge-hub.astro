@@ -115,7 +115,7 @@ function formatEventDate(dateStr?: string) {
                 <p class="font-body-md text-body-md text-on-surface-variant mb-8 line-clamp-3">{featuredEvent.description}</p>
               )}
               <div class="flex flex-col sm:flex-row items-center gap-6 mt-auto">
-                <button class="w-full sm:w-auto bg-primary text-on-primary font-cta-text text-cta-text px-8 py-3 rounded-lg hover:bg-on-primary-fixed transition-colors flex items-center justify-center gap-2" data-register-event={featuredEvent.title}>Register Now <span class="material-symbols-outlined">arrow_forward</span></button>
+                <button class="w-full sm:w-auto bg-primary text-on-primary font-cta-text text-cta-text px-8 py-3 rounded-lg hover:bg-on-primary-fixed transition-colors flex items-center justify-center gap-2" data-register-event={featuredEvent.title} data-register-event-id={featuredEvent._id}>Register Now <span class="material-symbols-outlined">arrow_forward</span></button>
                 <div class="event-countdown flex items-center gap-4 text-center" data-event-date={featuredEvent.date}>
                   <div class="flex flex-col">
                     <span class="font-headline-md text-headline-md text-primary countdown-days">--</span>
@@ -157,7 +157,7 @@ function formatEventDate(dateStr?: string) {
                 {e.location && <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">location_on</span> {e.location}</div>}
               </div>
               {e.description && <p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2 flex-grow">{e.description}</p>}
-              <button class="w-full border border-primary text-primary font-cta-text text-cta-text px-4 py-2 rounded hover:bg-primary hover:text-on-primary transition-colors mt-auto" data-register-event={e.title}>Register Interest</button>
+              <button class="w-full border border-primary text-primary font-cta-text text-cta-text px-4 py-2 rounded hover:bg-primary hover:text-on-primary transition-colors mt-auto" data-register-event={e.title} data-register-event-id={e._id}>Register Interest</button>
             </div>
           )) : (
             <p class="text-on-surface-variant col-span-full">No additional sessions scheduled at the moment.</p>

@@ -13,6 +13,13 @@ const SERVICE_LABELS: Record<string, string> = {
   insurance: "Insurance",
 };
 
+const INVESTOR_CATEGORY_LABELS: Record<string, string> = {
+  institutional_investor: "Institutional Investor",
+  family_office: "Family Office",
+  hnwi: "High Net Worth Individual",
+  financial_advisor: "Financial Advisor",
+};
+
 export async function sendContactNotification(data: {
   fullName: string;
   email: string;
@@ -90,6 +97,45 @@ export async function sendCareersNotification(data: {
         "<p>Dear " + data.firstName + ",</p>" +
         "<p>Thank you for applying for <b>" + data.jobTitleSnapshot + "</b> at Rakhecha Finserv.</p>" +
         "<p>Our talent acquisition team will review your application and be in touch if your profile is a match.</p>" +
+        "<p>Best regards,<br/><b>Rakhecha Finserv Team</b></p>",
+    }),
+  ]);
+}
+
+export async function sendEventRegistrationNotification(data: {
+  fullName: string;
+  email: string;
+  contactNumber: string;
+  currentLocation: string;
+  investorCategory: string;
+  eventTitleSnapshot: string;
+  submittedAt: string;
+}): Promise<void> {
+  const team = toList(process.env.EMAIL_INTERNAL_TEAM, "team@rakhechafinserv.com");
+  const categoryLabel = INVESTOR_CATEGORY_LABELS[data.investorCategory] ?? data.investorCategory;
+  await Promise.all([
+    resend.emails.send({
+      from: FROM,
+      to: team,
+      subject: "New Event Registration — " + data.eventTitleSnapshot,
+      html:
+        "<h2>New Event Registration</h2><table cellpadding='6'>" +
+        "<tr><td><b>Name</b></td><td>" + data.fullName + "</td></tr>" +
+        "<tr><td><b>Event</b></td><td>" + data.eventTitleSnapshot + "</td></tr>" +
+        "<tr><td><b>Email</b></td><td>" + data.email + "</td></tr>" +
+        "<tr><td><b>Phone</b></td><td>" + (data.contactNumber || "—") + "</td></tr>" +
+        "<tr><td><b>Location</b></td><td>" + data.currentLocation + "</td></tr>" +
+        "<tr><td><b>Investor Category</b></td><td>" + categoryLabel + "</td></tr>" +
+        "<tr><td><b>Submitted</b></td><td>" + data.submittedAt + "</td></tr>" +
+        "</table>",
+    }),
+    resend.emails.send({
+      from: FROM,
+      to: [data.email],
+      subject: "You're registered — " + data.eventTitleSnapshot,
+      html:
+        "<p>Dear " + data.fullName + ",</p>" +
+        "<p>You're registered for <b>" + data.eventTitleSnapshot + "</b>. We'll be in touch with further details ahead of the event.</p>" +
         "<p>Best regards,<br/><b>Rakhecha Finserv Team</b></p>",
     }),
   ]);

@@ -48,3 +48,22 @@ model JobApplication {
 
   @@map("job_applications")
 }
+
+model EventRegistration {
+  id                 String    @id @default(cuid())
+  eventId            String
+  eventTitleSnapshot String
+  fullName           String
+  email              String
+  contactNumber      String    @default("")
+  currentLocation    String
+  investorCategory   String
+  referralSource     String    @default("")
+  consentGiven       Boolean
+  ipHash             String
+  submissionId       String    @unique @default(cuid())
+  submittedAt        DateTime  @default(now())
+  exportedAt         DateTime?
+
+  @@map("event_registrations")
+}

@@ -29,12 +29,13 @@ function toList(env: string | undefined, fallback: string) {
 async function run() {
   const exportDate = new Date().toISOString().slice(0, 10);
 
-  const [contacts, applications] = await Promise.all([
+  const [contacts, applications, registrations] = await Promise.all([
     db.contactSubmission.findMany({ where: { exportedAt: null } }),
     db.jobApplication.findMany({ where: { exportedAt: null } }),
+    db.eventRegistration.findMany({ where: { exportedAt: null } }),
   ]);
 
-  if (!contacts.length && !applications.length) {
+  if (!contacts.length && !applications.length && !registrations.length) {
     console.log("[export] " + exportDate + ": No new submissions.");
     return;
   }
@@ -77,6 +78,23 @@ async function run() {
     );
   }
 
+  if (registrations.length) {
+    const ws = wb.addWorksheet("Event Registrations");
+    ws.columns = [
+      { header: "Submission ID", key: "submissionId" },
+      { header: "Name", key: "fullName" },
+      { header: "Email", key: "email" },
+      { header: "Phone", key: "contactNumber" },
+      { header: "Event", key: "eventTitleSnapshot" },
+      { header: "Event ID", key: "eventId" },
+      { header: "Location", key: "currentLocation" },
+      { header: "Investor Category", key: "investorCategory" },
+      { header: "Referral Source", key: "referralSource" },
+      { header: "Submitted At", key: "submittedAt" },
+    ];
+    registrations.forEach((r) => ws.addRow({ ...r, submittedAt: r.submittedAt.toISOString() }));
+  }
+
   const buffer = Buffer.from(await wb.xlsx.writeBuffer());
   const exportKey = "exports/leads-" + exportDate + ".xlsx";
   const store = s3();
@@ -105,6 +123,7 @@ async function run() {
       "<h2>Daily Lead Export — " + exportDate + "</h2>" +
       "<p><b>" + contacts.length + "</b> consultation request(s)</p>" +
       "<p><b>" + applications.length + "</b> job application(s)</p>" +
+      "<p><b>" + registrations.length + "</b> event registration(s)</p>" +
       "<p><a href='" + signedUrl + "'><b>Download Export (XLSX)</b></a></p>" +
       "<p style='font-size:11px;color:#888'>Expires: " + expiresAt + ". Do not forward.</p>",
   });
@@ -121,9 +140,14 @@ async function run() {
         where: { id: { in: applications.map((a) => a.id) } },
         data: { exportedAt: now },
       }),
+    registrations.length &&
+      db.eventRegistration.updateMany({
+        where: { id: { in: registrations.map((r) => r.id) } },
+        data: { exportedAt: now },
+      }),
   ]);
 
-  console.log("[export] " + exportDate + ": " + contacts.length + " contacts, " + applications.length + " applications exported.");
+  console.log("[export] " + exportDate + ": " + contacts.length + " contacts, " + applications.length + " applications, " + registrations.length + " registrations exported.");
 }
 
 run()

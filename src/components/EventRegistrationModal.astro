@@ -1,11 +1,8 @@
 ---
-// Shared event-registration popup. Any element anywhere on the page with a
-// `data-register-event="<Event Title>"` attribute opens this same modal,
-// pre-filled with that event's title — instead of each "Register" button
-// having its own separate flow (previously: the featured event on
-// /knowledge-hub/ opened this dialog, while the "Upcoming Sessions" cards
-// there transformed their own card content inline, and the homepage's
-// "Register Now"/"Register Interest" buttons did nothing at all).
+// Shared event-registration popup. Any element anywhere on the page with
+// `data-register-event="<Event Title>"` and `data-register-event-id="<Sanity _id>"`
+// attributes opens this same modal, pre-filled with that event's title —
+// instead of each "Register" button having its own separate flow.
 // Include this component once per page; it self-wires via event delegation
 // so no per-button JS is needed at the call site.
 ---
@@ -14,57 +11,84 @@
   <div class="bg-surface-container-lowest rounded-xl shadow-2xl overflow-hidden border border-outline-variant">
     <div class="flex justify-between items-center p-6 border-b border-outline-variant">
       <h3 class="font-headline-md text-headline-md text-primary">Event Registration</h3>
-      <button class="text-outline-variant hover:text-primary transition-colors" id="close-registration-modal"><span class="material-symbols-outlined">close</span></button>
+      <button class="text-outline-variant hover:text-primary transition-colors" id="close-registration-modal" type="button"><span class="material-symbols-outlined">close</span></button>
     </div>
     <div class="p-6 md:p-8">
-      <div class="bg-surface p-4 rounded-lg mb-6 border border-outline-variant">
-        <p class="font-label-bold text-label-bold text-primary uppercase mb-1">Registering for</p>
-        <p class="font-body-md text-body-md font-bold text-primary" id="registration-event-title">&nbsp;</p>
+      <div id="registrationFormCard">
+        <div class="bg-surface p-4 rounded-lg mb-6 border border-outline-variant">
+          <p class="font-label-bold text-label-bold text-primary uppercase mb-1">Registering for</p>
+          <p class="font-body-md text-body-md font-bold text-primary" id="registration-event-title">&nbsp;</p>
+        </div>
+        <p id="registrationFormError" class="hidden mb-4 text-sm text-error" role="alert"></p>
+        <form id="registrationForm" class="space-y-5">
+          <input type="hidden" name="eventId" id="registration-event-id" />
+          <input type="hidden" name="eventTitle" id="registration-event-title-input" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="space-y-1">
+              <label class="font-label-bold text-label-bold text-on-surface-variant" for="registration-fullName">Full Name *</label>
+              <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" id="registration-fullName" name="fullName" required type="text" />
+            </div>
+            <div class="space-y-1">
+              <label class="font-label-bold text-label-bold text-on-surface-variant" for="registration-email">Corporate Email *</label>
+              <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" id="registration-email" name="email" required type="email" />
+            </div>
+            <div class="space-y-1">
+              <label class="font-label-bold text-label-bold text-on-surface-variant" for="registration-contactNumber">Phone Number</label>
+              <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" id="registration-contactNumber" name="contactNumber" type="tel" />
+            </div>
+            <div class="space-y-1">
+              <label class="font-label-bold text-label-bold text-on-surface-variant" for="registration-currentLocation">City / Location *</label>
+              <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" id="registration-currentLocation" name="currentLocation" required type="text" />
+            </div>
+          </div>
+          <div class="space-y-1">
+            <label class="font-label-bold text-label-bold text-on-surface-variant" for="registration-investorCategory">Investor Category *</label>
+            <select class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" id="registration-investorCategory" name="investorCategory" required>
+              <option disabled selected value="">Select Category...</option>
+              <option value="institutional_investor">Institutional Investor</option>
+              <option value="family_office">Family Office</option>
+              <option value="hnwi">High Net Worth Individual</option>
+              <option value="financial_advisor">Financial Advisor</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="font-label-bold text-label-bold text-on-surface-variant" for="registration-referralSource">How did you hear about us?</label>
+            <select class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" id="registration-referralSource" name="referralSource">
+              <option selected value="">Select Source...</option>
+              <option value="direct_invitation">Direct Invitation</option>
+              <option value="linkedin">LinkedIn</option>
+              <option value="newsletter">Newsletter</option>
+              <option value="referral">Colleague / Referral</option>
+            </select>
+          </div>
+          <div>
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input
+                class="mt-0.5 h-4 w-4 shrink-0 rounded border border-outline-variant/30 text-primary focus:ring-primary"
+                id="registration-consentGiven"
+                name="consentGiven"
+                required
+                type="checkbox"
+              />
+              <span class="text-sm text-on-surface-variant leading-relaxed">
+                I consent to Rakhecha Finserv collecting and using my personal data to process this registration,
+                in accordance with the
+                <a class="text-primary underline hover:no-underline" href="/privacy-policy/">Privacy Policy</a>.
+              </span>
+            </label>
+          </div>
+          <div class="pt-4 flex justify-end gap-4">
+            <button class="px-6 py-2 border border-outline-variant text-on-surface-variant font-cta-text rounded hover:bg-surface transition-colors" id="cancel-registration-modal" type="button">Cancel</button>
+            <button class="px-6 py-2 bg-primary text-on-primary font-cta-text rounded hover:bg-on-primary-fixed transition-colors disabled:opacity-60 disabled:cursor-not-allowed" id="confirm-registration-modal" type="submit">Secure Spot</button>
+          </div>
+        </form>
       </div>
-      <form class="space-y-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div class="space-y-1">
-            <label class="font-label-bold text-label-bold text-on-surface-variant">Full Name *</label>
-            <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" type="text" />
-          </div>
-          <div class="space-y-1">
-            <label class="font-label-bold text-label-bold text-on-surface-variant">Corporate Email *</label>
-            <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" type="email" />
-          </div>
-          <div class="space-y-1">
-            <label class="font-label-bold text-label-bold text-on-surface-variant">Phone Number</label>
-            <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" type="tel" />
-          </div>
-          <div class="space-y-1">
-            <label class="font-label-bold text-label-bold text-on-surface-variant">City / Location *</label>
-            <input class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm" type="text" />
-          </div>
-        </div>
-        <div class="space-y-1">
-          <label class="font-label-bold text-label-bold text-on-surface-variant">Investor Category *</label>
-          <select class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm">
-            <option>Select Category...</option>
-            <option>Institutional Investor</option>
-            <option>Family Office</option>
-            <option>High Net Worth Individual</option>
-            <option>Financial Advisor</option>
-          </select>
-        </div>
-        <div class="space-y-1">
-          <label class="font-label-bold text-label-bold text-on-surface-variant">How did you hear about us?</label>
-          <select class="w-full bg-transparent border border-outline-variant rounded py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-body-sm">
-            <option>Select Source...</option>
-            <option>Direct Invitation</option>
-            <option>LinkedIn</option>
-            <option>Newsletter</option>
-            <option>Colleague / Referral</option>
-          </select>
-        </div>
-        <div class="pt-4 flex justify-end gap-4">
-          <button class="px-6 py-2 border border-outline-variant text-on-surface-variant font-cta-text rounded hover:bg-surface transition-colors" id="cancel-registration-modal" type="button">Cancel</button>
-          <button class="px-6 py-2 bg-primary text-on-primary font-cta-text rounded hover:bg-on-primary-fixed transition-colors" id="confirm-registration-modal" type="button">Secure Spot</button>
-        </div>
-      </form>
+      <div id="registrationSuccess" class="hidden text-center py-6" role="status">
+        <span class="material-symbols-outlined text-secondary-container text-[48px] mb-4 inline-block" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+        <p class="font-headline-md text-headline-md text-primary mb-2">You're Registered</p>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">We've sent a confirmation to your email. We'll be in touch with further details ahead of the event.</p>
+        <button class="px-6 py-2 bg-primary text-on-primary font-cta-text rounded hover:bg-on-primary-fixed transition-colors" id="done-registration-modal" type="button">Done</button>
+      </div>
     </div>
   </div>
 </dialog>
@@ -79,9 +103,33 @@
 <script>
   const modal = document.getElementById("registrationModal") as HTMLDialogElement;
   const eventTitleEl = document.getElementById("registration-event-title") as HTMLParagraphElement;
+  const eventIdInput = document.getElementById("registration-event-id") as HTMLInputElement;
+  const eventTitleInput = document.getElementById("registration-event-title-input") as HTMLInputElement;
+  const formCard = document.getElementById("registrationFormCard") as HTMLElement;
+  const successPanel = document.getElementById("registrationSuccess") as HTMLElement;
+  const form = document.getElementById("registrationForm") as HTMLFormElement;
+  const formError = document.getElementById("registrationFormError") as HTMLParagraphElement;
+  const submitButton = document.getElementById("confirm-registration-modal") as HTMLButtonElement;
 
-  function openModal(eventTitle: string) {
+  function setFormError(message: string | null) {
+    formError.textContent = message ?? "";
+    formError.classList.toggle("hidden", !message);
+  }
+
+  function resetModal() {
+    form.reset();
+    setFormError(null);
+    formCard.classList.remove("hidden");
+    successPanel.classList.add("hidden");
+    submitButton.disabled = false;
+    submitButton.textContent = "Secure Spot";
+  }
+
+  function openModal(eventTitle: string, eventId: string) {
+    resetModal();
     eventTitleEl.textContent = eventTitle;
+    eventTitleInput.value = eventTitle;
+    eventIdInput.value = eventId;
     modal.showModal();
     document.body.style.overflow = "hidden";
   }
@@ -97,12 +145,12 @@
     const trigger = (e.target as Element).closest<HTMLElement>("[data-register-event]");
     if (!trigger) return;
     e.preventDefault();
-    openModal(trigger.dataset.registerEvent ?? "");
+    openModal(trigger.dataset.registerEvent ?? "", trigger.dataset.registerEventId ?? "");
   });
 
   document.getElementById("close-registration-modal")?.addEventListener("click", closeModal);
   document.getElementById("cancel-registration-modal")?.addEventListener("click", closeModal);
-  document.getElementById("confirm-registration-modal")?.addEventListener("click", closeModal);
+  document.getElementById("done-registration-modal")?.addEventListener("click", closeModal);
 
   modal.addEventListener("click", (e) => {
     const dialogDimensions = modal.getBoundingClientRect();
@@ -113,6 +161,38 @@
       e.clientY > dialogDimensions.bottom
     ) {
       closeModal();
+    }
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    setFormError(null);
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    try {
+      const response = await fetch("/api/event-register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const payload = await response.json();
+
+      if (!response.ok || !payload.success) {
+        setFormError(payload.errors?._form ?? "We couldn't submit your registration. Please check the form and try again.");
+        submitButton.disabled = false;
+        submitButton.textContent = "Secure Spot";
+        return;
+      }
+
+      formCard.classList.add("hidden");
+      successPanel.classList.remove("hidden");
+    } catch {
+      setFormError("Something went wrong. Please check your connection and try again.");
+      submitButton.disabled = false;
+      submitButton.textContent = "Secure Spot";
     }
   });
 </script>

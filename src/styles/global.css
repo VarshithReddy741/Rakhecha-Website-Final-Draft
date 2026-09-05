@@ -231,3 +231,25 @@
    above (dark: utilities apply under a .dark ancestor class). */
 
 @import "./theme.css";
+
+/* Seamless auto-scrolling card marquee (testimonials, industry recognition).
+   The track's content is duplicated once in markup; animating -50% loops
+   back to a visually identical starting point instead of the visible jump
+   cut you'd get from resetting an overflow container's scrollLeft to 0.
+   Pausing is handled in JS (site-effects.js) via the .marquee-paused class
+   so hover, touch, and click/drag all pause+resume the same way. */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  width: max-content;
+  animation: marquee-scroll linear infinite;
+}
+.marquee-track.marquee-paused {
+  animation-play-state: paused;
+}

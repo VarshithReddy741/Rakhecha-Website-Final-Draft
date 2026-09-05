@@ -6,6 +6,28 @@
 // founder-carousel arrow buttons, and the "Our Businesses" reveal-on-scroll
 // animation. Loaded only on pages that use these classes/attributes.
 
+// Seamless CSS-animation card marquees (.marquee-track, paired with the
+// @keyframes/utility classes in global.css). Pauses on hover, touch, and
+// mousedown/drag alike — one class toggle drives all three, so it behaves
+// the same on desktop and mobile.
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".marquee-track").forEach((track) => {
+    const wrapper = track.parentElement;
+    if (!wrapper) return;
+
+    const pause = () => track.classList.add("marquee-paused");
+    const resume = () => track.classList.remove("marquee-paused");
+
+    wrapper.addEventListener("mouseenter", pause);
+    wrapper.addEventListener("mouseleave", resume);
+    wrapper.addEventListener("touchstart", pause, { passive: true });
+    wrapper.addEventListener("touchend", resume, { passive: true });
+    wrapper.addEventListener("touchcancel", resume, { passive: true });
+    wrapper.addEventListener("mousedown", pause);
+    wrapper.addEventListener("mouseup", resume);
+  });
+});
+
 // Slow auto-scroll for horizontally-scrolling card carousels (.auto-scroll-x).
 // Loops back to the start once it reaches the end. On breakpoints where a
 // carousel becomes a static grid (no overflow), incrementing scrollLeft is

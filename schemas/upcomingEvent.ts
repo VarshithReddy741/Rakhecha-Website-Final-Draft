@@ -9,7 +9,7 @@ export const upcomingEventSchema = defineType({
     defineField({ name: "format", title: "Format", type: "string", options: { list: [{ title: "Online", value: "online" }, { title: "In-Person", value: "in-person" }] } }),
     defineField({ name: "location", title: "Location (for in-person events)", type: "string" }),
     defineField({ name: "description", title: "Description", type: "text", rows: 4 }),
-    defineField({ name: "imageUrl", title: "Event Image URL", type: "url" }),
+    defineField({ name: "imageUrl", title: "Event Image", type: "image", options: { hotspot: true } }),
     defineField({ name: "isFeatured", title: "Show as Featured Hero Event", type: "boolean", initialValue: false }),
   ],
   preview: { select: { title: "title", subtitle: "date" } }

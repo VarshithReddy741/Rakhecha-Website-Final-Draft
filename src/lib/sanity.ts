@@ -1,4 +1,6 @@
 import { createClient } from "@sanity/client";
+import type { SanityImageSource } from "@sanity/image-url";
+import type { PortableTextBlock } from "@portabletext/types";
 
 export const sanityClient = createClient({
   projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID ?? "yoc5jesn",
@@ -16,16 +18,22 @@ export interface ArticleBlock {
   text: string;
 }
 
+// Legacy documents may still hold a plain pasted-URL string until
+// scripts/migrate-photos-to-sanity-assets.ts converts them to real Sanity
+// image assets — see resolveImage() in lib/sanityImage.ts, which handles
+// both shapes.
+export type LegacyOrImage = SanityImageSource | string;
+
 export interface Article {
   slug: string;
   title: string;
   category: string;
   date: string;
   readTime: string;
-  imageUrl?: string;
+  imageUrl?: LegacyOrImage;
   authorName?: string;
   authorRole?: string;
-  authorPhotoUrl?: string;
+  authorPhotoUrl?: LegacyOrImage;
   excerpt?: string;
   body: ArticleBlock[];
 }
@@ -34,7 +42,7 @@ export interface Founder {
   slug: string;
   name: string;
   role: string;
-  photoUrl?: string;
+  photoUrl?: LegacyOrImage;
   education: string;
   shortBio: string;
   extendedBio?: string;
@@ -62,7 +70,7 @@ export interface UpcomingEvent {
   format?: string;
   location?: string;
   description?: string;
-  imageUrl?: string;
+  imageUrl?: LegacyOrImage;
   isFeatured?: boolean;
 }
 
@@ -72,7 +80,7 @@ export interface PastEvent {
   date: string;
   type?: string;
   tags?: string[];
-  imageUrl?: string;
+  imageUrl?: LegacyOrImage;
   recordingUrl?: string;
 }
 
@@ -81,8 +89,35 @@ export interface VideoItem {
   title: string;
   date: string;
   duration?: string;
-  thumbnailUrl?: string;
+  thumbnailUrl?: LegacyOrImage;
   embedUrl?: string;
+}
+
+export interface BusinessCard {
+  slug: string;
+  title: string;
+  href: string;
+  description?: string;
+  image: SanityImageSource;
+  mobileImage?: SanityImageSource;
+  imagePosition?: "center" | "right";
+  order?: number;
+}
+
+export interface ServiceContentBox {
+  heading?: string;
+  body?: PortableTextBlock[];
+}
+
+export interface Service {
+  title: string;
+  businessLine: "investment-banking" | "wealth-management" | "insurance";
+  cardId: string;
+  shortDescription?: string;
+  image: SanityImageSource;
+  imagePosition?: "center" | "right";
+  order?: number;
+  contentBoxes?: ServiceContentBox[];
 }
 
 export const queries = {
@@ -102,4 +137,7 @@ export const queries = {
   upcomingEvents: `*[_type == "upcomingEvent"] | order(date asc) { _id, title, date, time, type, format, location, description, imageUrl, isFeatured }`,
   pastEvents:     `*[_type == "pastEvent"] | order(date desc) { _id, title, date, type, tags, imageUrl, recordingUrl }`,
   videos:         `*[_type == "video"] | order(date desc) { _id, title, date, duration, thumbnailUrl, embedUrl }`,
+
+  businessCards:  `*[_type == "businessCard"] | order(order asc) { "slug": slug.current, title, href, description, image, mobileImage, imagePosition, order }`,
+  servicesByLine: `*[_type == "service" && businessLine == $businessLine] | order(order asc) { title, businessLine, "cardId": cardId.current, shortDescription, image, imagePosition, order, contentBoxes }`,
 };

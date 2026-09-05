@@ -4,8 +4,9 @@
 // founders collection (Prompt 3) instead of main.js's client-rendered
 // innerHTML. Carousel/reveal behaviors (auto-scroll-x, founder-scroll-btn,
 // hero-card-anim) come from /scripts/site-effects.js (see Prompt 4 notes).
-import { sanityClient, queries, type Founder, type UpcomingEvent } from "../lib/sanity";
-import { Image, Picture } from "astro:assets";
+import { sanityClient, queries, type Founder, type UpcomingEvent, type BusinessCard } from "../lib/sanity";
+import { urlFor, resolveImage } from "../lib/sanityImage";
+import { Picture } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
@@ -16,18 +17,15 @@ import EventRegistrationModal from "../components/EventRegistrationModal.astro";
 import heroDesktop from "../assets/images/Homepage image web.png";
 import heroMobile from "../assets/images/Home page moblie.png";
 import nriHero from "../assets/images/NRI services web.png";
-import wealthBusinessImage from "../assets/images/Wealth home.jpg";
-import ibBusinessImage from "../assets/images/IB Hero Card.png";
-import insuranceBusinessDesktop from "../assets/images/Insurance hero card.png";
-import insuranceBusinessMobile from "../assets/images/Insurance home page.png";
 import devPhoto from "../assets/images/Dev.png";
 import nitishPhoto from "../assets/images/Nitish.png";
 import nidhhiPhoto from "../assets/images/Nidhhi.png";
 
 const founderOrder = ["dev-piyush-rakhecha", "nidhhi-rakhecha", "nitish-rakhecha", "megha-rakhecha"];
-const [founderEntries, allUpcomingEvents] = await Promise.all([
+const [founderEntries, allUpcomingEvents, businessCards] = await Promise.all([
   sanityClient.fetch<Founder[]>(queries.allFounders),
   sanityClient.fetch<UpcomingEvent[]>(queries.upcomingEvents),
+  sanityClient.fetch<BusinessCard[]>(queries.businessCards),
 ]);
 const founders = founderOrder
   .map((slug) => founderEntries.find((f) => f.slug === slug))
@@ -182,87 +180,47 @@ const founderPhotos: Record<string, ImageMetadata> = {
     </div>
     <!-- Desktop Layout: Vertical Strips -->
     <div class="hidden md:flex h-[600px] w-full gap-2 overflow-hidden">
-      <a href="/wealth-management/" class="group relative flex-grow transition-all duration-500 ease-in-out hover:flex-[3] cursor-pointer overflow-hidden rounded-lg">
-        <Image src={wealthBusinessImage} alt="Wealth Management" width={1200} class="absolute inset-0 w-full h-full object-cover brightness-50 group-hover:brightness-75 transition-all duration-500" />
-        <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.65) 100%);"></div>
-        <div class="absolute inset-0 p-8 flex flex-col justify-between">
-          <div class="space-y-2">
-            <h3 class="text-headline-md font-headline-md text-white hero-card-anim hero-card-anim-1">Wealth Management</h3>
+      {businessCards.map((card, i) => (
+        <a href={card.href} class="group relative flex-grow transition-all duration-500 ease-in-out hover:flex-[3] cursor-pointer overflow-hidden rounded-lg">
+          <img
+            src={urlFor(card.image).width(1200).url()}
+            alt={card.title}
+            class={`absolute inset-0 w-full h-full object-cover brightness-50 group-hover:brightness-75 transition-all duration-500${card.imagePosition === "right" ? " object-right" : ""}`}
+          />
+          <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.65) 100%);"></div>
+          <div class="absolute inset-0 p-8 flex flex-col justify-between">
+            <div class="space-y-2">
+              <h3 class={`text-headline-md font-headline-md text-white hero-card-anim hero-card-anim-${i + 1}`}>{card.title}</h3>
+            </div>
+            <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+              <p class="text-white/90 text-body-md mb-6 max-w-md">{card.description}</p>
+              <span class="flex items-center gap-2 text-gold font-cta-text group-hover:text-white transition-colors">READ MORE <span class="material-symbols-outlined">arrow_forward</span></span>
+            </div>
           </div>
-          <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-            <p class="text-white/90 text-body-md mb-6 max-w-md">Comprehensive Wealth Management solutions to protect and grow your assets.</p>
-            <span class="flex items-center gap-2 text-gold font-cta-text group-hover:text-white transition-colors">READ MORE <span class="material-symbols-outlined">arrow_forward</span></span>
-          </div>
-        </div>
-      </a>
-      <a href="/investment-banking/" class="group relative flex-grow transition-all duration-500 ease-in-out hover:flex-[3] cursor-pointer overflow-hidden rounded-lg">
-        <Image src={ibBusinessImage} alt="Investment Banking" width={1200} class="absolute inset-0 w-full h-full object-cover object-right brightness-50 group-hover:brightness-75 transition-all duration-500" />
-        <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.65) 100%);"></div>
-        <div class="absolute inset-0 p-8 flex flex-col justify-between">
-          <div class="space-y-2">
-            <h3 class="text-headline-md font-headline-md text-white hero-card-anim hero-card-anim-2">Investment Banking</h3>
-          </div>
-          <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-            <p class="text-white/90 text-body-md mb-6 max-w-md">Strategic advisory for mergers, acquisitions, and capital raising, delivering bespoke solutions for complex corporate transactions.</p>
-            <span class="flex items-center gap-2 text-gold font-cta-text group-hover:text-white transition-colors">READ MORE <span class="material-symbols-outlined">arrow_forward</span></span>
-          </div>
-        </div>
-      </a>
-      <a href="/insurance/" class="group relative flex-grow transition-all duration-500 ease-in-out hover:flex-[3] cursor-pointer overflow-hidden rounded-lg">
-        <Image src={insuranceBusinessDesktop} alt="Insurance" width={1200} class="absolute inset-0 w-full h-full object-cover brightness-50 group-hover:brightness-75 transition-all duration-500" />
-        <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.65) 100%);"></div>
-        <div class="absolute inset-0 p-8 flex flex-col justify-between">
-          <div class="space-y-2">
-            <h3 class="text-headline-md font-headline-md text-white hero-card-anim hero-card-anim-3">Insurance</h3>
-          </div>
-          <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-            <p class="text-white/90 text-body-md mb-6 max-w-md">Insurance solutions designed to protect your assets and provide peace of mind.</p>
-            <span class="flex items-center gap-2 text-gold font-cta-text group-hover:text-white transition-colors">READ MORE <span class="material-symbols-outlined">arrow_forward</span></span>
-          </div>
-        </div>
-      </a>
+        </a>
+      ))}
     </div>
     <!-- Mobile Layout: Horizontal Scroll -->
     <div class="auto-scroll-x md:hidden flex overflow-x-auto gap-4 pb-6 no-scrollbar px-margin-mobile">
-      <a href="/wealth-management/" class="flex-shrink-0 w-[85%] snap-center relative h-[450px] rounded-lg overflow-hidden">
-        <Image src={wealthBusinessImage} alt="Wealth Management" width={680} class="absolute inset-0 w-full h-full object-cover brightness-50" />
-        <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.65) 100%);"></div>
-        <div class="absolute inset-0 p-6 flex flex-col justify-between">
-          <div class="space-y-2">
-            <h3 class="text-headline-md font-headline-md text-white hero-card-anim hero-card-anim-1">Wealth Management</h3>
+      {businessCards.map((card, i) => (
+        <a href={card.href} class="flex-shrink-0 w-[85%] snap-center relative h-[450px] rounded-lg overflow-hidden">
+          <img
+            src={urlFor(card.mobileImage ?? card.image).width(680).url()}
+            alt={card.title}
+            class={`absolute inset-0 w-full h-full object-cover brightness-50${card.imagePosition === "right" ? " object-right" : ""}`}
+          />
+          <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.65) 100%);"></div>
+          <div class="absolute inset-0 p-6 flex flex-col justify-between">
+            <div class="space-y-2">
+              <h3 class={`text-headline-md font-headline-md text-white hero-card-anim hero-card-anim-${i + 1}`}>{card.title}</h3>
+            </div>
+            <div>
+              <p class="text-white/90 text-body-sm mb-4">{card.description}</p>
+              <span class="flex items-center gap-2 text-gold font-cta-text">READ MORE <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+            </div>
           </div>
-          <div>
-            <p class="text-white/90 text-body-sm mb-4">Comprehensive wealth structuring and portfolio management tailored to generational wealth preservation.</p>
-            <span class="flex items-center gap-2 text-gold font-cta-text">READ MORE <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
-          </div>
-        </div>
-      </a>
-      <a href="/investment-banking/" class="flex-shrink-0 w-[85%] snap-center relative h-[450px] rounded-lg overflow-hidden">
-        <Image src={ibBusinessImage} alt="Investment Banking" width={680} class="absolute inset-0 w-full h-full object-cover object-right brightness-50" />
-        <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.65) 100%);"></div>
-        <div class="absolute inset-0 p-6 flex flex-col justify-between">
-          <div class="space-y-2">
-            <h3 class="text-headline-md font-headline-md text-white hero-card-anim hero-card-anim-2">Investment Banking</h3>
-          </div>
-          <div>
-            <p class="text-white/90 text-body-sm mb-4">Strategic advisory for mergers, acquisitions, and capital raising for complex corporate transactions.</p>
-            <span class="flex items-center gap-2 text-gold font-cta-text">READ MORE <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
-          </div>
-        </div>
-      </a>
-      <a href="/insurance/" class="flex-shrink-0 w-[85%] snap-center relative h-[450px] rounded-lg overflow-hidden">
-        <Image src={insuranceBusinessMobile} alt="Insurance" width={680} class="absolute inset-0 w-full h-full object-cover brightness-50" />
-        <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.65) 100%);"></div>
-        <div class="absolute inset-0 p-6 flex flex-col justify-between">
-          <div class="space-y-2">
-            <h3 class="text-headline-md font-headline-md text-white hero-card-anim hero-card-anim-3">Insurance</h3>
-          </div>
-          <div>
-            <p class="text-white/90 text-body-sm mb-4">Comprehensive insurance solutions designed to protect your assets and provide peace of mind.</p>
-            <span class="flex items-center gap-2 text-gold font-cta-text">READ MORE <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
-          </div>
-        </div>
-      </a>
+        </a>
+      ))}
     </div>
   </section>
 
@@ -282,7 +240,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
       <div class="relative">
         <div class="founder-scroll no-scrollbar flex overflow-x-auto snap-x snap-mandatory scroll-smooth md:overflow-visible p-2 md:p-4 pb-8 md:pb-4 md:grid md:grid-cols-4 gap-4 md:gap-6" id="home-founder-cards">
           {founders.map((f) => (
-            <FounderCard href={`/leadership/${f.slug}/`} image={founderPhotos[f.slug] ?? f.photoUrl} name={f.name} role={f.role} education={f.education} />
+            <FounderCard href={`/leadership/${f.slug}/`} image={founderPhotos[f.slug] ?? resolveImage(f.photoUrl, 400)} name={f.name} role={f.role} education={f.education} />
           ))}
         </div>
         <button aria-label="Scroll left" class="founder-scroll-btn md:hidden absolute left-1 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-primary/80 text-white shadow-md" data-scroll-dir="-1" data-scroll-target="home-founder-cards" type="button"><span class="material-symbols-outlined text-lg">chevron_left</span></button>
@@ -535,7 +493,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
         {homeUpcomingEvents.length > 0 ? homeUpcomingEvents.map((e) => (
           <div class="glass-card rounded-lg p-8 ambient-shadow flex flex-col md:flex-row gap-8">
             <div class="w-full md:w-1/3 h-48 rounded overflow-hidden">
-              <img alt={e.title} class="w-full h-full object-cover" src={e.imageUrl ?? ""} />
+              <img alt={e.title} class="w-full h-full object-cover" src={resolveImage(e.imageUrl, 600)} />
             </div>
             <div class="flex-grow flex flex-col">
               {e.format && <span class="bg-primary text-white font-label-bold text-[10px] uppercase px-2 py-1 rounded w-max mb-4">{e.format}</span>}

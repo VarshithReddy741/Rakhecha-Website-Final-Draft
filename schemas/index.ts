@@ -4,5 +4,16 @@ import { jobSchema } from "./job";
 import { upcomingEventSchema } from "./upcomingEvent";
 import { pastEventSchema } from "./pastEvent";
 import { videoSchema } from "./video";
+import { businessCardSchema } from "./businessCard";
+import { serviceSchema } from "./service";
 
-export const schemaTypes = [articleSchema, founderSchema, jobSchema, upcomingEventSchema, pastEventSchema, videoSchema];
+export const schemaTypes = [
+  articleSchema,
+  founderSchema,
+  jobSchema,
+  upcomingEventSchema,
+  pastEventSchema,
+  videoSchema,
+  businessCardSchema,
+  serviceSchema,
+];

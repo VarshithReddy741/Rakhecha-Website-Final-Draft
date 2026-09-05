@@ -1,5 +1,6 @@
 ---
 import { sanityClient, queries, type Article, type ArticleBlock } from "../../lib/sanity";
+import { resolveImage } from "../../lib/sanityImage";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
@@ -13,7 +14,9 @@ const { slug } = Astro.params;
 const article = await sanityClient.fetch<Article | null>(queries.articleBySlug, { slug });
 if (!article) return Astro.redirect("/404");
 
-const { title, category, date, imageUrl: image, authorName, authorRole, authorPhotoUrl: authorPhoto, excerpt, body } = article;
+const { title, category, date, imageUrl, authorName, authorRole, authorPhotoUrl, excerpt, body } = article;
+const image = resolveImage(imageUrl, 1200);
+const authorPhoto = resolveImage(authorPhotoUrl, 96);
 const metaDescription = excerpt ?? `${title} — Insights from Rakhecha Finserv`;
 ---
 

@@ -6,7 +6,7 @@ export const pastEventSchema = defineType({
     defineField({ name: "date", title: "Date", type: "date", validation: (r) => r.required() }),
     defineField({ name: "type", title: "Event Type", type: "string", options: { list: ["Panel", "Webinar", "Roundtable", "Workshop", "Conference"] } }),
     defineField({ name: "tags", title: "Tags", type: "array", of: [{ type: "string" }] }),
-    defineField({ name: "imageUrl", title: "Event Image URL", type: "url" }),
+    defineField({ name: "imageUrl", title: "Event Image", type: "image", options: { hotspot: true } }),
     defineField({ name: "recordingUrl", title: "Recording URL", type: "url" }),
   ],
   preview: { select: { title: "title", subtitle: "date" } }

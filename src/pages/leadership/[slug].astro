@@ -1,5 +1,6 @@
 ---
 import { sanityClient, queries, type Founder } from "../../lib/sanity";
+import { resolveImage } from "../../lib/sanityImage";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
@@ -13,7 +14,8 @@ const { slug } = Astro.params;
 const founder = await sanityClient.fetch<Founder | null>(queries.founderBySlug, { slug });
 if (!founder) return Astro.redirect("/404");
 
-const { name, role, photoUrl: photo, education, shortBio, extendedBio, linkedinUrl } = founder;
+const { name, role, photoUrl, education, shortBio, extendedBio, linkedinUrl } = founder;
+const photo = resolveImage(photoUrl, 768);
 const extendedParagraphs = (extendedBio ?? "").split("\n\n").filter(Boolean);
 const metaDescription = `${name} — ${role} at Rakhecha Finserv. ${(shortBio ?? "").slice(0, 100)}`;
 ---

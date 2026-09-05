@@ -7,10 +7,10 @@ export const articleSchema = defineType({
     defineField({ name: "category", title: "Category", type: "string", options: { list: ["Report", "Blog", "Insight"] }, validation: (r) => r.required() }),
     defineField({ name: "date", title: "Published Date", type: "date", validation: (r) => r.required() }),
     defineField({ name: "readTime", title: "Read Time (e.g. 5 min read)", type: "string" }),
-    defineField({ name: "imageUrl", title: "Cover Image URL", type: "url" }),
+    defineField({ name: "imageUrl", title: "Cover Image", type: "image", options: { hotspot: true } }),
     defineField({ name: "authorName", title: "Author Name", type: "string" }),
     defineField({ name: "authorRole", title: "Author Role", type: "string" }),
-    defineField({ name: "authorPhotoUrl", title: "Author Photo URL", type: "url" }),
+    defineField({ name: "authorPhotoUrl", title: "Author Photo", type: "image", options: { hotspot: true } }),
     defineField({ name: "excerpt", title: "Excerpt", type: "text", rows: 3 }),
     defineField({
       name: "body", title: "Body", type: "array",

@@ -8,6 +8,7 @@
 // page (from the articles collection, Prompt 4) instead of the single
 // shared "Article Page.html" every card pointed to.
 import { sanityClient, queries, type Article, type UpcomingEvent, type PastEvent, type VideoItem } from "../lib/sanity";
+import { resolveImage } from "../lib/sanityImage";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -93,7 +94,7 @@ function formatEventDate(dateStr?: string) {
         {featuredEvent ? (
           <div class="bg-surface-container-lowest rounded-xl overflow-hidden ambient-shadow flex flex-col md:flex-row border border-outline-variant">
             <div class="w-full md:w-1/2 relative h-64 md:h-auto">
-              <div class="absolute inset-0 bg-cover bg-center" style={`background-image: url('${featuredEvent.imageUrl ?? ""}')`}></div>
+              <div class="absolute inset-0 bg-cover bg-center" style={`background-image: url('${resolveImage(featuredEvent.imageUrl, 1200)}')`}></div>
               {featuredEvent.format && (
                 <div class="absolute top-6 left-6 bg-surface-container-lowest text-primary font-label-bold text-label-bold uppercase px-3 py-1 rounded shadow-sm flex items-center gap-1">
                   <span class="material-symbols-outlined text-[16px]">videocam</span> {featuredEvent.format}
@@ -194,7 +195,7 @@ function formatEventDate(dateStr?: string) {
         {pastEvents.length > 0 ? pastEvents.map((e) => (
           <article class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden ambient-shadow group cursor-pointer">
             <div class="relative h-48 overflow-hidden">
-              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style={`background-image: url('${e.imageUrl ?? ""}')`}></div>
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style={`background-image: url('${resolveImage(e.imageUrl, 600)}')`}></div>
               {e.recordingUrl && (
                 <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary rounded-full w-12 h-12 flex items-center justify-center"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span></div>
@@ -238,7 +239,7 @@ function formatEventDate(dateStr?: string) {
           {reports.map((a) => (
             <a href={`/knowledge-hub/${a.slug}/`} class="contents">
               <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
-                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.imageUrl ?? ""}')`}></div>
+                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${resolveImage(a.imageUrl, 600)}')`}></div>
                 <div class="p-6 flex flex-col flex-grow">
                   <span class="bg-surface-container-high text-primary font-label-bold text-label-bold px-2 py-1 rounded-sm w-max mb-4 uppercase tracking-wider">{a.category}</span>
                   <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors line-clamp-3">{a.title}</h3>
@@ -266,7 +267,7 @@ function formatEventDate(dateStr?: string) {
             <a href={v.embedUrl ?? "#"} target={v.embedUrl ? "_blank" : undefined} rel={v.embedUrl ? "noopener noreferrer" : undefined} class="contents">
               <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
                 {v.thumbnailUrl ? (
-                  <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${v.thumbnailUrl}')`}>
+                  <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${resolveImage(v.thumbnailUrl, 600)}')`}>
                     <div class="absolute inset-0 bg-black/20 flex items-center justify-center"><span class="material-symbols-outlined text-white text-[64px]" style="font-variation-settings: 'FILL' 1;">play_circle</span></div>
                   </div>
                 ) : (
@@ -299,7 +300,7 @@ function formatEventDate(dateStr?: string) {
           {blogs.map((a) => (
             <a href={`/knowledge-hub/${a.slug}/`} class="contents">
               <article class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow flex flex-col group cursor-pointer border border-transparent hover:border-outline-variant/50 transition-all duration-300">
-                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${a.imageUrl ?? ""}')`}></div>
+                <div class="bg-cover bg-center w-full h-56 relative" style={`background-image: url('${resolveImage(a.imageUrl, 600)}')`}></div>
                 <div class="p-6 flex flex-col flex-grow">
                   <span class="bg-surface-container-high text-primary font-label-bold text-label-bold px-2 py-1 rounded-sm w-max mb-4 uppercase tracking-wider">{a.category}</span>
                   <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors line-clamp-3">{a.title}</h3>

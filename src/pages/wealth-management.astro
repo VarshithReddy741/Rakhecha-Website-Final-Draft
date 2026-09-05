@@ -1,233 +1,92 @@
 ---
-// Ported from "Wealth Management.html". The panel-toggle JS is now the
-// shared ServicePanel component (Prompt 3); this page supplies card data
-// and reproduces generateWMContent()'s exact template logic at build time
-// instead of hand-authoring ~7 near-identical HTML blocks.
-//
-// Fix (per prompt): the Venture Capital Funds card was already commented
-// out/disabled in the source (both the desktop card and its mobile
-// accordion counterpart). Removed here rather than carried over as dead
-// markup — it was never rendered either way, so there's no behavior
-// change, just less inert HTML to maintain.
-import { Picture, getImage } from "astro:assets";
+// Card data and expanded-panel content now come from Sanity (`service`
+// documents with businessLine: "wealth-management"), editable/addable in
+// Studio without a code change. The "Products Available to NRIs" table
+// under NRI Services stays hardcoded below — a bespoke, illustrative
+// block, not part of the editable content.
+import { Picture } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import ServicePanel from "../components/ServicePanel.astro";
+import { sanityClient, queries, type Service } from "../lib/sanity";
+import { urlFor } from "../lib/sanityImage";
+import { renderPortableText } from "../lib/portableText";
 import wmHeroDesktop from "../assets/images/Wealth home landscape.png";
 import wmHeroMobile from "../assets/images/wealth management mobile.png";
-import aifImage from "../assets/images/Alternate Investmetns.jpeg";
-import pmsImage from "../assets/images/PMS.jpeg";
-import bondsImage from "../assets/images/Bonds.jpeg";
-import mutualFundsImage from "../assets/images/Mutual funds.png";
-import invoiceDiscountingImage from "../assets/images/Invoie discountig.jpeg";
-import privateWealthImage from "../assets/images/private wealth.jpg";
-import nriServiceImage from "../assets/images/NRI service.jpeg";
 
-// ServicePanel uses `image` both as a CSS background-image (desktop cards)
-// and as a plain <img src> (mobile accordion) — see ServicePanel.astro — so
-// there's no single <img>/<Image> call site to swap there. Instead we
-// pre-optimize through Astro's image pipeline here and hand ServicePanel an
-// already-hashed, already-WebP URL string, same as it always received.
-const [aifOptimized, pmsOptimized, bondsOptimized, mutualFundsOptimized, invoiceOptimized, privateWealthOptimized, nriOptimized] =
-  await Promise.all(
-    [aifImage, pmsImage, bondsImage, mutualFundsImage, invoiceDiscountingImage, privateWealthImage, nriServiceImage].map((src) =>
-      getImage({ src, width: 800, format: "webp" }),
-    ),
-  );
+const wmServices = await sanityClient.fetch<Service[]>(queries.servicesByLine, { businessLine: "wealth-management" });
 
-interface WMServiceItem {
-  name: string;
-  desc: string;
-}
-
-interface WMService {
-  id: string;
-  title: string;
-  desc: string;
-  image: string;
-  items: WMServiceItem[];
-}
-
-const wmServices: WMService[] = [
-  {
-    id: "aif",
-    title: "Alternative Investment Funds (AIF)",
-    desc: "Explore investment opportunities beyond traditional markets.",
-    image: aifOptimized.src,
-    items: [
-      { name: "Category I", desc: "Start-ups, SMEs, and infrastructure funds." },
-      { name: "Category II", desc: "Private equity and debt funds." },
-      { name: "Category III", desc: "Complex trading strategies and hedge funds." },
-      { name: "Minimum Investment", desc: "Rs. 1 crore as per SEBI regulations." },
-    ],
-  },
-  {
-    id: "pms",
-    title: "Portfolio Management Services (PMS)",
-    desc: "Professional portfolio management, tailored to your goals.",
-    image: pmsOptimized.src,
-    items: [
-      { name: "Equity PMS", desc: "Direct equity portfolios managed by experts." },
-      { name: "Multi-Asset PMS", desc: "Diversified exposure across asset classes." },
-      { name: "Minimum Investment", desc: "Rs. 50 lakhs entry threshold." },
-      { name: "Reporting", desc: "Monthly performance attribution and transparency." },
-    ],
-  },
-  {
-    id: "bonds",
-    title: "Bonds & Fixed Income",
-    desc: "Predictable Returns. Principal Protection.",
-    image: bondsOptimized.src,
-    items: [
-      { name: "G-Secs & T-Bills", desc: "Sovereign backed instruments." },
-      { name: "Corporate Bonds", desc: "High-yield NCDs from blue-chip entities." },
-      { name: "Tax-Free Bonds", desc: "Optimized returns for high tax brackets." },
-      { name: "SGBs", desc: "Sovereign Gold Bonds for digital gold exposure." },
-    ],
-  },
-  {
-    id: "mutual-funds",
-    title: "Mutual Funds",
-    desc: "Choose mutual funds that fit your investment goals.",
-    image: mutualFundsOptimized.src,
-    items: [
-      { name: "Equity Funds", desc: "Growth-oriented diversified portfolios." },
-      { name: "Debt Funds", desc: "Stability and regular income focus." },
-      { name: "Hybrid Funds", desc: "Balanced risk-reward strategies." },
-      { name: "SIP/Lump-sum", desc: "Flexible investment modes." },
-    ],
-  },
-  {
-    id: "invoice",
-    title: "Invoice Discounting",
-    desc: "Finance the Future. Earn Today.",
-    image: invoiceOptimized.src,
-    items: [
-      { name: "Short-term Yield", desc: "30-120 day investment cycles." },
-      { name: "Verified Invoices", desc: "Exposure to blue-chip corporate receivables." },
-      { name: "High Returns", desc: "Superior risk-adjusted yields." },
-      { name: "Low Correlation", desc: "Independent of stock market volatility." },
-    ],
-  },
-  {
-    id: "private-wealth",
-    title: "Private Wealth Advisory",
-    desc: "Helping you build and preserve wealth across generations.",
-    image: privateWealthOptimized.src,
-    items: [
-      { name: "Family Office", desc: "Comprehensive multi-generational planning." },
-      { name: "Estate Planning", desc: "Succession and trust structuring." },
-      { name: "Global Solutions", desc: "International asset allocation." },
-      { name: "Consolidated Reporting", desc: "Unified view of all global assets." },
-    ],
-  },
-  {
-    id: "nri-services",
-    title: "NRI Services",
-    desc: "Invest in India's Growth Story.",
-    image: nriOptimized.src,
-    items: [
-      { name: "Repatriation", desc: "LRS and FEMA compliance advisory." },
-      { name: "NRE/NRO Accounts", desc: "Banking coordination and setup." },
-      { name: "DTAA Benefits", desc: "Tax optimization for cross-border income." },
-      { name: "India Desk", desc: "Dedicated support for non-resident investors." },
-    ],
-  },
-];
-
-// Ported 1:1 from generateWMContent() in the source's inline <script>.
-function generateWMContent(service: WMService): string {
-  const rows: WMServiceItem[][] = [];
-  for (let i = 0; i < service.items.length; i += 2) rows.push(service.items.slice(i, i + 2));
-
-  let content = `
-    <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-4">${service.title}</h2>
-    <p class="font-body-md text-on-surface-variant mb-3">${service.desc}</p>
-    <hr class="border-outline-variant/30 mb-8">
-    <div class="grid grid-cols-1 gap-6">
-        <div>
-            <h4 class="font-label-bold text-base font-bold text-primary-light mb-6 uppercase tracking-wider">Our Services</h4>
-            <div class="divide-y divide-outline-variant/30">
-                ${rows
-                  .map(
-                    (row) => `
-                <div class="grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-outline-variant/30 py-3">
-                    ${row
-                      .map(
-                        (item, cIdx) => `
-                    <div class="flex items-start gap-4${cIdx === 1 ? " mt-4 md:mt-0 md:pl-8" : ""}"><svg class="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
-                        <div>
-                            <p class="font-label-bold text-primary">${item.name}</p>
-                            <p class="font-body-sm text-on-surface-variant mt-0.5">${item.desc}</p>
-                        </div>
-                    </div>
-                    `,
-                      )
-                      .join("")}
-                </div>
-                `,
-                  )
-                  .join("")}
-            </div>
-        </div>
-    </div>
+const NRI_PRODUCTS_TABLE = `
+<div class="mt-8 overflow-x-auto border border-outline-variant/30 rounded-lg">
+    <h3 class="font-headline-md text-[20px] text-primary p-4 pb-2">Products Available to NRIs</h3>
+    <table class="w-full text-left border-collapse min-w-[600px]">
+        <thead class="bg-surface text-on-surface border-b border-outline-variant/30">
+            <tr>
+                <th class="py-4 px-3 md:p-4 font-label-bold font-bold text-primary">Product</th>
+                <th class="p-4 font-label-bold font-bold text-primary">NRI Eligibility</th>
+                <th class="py-4 px-3 md:p-4 font-label-bold font-bold text-primary whitespace-nowrap">Account Type</th>
+            </tr>
+        </thead>
+        <tbody class="text-body-sm text-on-surface-variant bg-surface-container-lowest">
+            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                <td class="py-4 px-3 md:p-4 font-semibold text-primary">Mutual Funds</td>
+                <td class="p-4">NRIs eligible subject to US/Canada FATCA restrictions</td>
+                <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO / FCNR</td>
+            </tr>
+            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                <td class="py-4 px-3 md:p-4 font-semibold text-primary">PMS</td>
+                <td class="p-4">Fully eligible with SEBI-compliant KYC</td>
+                <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO</td>
+            </tr>
+            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                <td class="py-4 px-3 md:p-4 font-semibold text-primary">AIFs</td>
+                <td class="p-4">Category II &amp; III open to NRI LPs</td>
+                <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO (Repatriable)</td>
+            </tr>
+            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                <td class="py-4 px-3 md:p-4 font-semibold text-primary">Bonds &amp; NCDs</td>
+                <td class="p-4">Listed bonds fully eligible; unlisted subject to case-by-case</td>
+                <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO</td>
+            </tr>
+            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                <td class="py-4 px-3 md:p-4 font-semibold text-primary">Unlisted / Pre-IPO</td>
+                <td class="p-4">Eligible under FEMA Schedule II (subject to sectoral caps)</td>
+                <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRO (non-repatriable)</td>
+            </tr>
+            <tr class="hover:bg-surface-container-low transition-colors">
+                <td class="py-4 px-3 md:p-4 font-semibold text-primary">VC Funds</td>
+                <td class="p-4">Eligible as LPs with AIF Category I / II registration</td>
+                <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 `;
 
-  if (service.id === "nri-services") {
-    content += `
-    <div class="mt-8 overflow-x-auto border border-outline-variant/30 rounded-lg">
-        <h3 class="font-headline-md text-[20px] text-primary p-4 pb-2">Products Available to NRIs</h3>
-        <table class="w-full text-left border-collapse min-w-[600px]">
-            <thead class="bg-surface text-on-surface border-b border-outline-variant/30">
-                <tr>
-                    <th class="py-4 px-3 md:p-4 font-label-bold font-bold text-primary">Product</th>
-                    <th class="p-4 font-label-bold font-bold text-primary">NRI Eligibility</th>
-                    <th class="py-4 px-3 md:p-4 font-label-bold font-bold text-primary whitespace-nowrap">Account Type</th>
-                </tr>
-            </thead>
-            <tbody class="text-body-sm text-on-surface-variant bg-surface-container-lowest">
-                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
-                    <td class="py-4 px-3 md:p-4 font-semibold text-primary">Mutual Funds</td>
-                    <td class="p-4">NRIs eligible subject to US/Canada FATCA restrictions</td>
-                    <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO / FCNR</td>
-                </tr>
-                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
-                    <td class="py-4 px-3 md:p-4 font-semibold text-primary">PMS</td>
-                    <td class="p-4">Fully eligible with SEBI-compliant KYC</td>
-                    <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO</td>
-                </tr>
-                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
-                    <td class="py-4 px-3 md:p-4 font-semibold text-primary">AIFs</td>
-                    <td class="p-4">Category II &amp; III open to NRI LPs</td>
-                    <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO (Repatriable)</td>
-                </tr>
-                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
-                    <td class="py-4 px-3 md:p-4 font-semibold text-primary">Bonds &amp; NCDs</td>
-                    <td class="p-4">Listed bonds fully eligible; unlisted subject to case-by-case</td>
-                    <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO</td>
-                </tr>
-                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
-                    <td class="py-4 px-3 md:p-4 font-semibold text-primary">Unlisted / Pre-IPO</td>
-                    <td class="p-4">Eligible under FEMA Schedule II (subject to sectoral caps)</td>
-                    <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRO (non-repatriable)</td>
-                </tr>
-                <tr class="hover:bg-surface-container-low transition-colors">
-                    <td class="py-4 px-3 md:p-4 font-semibold text-primary">VC Funds</td>
-                    <td class="p-4">Eligible as LPs with AIF Category I / II registration</td>
-                    <td class="py-4 px-3 md:p-4 whitespace-nowrap">NRE / NRO</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    `;
-  }
+function renderServiceBody(svc: Service): string {
+  const boxesHtml = (svc.contentBoxes ?? [])
+    .map(
+      (box) => `
+${box.heading ? `<h4 class="font-label-bold text-base font-bold text-primary-light mb-6 uppercase tracking-wider">${box.heading}</h4>` : ""}
+${renderPortableText(box.body)}`,
+    )
+    .join("<hr class=\"border-outline-variant/30 my-8\">");
 
-  return content;
+  let html = `<h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-4">${svc.title}</h2>${boxesHtml}`;
+  if (svc.cardId === "nri-services") html += NRI_PRODUCTS_TABLE;
+  return html;
 }
 
-const wmItems = wmServices.map((svc) => ({ id: svc.id, title: svc.title, desc: svc.desc, image: svc.image }));
-const wmBodies: Record<string, string> = Object.fromEntries(wmServices.map((svc) => [svc.id, generateWMContent(svc)]));
+const wmBodies: Record<string, string> = Object.fromEntries(wmServices.map((svc) => [svc.cardId, renderServiceBody(svc)]));
+
+const wmItems = wmServices.map((svc) => ({
+  id: svc.cardId,
+  title: svc.title,
+  desc: svc.shortDescription ?? "",
+  image: urlFor(svc.image).width(800).url(),
+  bodyHtml: wmBodies[svc.cardId],
+}));
 ---
 
 <BaseLayout
@@ -269,29 +128,7 @@ const wmBodies: Record<string, string> = Object.fromEntries(wmServices.map((svc)
     <!-- Services Interactive Section -->
     <section class="py-section-gap bg-white relative z-20 -mt-20">
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-        <ServicePanel items={wmItems} columns={3} expandedHeight="h-[440px]" expandedScale={true}>
-          <Fragment slot="panel-aif">
-            <div set:html={wmBodies.aif} />
-          </Fragment>
-          <Fragment slot="panel-pms">
-            <div set:html={wmBodies.pms} />
-          </Fragment>
-          <Fragment slot="panel-bonds">
-            <div set:html={wmBodies.bonds} />
-          </Fragment>
-          <Fragment slot="panel-mutual-funds">
-            <div set:html={wmBodies["mutual-funds"]} />
-          </Fragment>
-          <Fragment slot="panel-invoice">
-            <div set:html={wmBodies.invoice} />
-          </Fragment>
-          <Fragment slot="panel-private-wealth">
-            <div set:html={wmBodies["private-wealth"]} />
-          </Fragment>
-          <Fragment slot="panel-nri-services">
-            <div set:html={wmBodies["nri-services"]} />
-          </Fragment>
-        </ServicePanel>
+        <ServicePanel items={wmItems} columns={3} expandedHeight="h-[440px]" expandedScale={true} />
       </div>
     </section>
     <!-- Contact CTA -->

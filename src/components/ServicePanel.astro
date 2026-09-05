@@ -22,6 +22,14 @@ export interface ServicePanelItem {
   /** A ready-to-use URL — callers pass astro:assets' getImage().src, which is already correctly encoded. Do NOT run this through encodeURI() below; that double-encodes it and breaks the image. */
   image: string;
   imagePosition?: "center" | "right";
+  /**
+   * Rendered HTML for the panel/accordion body shown when this card is
+   * expanded. Passed as data (not a named slot) because callers build a
+   * variable-length, Sanity-driven items array — a `.map()` producing
+   * `<Fragment slot={...}>` per item hits an Astro compiler limitation
+   * where the loop variable falls out of scope inside the slot content.
+   */
+  bodyHtml?: string;
 }
 
 export interface Props {
@@ -77,9 +85,7 @@ const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
         <div id={`${panelId}-desktop-panel-content`} data-desktop-panel-content>
           {
             items.map((item) => (
-              <div class="hidden" data-desktop-content={item.id}>
-                <slot name={`panel-${item.id}`} />
-              </div>
+              <div class="hidden" data-desktop-content={item.id} set:html={item.bodyHtml} />
             ))
           }
         </div>
@@ -148,9 +154,8 @@ const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
             class="hidden px-4 pt-4 pb-6 animate-fade-in"
             id={`${panelId}-mobile-content-${item.id}`}
             data-mobile-content={item.id}
-          >
-            <slot name={`panel-${item.id}`} />
-          </div>
+            set:html={item.bodyHtml}
+          />
         </div>
       ))
     }

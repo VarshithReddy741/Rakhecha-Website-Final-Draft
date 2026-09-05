@@ -5,7 +5,7 @@ export const founderSchema = defineType({
     defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
     defineField({ name: "slug", title: "Slug", type: "slug", options: { source: "name" }, validation: (r) => r.required() }),
     defineField({ name: "role", title: "Role / Title", type: "string", validation: (r) => r.required() }),
-    defineField({ name: "photoUrl", title: "Photo URL", type: "url" }),
+    defineField({ name: "photoUrl", title: "Photo", type: "image", options: { hotspot: true } }),
     defineField({ name: "education", title: "Education", type: "string" }),
     defineField({ name: "shortBio", title: "Short Bio", type: "text", rows: 3 }),
     defineField({ name: "extendedBio", title: "Extended Bio", type: "text", rows: 6 }),

@@ -4,7 +4,11 @@ export const sanityClient = createClient({
   projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID ?? "yoc5jesn",
   dataset: import.meta.env.PUBLIC_SANITY_DATASET ?? "production",
   apiVersion: "2024-01-01",
-  useCdn: true,
+  // Only ever fetched at build time (output: 'static'), not per-request, so
+  // there's no traffic to shield with the CDN's cache — and that cache can
+  // lag up to ~60s behind a fresh publish, which was baking stale content
+  // into rebuilds triggered right after publishing in Sanity.
+  useCdn: false,
 });
 
 export interface ArticleBlock {

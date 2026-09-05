@@ -23,7 +23,7 @@ export const onRequest = defineMiddleware(async ({ request }, next) => {
     request.headers.get("x-real-ip") ??
     "unknown";
 
-  const key = hashIp(rawIp);
+  const key = hashIp(rawIp) + ":" + pathname;
   const now = Date.now();
   const entry = store.get(key);
 

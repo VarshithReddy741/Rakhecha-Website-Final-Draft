@@ -11,7 +11,13 @@ const eventRegisterSchema = z.object({
   eventTitle: z.string().trim().min(1),
   fullName: z.string().trim().min(2, "Enter your full name").max(200),
   email: z.email("Enter a valid email address").trim(),
-  contactNumber: z.string().trim().max(20).optional().default(""),
+  contactNumber: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/[\s-]/g, ""))
+    .optional()
+    .default("")
+    .refine((v) => v === "" || /^\d{10}$/.test(v), "Enter a valid 10-digit mobile number"),
   currentLocation: z.string().trim().min(1, "Enter your city or location").max(200),
   investorCategory: z.enum(
     ["institutional_investor", "family_office", "hnwi", "financial_advisor"],

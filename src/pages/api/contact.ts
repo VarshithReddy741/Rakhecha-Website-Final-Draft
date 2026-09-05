@@ -11,7 +11,11 @@ const contactSchema = z.object({
   serviceSelection: z.enum(["investment_banking", "wealth_management", "insurance"], {
     message: "Select a service",
   }),
-  contactNumber: z.string().trim().min(7, "Enter a valid contact number").max(20),
+  contactNumber: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/[\s-]/g, ""))
+    .pipe(z.string().regex(/^\d{10}$/, "Enter a valid 10-digit mobile number")),
   email: z.email("Enter a valid email address").trim(),
   queryDetails: z.string().trim().max(2000).optional().default(""),
   consentGiven: z

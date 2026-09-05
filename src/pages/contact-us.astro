@@ -151,6 +151,11 @@ import FormSuccessState from "../components/FormSuccessState.astro";
       formError.classList.toggle("hidden", !message);
     }
 
+    function firstErrorMessage(errors: Record<string, string> | undefined): string | null {
+      if (!errors) return null;
+      return errors._form ?? Object.values(errors)[0] ?? null;
+    }
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       setFormError(null);
@@ -168,7 +173,7 @@ import FormSuccessState from "../components/FormSuccessState.astro";
         const payload = await response.json();
 
         if (!response.ok || !payload.success) {
-          setFormError(payload.errors?._form ?? "We couldn't submit your request. Please check the form and try again.");
+          setFormError(firstErrorMessage(payload.errors) ?? "We couldn't submit your request. Please check the form and try again.");
           submitButton.disabled = false;
           submitButton.textContent = "Submit Request";
           return;

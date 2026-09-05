@@ -21,14 +21,26 @@ const careersApplySchema = z.object({
   firstName: z.string().trim().min(1, "Enter your first name").max(100),
   lastName: z.string().trim().min(1, "Enter your last name").max(100),
   countryCode: z.string().trim().min(1).default("+91"),
-  contactNumber: z.string().trim().min(7, "Enter a valid contact number").max(20),
+  contactNumber: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/[\s-]/g, ""))
+    .pipe(z.string().regex(/^\d{10}$/, "Enter a valid 10-digit mobile number")),
   email: z.email("Enter a valid email address").trim(),
-  currentLocation: z.enum(["kolkata", "mumbai", "delhi", "bangalore", "other"], {
-    message: "Select your current location",
-  }),
+  currentLocation: z.string().trim().min(1, "Enter your city").max(100),
   isFresher: z.literal("on").optional(),
-  experienceYears: z.string().trim().optional().default(""),
-  experienceMonths: z.string().trim().optional().default(""),
+  experienceYears: z
+    .string()
+    .trim()
+    .optional()
+    .default("")
+    .refine((v) => v === "" || /^\d{1,2}$/.test(v), "Years must be a number"),
+  experienceMonths: z
+    .string()
+    .trim()
+    .optional()
+    .default("")
+    .refine((v) => v === "" || /^\d{1,2}$/.test(v), "Months must be a number"),
   currentCtc: z.string().trim().max(50).optional().default(""),
   expectedCtc: z.string().trim().max(50).optional().default(""),
   consentGiven: z

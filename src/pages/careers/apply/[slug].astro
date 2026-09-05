@@ -6,10 +6,6 @@
 // is now a dynamic route that fetches the real job from Sanity by slug,
 // same pattern as /careers/[slug].astro.
 //
-// Fix (per prompt): city dropdown only had Mumbai/Delhi/Bangalore. Added
-// Kolkata (company HQ) and kept it a <select> rather than converting to
-// free text, since a constrained list is easier to route/filter on later
-// and free text would be a bigger UX change than asked for.
 import { sanityClient, queries, type Job } from "../../../lib/sanity";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Header from "../../../components/Header.astro";
@@ -98,18 +94,9 @@ const { title, jobId, location, employmentType, experience } = job;
             </div>
           </div>
         </div>
-        <!-- Location (fix: Kolkata added as company HQ; list kept as a
-             constrained <select> rather than free text) -->
         <div>
           <label class="form-label" for="currentLocation">Current Location<span class="required-asterisk">*</span></label>
-          <select class="form-select" id="currentLocation" name="currentLocation" required>
-            <option disabled selected value="">City</option>
-            <option value="kolkata">Kolkata</option>
-            <option value="mumbai">Mumbai</option>
-            <option value="delhi">Delhi</option>
-            <option value="bangalore">Bangalore</option>
-            <option value="other">Other</option>
-          </select>
+          <input class="form-input" id="currentLocation" name="currentLocation" placeholder="City" required type="text" />
         </div>
         <div>
           <label class="form-label">Total years of experience<span class="required-asterisk">*</span></label>
@@ -120,20 +107,9 @@ const { title, jobId, location, employmentType, experience } = job;
             </div>
             <span class="text-sm text-on-surface-variant">I am a fresher</span>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <select aria-label="Years" class="form-select" id="experienceYears" name="experienceYears">
-              <option disabled selected value="">Years</option>
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="6">6</option>
-            </select>
-            <select aria-label="Months" class="form-select" id="experienceMonths" name="experienceMonths">
-              <option disabled selected value="">Months</option>
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-            </select>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="experienceFields">
+            <input aria-label="Years" class="form-input" id="experienceYears" name="experienceYears" inputmode="numeric" pattern="[0-9]*" placeholder="Years" type="text" />
+            <input aria-label="Months" class="form-input" id="experienceMonths" name="experienceMonths" inputmode="numeric" pattern="[0-9]*" placeholder="Months" type="text" />
           </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -208,6 +184,28 @@ const { title, jobId, location, employmentType, experience } = job;
     const resumeError = document.querySelector<HTMLParagraphElement>("#resumeError")!;
     const formError = document.querySelector<HTMLParagraphElement>("#applyFormError")!;
     const submitButton = document.querySelector<HTMLButtonElement>("#submitButton")!;
+    const isFresherCheckbox = document.querySelector<HTMLInputElement>("#isFresher")!;
+    const experienceFields = document.querySelector<HTMLElement>("#experienceFields")!;
+    const experienceYears = document.querySelector<HTMLInputElement>("#experienceYears")!;
+    const experienceMonths = document.querySelector<HTMLInputElement>("#experienceMonths")!;
+
+    function toggleExperienceFields() {
+      const isFresher = isFresherCheckbox.checked;
+      experienceFields.classList.toggle("hidden", isFresher);
+      if (isFresher) {
+        experienceYears.value = "";
+        experienceMonths.value = "";
+      }
+    }
+
+    isFresherCheckbox.addEventListener("change", toggleExperienceFields);
+    toggleExperienceFields();
+
+    for (const input of [experienceYears, experienceMonths]) {
+      input.addEventListener("input", () => {
+        input.value = input.value.replace(/\D/g, "");
+      });
+    }
 
     function validateResumeFile(file: File | undefined): string | null {
       if (!file) return "Attach your resume.";
@@ -230,6 +228,12 @@ const { title, jobId, location, employmentType, experience } = job;
     function setFormError(message: string | null) {
       formError.textContent = message ?? "";
       formError.classList.toggle("hidden", !message);
+    }
+
+    function firstErrorMessage(errors: Record<string, string> | undefined): string | null {
+      if (!errors) return null;
+      const { resume, ...rest } = errors;
+      return rest._form ?? Object.values(rest)[0] ?? null;
     }
 
     resumeInput.addEventListener("change", () => {
@@ -275,8 +279,8 @@ const { title, jobId, location, employmentType, experience } = job;
         const payload = await response.json();
 
         if (!response.ok || !payload.success) {
-          setFormError(payload.errors?._form ?? "We couldn't submit your application. Please check the form and try again.");
           if (payload.errors?.resume) setResumeError(payload.errors.resume);
+          setFormError(firstErrorMessage(payload.errors) ?? "We couldn't submit your application. Please check the form and try again.");
           submitButton.disabled = false;
           submitButton.textContent = "Submit Application";
           return;

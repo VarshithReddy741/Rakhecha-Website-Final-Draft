@@ -233,6 +233,11 @@ const careersHeroOptimized = await getImage({ src: careersHeroImage, width: 1920
     resumeFormError.classList.toggle("hidden", !message);
   }
 
+  function firstErrorMessage(errors: Record<string, string> | undefined): string | null {
+    if (!errors) return null;
+    return errors._form ?? Object.values(errors)[0] ?? null;
+  }
+
   resumeForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     setResumeFormError(null);
@@ -247,7 +252,7 @@ const careersHeroOptimized = await getImage({ src: careersHeroImage, width: 1920
       const payload = await response.json();
 
       if (!response.ok || !payload.success) {
-        setResumeFormError(payload.errors?._form ?? payload.errors?.resume ?? "We couldn't submit your resume. Please check the form and try again.");
+        setResumeFormError(firstErrorMessage(payload.errors) ?? "We couldn't submit your resume. Please check the form and try again.");
         resumeSubmitButton.disabled = false;
         resumeSubmitButton.textContent = "Submit Application";
         return;

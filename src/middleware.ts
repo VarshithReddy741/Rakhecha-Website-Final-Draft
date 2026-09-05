@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 
 const GUARDED = new Set(["/api/contact", "/api/careers-apply", "/api/event-register"]);
 const WINDOW_MS = 10 * 60 * 1000;
-const MAX = 100; // TEMP: raised for cross-browser/cross-form testing — reset to 5 after
+const MAX = 5;
 const store = new Map<string, { count: number; windowStart: number }>();
 
 function hashIp(ip: string): string {

@@ -9,10 +9,10 @@ interface Props {
   title: string;
   titleTag?: "h1" | "h2";
   message: string;
-  primaryHref: string;
-  primaryLabel: string;
-  secondaryHref: string;
-  secondaryLabel: string;
+  primaryHref?: string;
+  primaryLabel?: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
   footnote?: string;
 }
 
@@ -36,21 +36,29 @@ const TitleTag = titleTag;
   </div>
   <TitleTag class="font-display-lg text-display-lg text-primary mb-6">{title}</TitleTag>
   <p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mb-12">{message}</p>
-  <div class="flex flex-col sm:flex-row gap-6 w-full sm:w-auto items-center">
-    <a
-      class="inline-flex items-center justify-center px-8 py-3 bg-secondary-container text-on-secondary-container font-cta-text text-cta-text rounded hover:bg-secondary-fixed transition-colors duration-300 w-full sm:w-auto shadow-sm"
-      href={primaryHref}
-    >
-      {primaryLabel}
-    </a>
-    <a
-      class="inline-flex items-center justify-center px-8 py-3 bg-transparent text-primary border border-outline-variant hover:border-primary hover:text-primary font-cta-text text-cta-text rounded transition-colors duration-300 w-full sm:w-auto group"
-      href={secondaryHref}
-    >
-      {secondaryLabel}
-      <span class="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
-    </a>
-  </div>
+  {
+    (primaryHref || secondaryHref) && (
+      <div class="flex flex-col sm:flex-row gap-6 w-full sm:w-auto items-center">
+        {primaryHref && (
+          <a
+            class="inline-flex items-center justify-center px-8 py-3 bg-secondary-container text-on-secondary-container font-cta-text text-cta-text rounded hover:bg-secondary-fixed transition-colors duration-300 w-full sm:w-auto shadow-sm"
+            href={primaryHref}
+          >
+            {primaryLabel}
+          </a>
+        )}
+        {secondaryHref && (
+          <a
+            class="inline-flex items-center justify-center px-8 py-3 bg-transparent text-primary border border-outline-variant hover:border-primary hover:text-primary font-cta-text text-cta-text rounded transition-colors duration-300 w-full sm:w-auto group"
+            href={secondaryHref}
+          >
+            {secondaryLabel}
+            <span class="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+          </a>
+        )}
+      </div>
+    )
+  }
   {
     footnote && (
       <>

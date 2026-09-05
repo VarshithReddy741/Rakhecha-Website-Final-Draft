@@ -30,11 +30,11 @@ import FormSuccessState from "../components/FormSuccessState.astro";
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="fullName">Full Name<span class="text-error ml-1">*</span></label>
-                <input class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="fullName" name="fullName" placeholder="Full Name" required type="text" />
+                <input class="w-full border border-outline rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="fullName" name="fullName" placeholder="Full Name" required type="text" />
               </div>
               <div>
                 <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="serviceSelection">Service Selection<span class="text-error ml-1">*</span></label>
-                <select class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="serviceSelection" name="serviceSelection" required>
+                <select class="w-full border border-outline rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="serviceSelection" name="serviceSelection" required>
                   <option disabled selected value="">Select a Service</option>
                   <option value="investment_banking">Investment Banking</option>
                   <option value="wealth_management">Wealth Management</option>
@@ -45,16 +45,16 @@ import FormSuccessState from "../components/FormSuccessState.astro";
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="contactNumber">Contact Number<span class="text-error ml-1">*</span></label>
-                <input class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="contactNumber" name="contactNumber" placeholder="Contact Number" required type="tel" />
+                <input class="w-full border border-outline rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="contactNumber" name="contactNumber" placeholder="Contact Number" required type="tel" />
               </div>
               <div>
                 <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="email">Email Address<span class="text-error ml-1">*</span></label>
-                <input class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="email" name="email" placeholder="Email Address" required type="email" />
+                <input class="w-full border border-outline rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="email" name="email" placeholder="Email Address" required type="email" />
               </div>
             </div>
             <div>
               <label class="block mb-2 text-sm font-medium text-on-surface-variant" for="queryDetails">Query / Requirement Details</label>
-              <textarea class="w-full border border-outline-variant/30 rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none" id="queryDetails" name="queryDetails" placeholder="How can we help you?" rows="4"></textarea>
+              <textarea class="w-full border border-outline rounded-4 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none" id="queryDetails" name="queryDetails" placeholder="How can we help you?" rows="4"></textarea>
             </div>
             <div>
               <label class="flex items-start gap-3 cursor-pointer">
@@ -81,10 +81,6 @@ import FormSuccessState from "../components/FormSuccessState.astro";
           <FormSuccessState
             title="Request Received"
             message="Thank you for reaching out to Rakhecha Finserv. Our advisory team will review your request and get back to you shortly."
-            primaryHref="/"
-            primaryLabel="Return Home"
-            secondaryHref="/wealth-management/"
-            secondaryLabel="Explore Our Services"
           />
         </div>
       </div>
@@ -180,6 +176,14 @@ import FormSuccessState from "../components/FormSuccessState.astro";
 
         formCard.hidden = true;
         successPanel.hidden = false;
+
+        window.setTimeout(() => {
+          successPanel.hidden = true;
+          formCard.hidden = false;
+          form.reset();
+          submitButton.disabled = false;
+          submitButton.textContent = "Submit Request";
+        }, 4000);
       } catch {
         setFormError("Something went wrong. Please check your connection and try again.");
         submitButton.disabled = false;

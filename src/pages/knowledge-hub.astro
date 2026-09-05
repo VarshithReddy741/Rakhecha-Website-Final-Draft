@@ -170,10 +170,14 @@ function formatEventDate(dateStr?: string) {
           <h3 class="font-headline-lg text-headline-lg mb-2">Curated Insights, Delivered.</h3>
           <p class="font-body-md text-body-md text-primary-fixed opacity-90">Subscribe to receive exclusive invitations to future events, expert market commentary, and premium research reports directly in your inbox.</p>
         </div>
-        <form class="w-full md:w-auto flex flex-col sm:flex-row gap-4">
-          <input class="bg-transparent border border-outline-variant/40 rounded-lg px-4 py-3 text-on-primary placeholder:text-outline-variant focus:outline-none focus:border-secondary-fixed focus:ring-1 focus:ring-secondary-fixed min-w-[280px]" placeholder="Corporate Email Address" type="email" />
-          <button class="bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap" type="button">Subscribe</button>
+        <form id="newsletterForm" class="w-full md:w-auto flex flex-col sm:flex-row gap-4">
+          <div class="flex flex-col gap-1 min-w-[280px]">
+            <input id="newsletterEmail" name="email" required class="bg-transparent border border-outline-variant/40 rounded-lg px-4 py-3 text-on-primary placeholder:text-outline-variant focus:outline-none focus:border-secondary-fixed focus:ring-1 focus:ring-secondary-fixed w-full" placeholder="Corporate Email Address" type="email" />
+            <p id="newsletterError" class="hidden text-sm text-red-300"></p>
+          </div>
+          <button id="newsletterSubmit" class="bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap" type="submit">Subscribe</button>
         </form>
+        <p id="newsletterSuccess" class="hidden text-sm text-secondary-fixed font-medium mt-2">Thanks for subscribing — you're on the list.</p>
       </section>
     </div>
 
@@ -388,5 +392,52 @@ function formatEventDate(dateStr?: string) {
       update();
       setInterval(update, 60000);
     }
+  </script>
+
+  <script>
+    const newsletterForm = document.querySelector<HTMLFormElement>("#newsletterForm")!;
+    const newsletterSubmit = document.querySelector<HTMLButtonElement>("#newsletterSubmit")!;
+    const newsletterError = document.querySelector<HTMLParagraphElement>("#newsletterError")!;
+    const newsletterSuccess = document.querySelector<HTMLParagraphElement>("#newsletterSuccess")!;
+
+    function setNewsletterError(message: string | null) {
+      newsletterError.textContent = message ?? "";
+      newsletterError.classList.toggle("hidden", !message);
+    }
+
+    newsletterForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setNewsletterError(null);
+      newsletterSuccess.classList.add("hidden");
+      newsletterSubmit.disabled = true;
+      newsletterSubmit.textContent = "Subscribing...";
+
+      const data = Object.fromEntries(new FormData(newsletterForm).entries());
+
+      try {
+        const response = await fetch("/api/newsletter-subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const payload = await response.json();
+
+        if (!response.ok || !payload.success) {
+          setNewsletterError(payload.errors?._form ?? payload.errors?.email ?? "Please enter a valid email address.");
+          newsletterSubmit.disabled = false;
+          newsletterSubmit.textContent = "Subscribe";
+          return;
+        }
+
+        newsletterForm.reset();
+        newsletterSuccess.classList.remove("hidden");
+        newsletterSubmit.disabled = false;
+        newsletterSubmit.textContent = "Subscribe";
+      } catch {
+        setNewsletterError("Something went wrong. Please check your connection and try again.");
+        newsletterSubmit.disabled = false;
+        newsletterSubmit.textContent = "Subscribe";
+      }
+    });
   </script>
 </BaseLayout>

@@ -49,6 +49,17 @@ model JobApplication {
   @@map("job_applications")
 }
 
+model NewsletterSubscription {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  source      String    @default("knowledge_hub")
+  ipHash      String
+  submittedAt DateTime  @default(now())
+  exportedAt  DateTime?
+
+  @@map("newsletter_subscriptions")
+}
+
 model EventRegistration {
   id                 String    @id @default(cuid())
   eventId            String

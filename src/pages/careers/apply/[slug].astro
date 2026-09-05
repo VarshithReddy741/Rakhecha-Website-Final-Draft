@@ -1,23 +1,35 @@
 ---
-// Ported from "Apply for a role page.html". The job header on this page
-// was already hardcoded to "Senior Manager - Legal & Compliance" in the
-// source, disconnected from the real careers.html listings (same
-// pattern as Job detail.html) — its "See Job Details" link is pointed at
-// /careers/ (the listing index) instead of a specific job, rather than
-// inventing a match that doesn't exist in the data.
+// Ported from "Apply for a role page.html". The job header used to be
+// hardcoded to "Senior Manager - Legal & Compliance" regardless of which
+// real job someone clicked "Apply" for on /careers/[slug]/ — every
+// application landed in job_applications tagged with that fake job. This
+// is now a dynamic route that fetches the real job from Sanity by slug,
+// same pattern as /careers/[slug].astro.
 //
 // Fix (per prompt): city dropdown only had Mumbai/Delhi/Bangalore. Added
 // Kolkata (company HQ) and kept it a <select> rather than converting to
 // free text, since a constrained list is easier to route/filter on later
 // and free text would be a bigger UX change than asked for.
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
+import { sanityClient, queries, type Job } from "../../../lib/sanity";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+
+export async function getStaticPaths() {
+  const slugs = await sanityClient.fetch<{ slug: string }[]>(queries.allJobSlugs);
+  return slugs.map((j) => ({ params: { slug: j.slug } }));
+}
+
+const { slug } = Astro.params;
+const job = await sanityClient.fetch<Job | null>(queries.jobBySlug, { slug });
+if (!job) return Astro.redirect("/404");
+
+const { title, jobId, location, employmentType, experience } = job;
 ---
 
 <BaseLayout
-  title="Job Application - Rakhecha Finserv"
-  description="Apply for open roles at Rakhecha Finserv by submitting your details and resume through our online job application form."
+  title={`Apply — ${title} | Rakhecha Finserv`}
+  description={`Apply for ${title} at Rakhecha Finserv by submitting your details and resume through our online job application form.`}
   noindex
   bodyClass="min-h-screen flex flex-col"
 >
@@ -28,26 +40,22 @@ import Footer from "../../components/Footer.astro";
     <div class="bg-surface-pure rounded-lg p-8 mb-8 shadow-sm border border-outline-variant/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
         <div class="flex items-center gap-3 mb-2">
-          <h1 class="text-2xl font-bold text-on-surface">Senior Manager- Legal &amp; Compliance</h1>
-          <span class="bg-surface-container text-on-surface-variant text-xs px-2 py-1 rounded-full font-medium">Job ID: 381562</span>
+          <h1 class="text-2xl font-bold text-on-surface">{title}</h1>
+          <span class="bg-surface-container text-on-surface-variant text-xs px-2 py-1 rounded-full font-medium">Job ID: {jobId}</span>
         </div>
         <div class="flex flex-wrap gap-4 text-sm text-on-surface-variant">
           <div class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-            Human Resources (HR)
-          </div>
-          <div class="flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-            In-Office
+            {employmentType}
           </div>
-          <div class="flex items-center gap-1">Mumbai, Maharashtra, India</div>
+          <div class="flex items-center gap-1">{location}</div>
           <div class="flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-            6 - 14 years
+            {experience}
           </div>
         </div>
       </div>
-      <a href="/careers/" class="px-4 py-2 border border-outline rounded-4 text-primary font-medium hover:bg-surface-container transition-colors inline-block text-center">See Job Details</a>
+      <a href={`/careers/${slug}/`} class="px-4 py-2 border border-outline rounded-4 text-primary font-medium hover:bg-surface-container transition-colors inline-block text-center">See Job Details</a>
     </div>
     <!-- Application Form -->
     <div class="bg-surface-pure rounded-lg p-8 shadow-sm border border-outline-variant/30">
@@ -55,8 +63,8 @@ import Footer from "../../components/Footer.astro";
            instead of leaking form data into a GET query string); the real
            submission always goes through the fetch() handler below. -->
       <form id="applyForm" action="/api/careers-apply" class="space-y-6" method="POST">
-        <input type="hidden" name="jobId" value="381562" />
-        <input type="hidden" name="jobTitle" value="Senior Manager- Legal &amp; Compliance" />
+        <input type="hidden" name="jobId" value={jobId} />
+        <input type="hidden" name="jobTitle" value={title} />
         <p id="applyFormError" class="hidden text-sm text-error" role="alert"></p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>

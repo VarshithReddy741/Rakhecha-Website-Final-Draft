@@ -94,44 +94,32 @@ const serviceGroups = await Promise.all(
     id="mobile-nav-panel"
   >
     <div class="flex flex-col divide-y divide-outline-variant px-margin-mobile">
-      <div>
-        <button
-          class="w-full flex justify-between items-center py-5 text-left"
-          id="mobile-section-toggle-about"
-          type="button"
-          aria-expanded="false"
-          aria-controls="mobile-section-about"
-        >
-          <span class="text-headline-md font-headline-md text-primary">About Us</span>
-          <span class="material-symbols-outlined text-primary transition-transform duration-300" id="mobile-arrow-about">expand_more</span>
-        </button>
-        <div class="hidden pb-4 space-y-3" id="mobile-section-about">
-          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/about-us#our-story">Our Story</a>
-          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/#core-values-section">Our Values</a>
-          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/about-us#our-leadership">Our Leadership</a>
-          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/about-us#awards-recognition">Awards and Recognition</a>
-        </div>
-      </div>
-      <a class="py-5 text-headline-md font-headline-md text-primary block" href="/investment-banking">Investment Banking</a>
-      <a class="py-5 text-headline-md font-headline-md text-primary block" href="/wealth-management">Wealth Management</a>
-      <a class="py-5 text-headline-md font-headline-md text-primary block" href="/insurance">Insurance</a>
-      <div>
-        <button
-          class="w-full flex justify-between items-center py-5 text-left"
-          id="mobile-section-toggle-knowledge"
-          type="button"
-          aria-expanded="false"
-          aria-controls="mobile-section-knowledge"
-        >
-          <span class="text-headline-md font-headline-md text-primary">Knowledge Hub</span>
-          <span class="material-symbols-outlined text-primary transition-transform duration-300" id="mobile-arrow-knowledge">expand_more</span>
-        </button>
-        <div class="hidden pb-4 space-y-3" id="mobile-section-knowledge">
-          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/knowledge-hub#upcoming-events">Upcoming Events</a>
-          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/knowledge-hub#past-events">Past Events</a>
-          <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href="/knowledge-hub#reports">Insights</a>
-        </div>
-      </div>
+      <a class="py-5 text-headline-md font-headline-md text-primary block" href="/about-us">About Us</a>
+      {
+        serviceGroups.map((group) => (
+          <div>
+            <button
+              class="w-full flex justify-between items-center py-5 text-left"
+              id={`mobile-section-toggle-${group.businessLine}`}
+              data-mobile-service-toggle
+              data-mobile-section={group.businessLine}
+              type="button"
+              aria-expanded="false"
+              aria-controls={`mobile-section-${group.businessLine}`}
+            >
+              <span class="text-headline-md font-headline-md text-primary">{group.label}</span>
+              <span class="material-symbols-outlined text-primary transition-transform duration-300" id={`mobile-arrow-${group.businessLine}`}>expand_more</span>
+            </button>
+            <div class="hidden pb-4 space-y-3" id={`mobile-section-${group.businessLine}`}>
+              <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href={group.href}>Explore {group.label}</a>
+              {group.services.map((service) => (
+                <a class="block text-on-surface-variant hover:text-primary py-1 text-body-md font-body-md" href={`${group.href}#service-${service.cardId}`}>{service.title}</a>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+      <a class="py-5 text-headline-md font-headline-md text-primary block" href="/knowledge-hub">Knowledge Hub</a>
       <a class="py-5 text-headline-md font-headline-md text-primary block" href="/careers">Careers</a>
     </div>
     <div class="px-margin-mobile py-6 flex flex-col gap-3 border-t border-outline-variant">
@@ -160,7 +148,7 @@ const serviceGroups = await Promise.all(
     });
 
     let activeSection: string | null = null;
-    const sectionKeys = ["about", "knowledge"];
+    const serviceSectionToggles = Array.from(document.querySelectorAll<HTMLElement>("[data-mobile-service-toggle]"));
 
     function toggleSection(key: string) {
       const section = document.getElementById("mobile-section-" + key);
@@ -188,8 +176,9 @@ const serviceGroups = await Promise.all(
       activeSection = key;
     }
 
-    sectionKeys.forEach((key) => {
-      document.getElementById("mobile-section-toggle-" + key)?.addEventListener("click", () => toggleSection(key));
+    serviceSectionToggles.forEach((toggle) => {
+      const key = toggle.dataset.mobileSection;
+      if (key) toggle.addEventListener("click", () => toggleSection(key));
     });
 
     // Close the mobile nav panel whenever a link inside it is tapped —

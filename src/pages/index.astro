@@ -4,9 +4,11 @@
 // founders collection (Prompt 3) instead of main.js's client-rendered
 // innerHTML. Carousel/reveal behaviors (auto-scroll-x, founder-scroll-btn,
 // hero-card-anim) come from /scripts/site-effects.js (see Prompt 4 notes).
-import { sanityClient, queries, type Founder, type UpcomingEvent, type BusinessCard } from "../lib/sanity";
+import { sanityClient, queries, type Founder, type UpcomingEvent, type BusinessCard, type HeroSlide } from "../lib/sanity";
 import { urlFor, resolveImage } from "../lib/sanityImage";
-import { Picture } from "astro:assets";
+import devPhoto from "../assets/images/Dev.png";
+import nitishPhoto from "../assets/images/Nitish.png";
+import nidhhiPhoto from "../assets/images/Nidhhi.png";
 import type { ImageMetadata } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
@@ -14,18 +16,13 @@ import Footer from "../components/Footer.astro";
 import FounderCard from "../components/FounderCard.astro";
 import MissionVision from "../components/MissionVision.astro";
 import EventRegistrationModal from "../components/EventRegistrationModal.astro";
-import heroDesktop from "../assets/images/Homepage image web.png";
-import heroMobile from "../assets/images/Home page moblie.png";
-import nriHero from "../assets/images/NRI services web.png";
-import devPhoto from "../assets/images/Dev.png";
-import nitishPhoto from "../assets/images/Nitish.png";
-import nidhhiPhoto from "../assets/images/Nidhhi.png";
 
 const founderOrder = ["dev-piyush-rakhecha", "nidhhi-rakhecha", "nitish-rakhecha", "megha-rakhecha"];
-const [founderEntries, allUpcomingEvents, businessCards] = await Promise.all([
+const [founderEntries, allUpcomingEvents, businessCards, heroSlides] = await Promise.all([
   sanityClient.fetch<Founder[]>(queries.allFounders),
   sanityClient.fetch<UpcomingEvent[]>(queries.upcomingEvents),
   sanityClient.fetch<BusinessCard[]>(queries.businessCards),
+  sanityClient.fetch<HeroSlide[]>(queries.heroSlides),
 ]);
 const founders = founderOrder
   .map((slug) => founderEntries.find((f) => f.slug === slug))
@@ -78,61 +75,56 @@ const founderPhotos: Record<string, ImageMetadata> = {
   <!-- Hero Slideshow -->
   <section class="relative w-full h-screen md:h-[819px] min-h-[600px] bg-white overflow-hidden" id="hero-slideshow">
     <div class="hero-track flex w-full h-full transition-transform duration-700 ease-in-out" id="hero-track">
-      <!-- Slide 1 -->
-      <div class="hero-slide relative w-full h-full flex-shrink-0 flex items-start md:items-center">
-        <div class="absolute inset-0 z-0">
-          <Picture
-            src={heroDesktop}
-            alt="Modern glass skyscraper against a clear sky"
-            class="hidden md:block w-full h-full object-cover"
-            widths={[768, 1280, 1920]}
-            sizes="100vw"
-            formats={["webp"]}
-            fallbackFormat="webp"
-            loading="eager"
-          />
-          <Picture
-            src={heroMobile}
-            alt="Modern glass skyscraper against a clear sky"
-            class="md:hidden w-full h-full object-cover object-bottom"
-            widths={[480, 768]}
-            sizes="100vw"
-            formats={["webp"]}
-            fallbackFormat="webp"
-            loading="eager"
-          />
-        </div>
-        <div class="relative z-10 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-[20vh] md:pt-0">
-          <div class="max-w-2xl md:max-w-none">
-            <h1 class="text-display-lg font-display-lg text-primary mb-6 leading-tight md:whitespace-nowrap">Invest Today for a<br class="md:hidden" /> Better Tomorrow</h1>
-            <div class="flex gap-4">
-              <a href="/contact-us/" class="bg-primary text-white border border-secondary px-8 py-3 rounded text-cta-text font-cta-text hover:bg-primary-dark transition-colors duration-300 inline-block text-center">Contact Us</a>
+      {heroSlides.map((slide) => (
+        <div class="hero-slide relative w-full h-full flex-shrink-0 flex items-start md:items-center">
+          <div class="absolute inset-0 z-0">
+            {slide.mediaType === "video" && slide.videoUrl ? (
+              <video
+                class="w-full h-full object-cover"
+                src={slide.videoUrl}
+                poster={slide.videoPoster ? urlFor(slide.videoPoster).width(1920).url() : undefined}
+                autoplay
+                muted
+                loop
+                playsinline
+              />
+            ) : (
+              <>
+                {slide.image && (
+                  <img
+                    src={urlFor(slide.image).width(1920).url()}
+                    srcset={`${urlFor(slide.image).width(768).url()} 768w, ${urlFor(slide.image).width(1280).url()} 1280w, ${urlFor(slide.image).width(1920).url()} 1920w`}
+                    sizes="100vw"
+                    alt={slide.headline}
+                    class="hidden md:block w-full h-full object-cover"
+                    loading="eager"
+                  />
+                )}
+                {(slide.mobileImage ?? slide.image) && (
+                  <img
+                    src={urlFor(slide.mobileImage ?? slide.image!).width(768).url()}
+                    srcset={`${urlFor(slide.mobileImage ?? slide.image!).width(480).url()} 480w, ${urlFor(slide.mobileImage ?? slide.image!).width(768).url()} 768w`}
+                    sizes="100vw"
+                    alt={slide.headline}
+                    class="md:hidden w-full h-full object-cover object-bottom"
+                    loading="eager"
+                  />
+                )}
+              </>
+            )}
+          </div>
+          <div class="relative z-10 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-[20vh] md:pt-0">
+            <div class="max-w-2xl md:max-w-none">
+              <h1 class="text-display-lg font-display-lg text-primary mb-6 leading-tight md:whitespace-nowrap">{slide.headline}</h1>
+              {slide.ctaText && slide.ctaLink && (
+                <div class="flex gap-4">
+                  <a href={slide.ctaLink} class="bg-primary text-white border border-secondary px-8 py-3 rounded text-cta-text font-cta-text hover:bg-primary-dark transition-colors duration-300 inline-block text-center">{slide.ctaText}</a>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </div>
-      <!-- Slide 2 -->
-      <div class="hero-slide relative w-full h-full flex-shrink-0 flex items-start md:items-center">
-        <div class="absolute inset-0 z-0">
-          <Picture
-            src={nriHero}
-            alt="NRI investors reviewing India investment opportunities"
-            class="w-full h-full object-cover object-right md:object-center"
-            widths={[480, 768, 1280, 1920]}
-            sizes="100vw"
-          formats={["webp"]}
-          fallbackFormat="webp"
-          />
-        </div>
-        <div class="relative z-10 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-[20vh] md:pt-0">
-          <div class="max-w-2xl md:max-w-none">
-            <h1 class="text-display-lg font-display-lg text-primary mb-6 leading-tight">Invest in India's<br class="md:hidden" /> Growth Story</h1>
-            <div class="flex gap-4">
-              <a href="/contact-us/" class="bg-primary text-white border border-secondary px-8 py-3 rounded text-cta-text font-cta-text hover:bg-primary-dark transition-colors duration-300 inline-block text-center">Contact Us</a>
-            </div>
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
     <!-- Slide arrows: full opacity on mobile (no hover), revealed on desktop only
          when the cursor is over that half of the hero (see script below) -->

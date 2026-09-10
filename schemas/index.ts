@@ -6,6 +6,7 @@ import { pastEventSchema } from "./pastEvent";
 import { videoSchema } from "./video";
 import { businessCardSchema } from "./businessCard";
 import { serviceSchema } from "./service";
+import { heroSlideSchema } from "./heroSlide";
 
 export const schemaTypes = [
   articleSchema,
@@ -16,4 +17,5 @@ export const schemaTypes = [
   videoSchema,
   businessCardSchema,
   serviceSchema,
+  heroSlideSchema,
 ];

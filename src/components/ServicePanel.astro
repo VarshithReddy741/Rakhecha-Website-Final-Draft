@@ -99,6 +99,7 @@ const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
       items.map((item) => (
         <button
           type="button"
+          id={`service-${item.id}`}
           class="relative overflow-hidden rounded-xl group h-[400px] border border-outline-variant/30 transition-all duration-300 text-left w-full appearance-none p-0"
           data-card={item.id}
           aria-expanded="false"
@@ -377,6 +378,24 @@ const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
         window.scrollBy(0, afterY - beforeY);
       });
     });
+
+    // Header service links use these anchors. Opening the corresponding
+    // card makes the destination useful rather than merely landing at the
+    // capabilities section.
+    function openServiceFromHash() {
+      const match = window.location.hash.match(/^#service-(.+)$/);
+      if (!match) return;
+      const type = decodeURIComponent(match[1]);
+
+      if (window.matchMedia("(min-width: 768px)").matches) {
+        openPanel(type);
+      } else {
+        root.querySelector<HTMLElement>(`[data-mobile-trigger="${type}"]`)?.click();
+      }
+    }
+
+    window.addEventListener("hashchange", openServiceFromHash);
+    requestAnimationFrame(openServiceFromHash);
   }
 
   document.querySelectorAll<HTMLElement>("[data-service-panel]").forEach(initServicePanel);

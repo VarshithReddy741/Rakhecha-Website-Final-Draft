@@ -15,9 +15,10 @@ export interface Props {
   buttonText: string;
   buttonHref?: string;
   icon?: string;
+  openInNewTab?: boolean;
 }
 
-const { heading, description, buttonText, buttonHref, icon } = Astro.props;
+const { heading, description, buttonText, buttonHref, icon, openInNewTab = false } = Astro.props;
 ---
 
 <section class="py-14 md:py-20 px-margin-mobile md:px-margin-desktop">
@@ -31,6 +32,8 @@ const { heading, description, buttonText, buttonHref, icon } = Astro.props;
         buttonHref ? (
           <a
             href={buttonHref}
+            target={openInNewTab ? "_blank" : undefined}
+            rel={openInNewTab ? "noopener noreferrer" : undefined}
             class="bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap inline-flex items-center gap-2 text-center"
           >
             {icon && <span class="material-symbols-outlined">{icon}</span>}

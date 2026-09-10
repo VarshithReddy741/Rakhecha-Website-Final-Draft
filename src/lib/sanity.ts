@@ -133,6 +133,10 @@ export interface HeroSlide {
   order: number;
 }
 
+export interface SiteSettings {
+  companyDeckUrl?: string;
+}
+
 export const queries = {
   reportArticles: `*[_type == "article" && category == "Report"] | order(date desc) { "slug": slug.current, title, category, date, readTime, imageUrl, authorName, authorRole, authorPhotoUrl, excerpt, body }`,
   blogArticles:   `*[_type == "article" && category == "Blog"] | order(date desc) { "slug": slug.current, title, category, date, readTime, imageUrl, authorName, authorRole, authorPhotoUrl, excerpt, body }`,
@@ -153,6 +157,8 @@ export const queries = {
 
   businessCards:  `*[_type == "businessCard"] | order(order asc) { "slug": slug.current, title, href, description, image, mobileImage, imagePosition, order }`,
   servicesByLine: `*[_type == "service" && businessLine == $businessLine] | order(order asc) { title, businessLine, "cardId": cardId.current, shortDescription, image, imagePosition, order, contentBoxes }`,
+
+  siteSettings: `*[_type == "siteSettings"][0] { "companyDeckUrl": companyDeck.asset->url }`,
 
   heroSlides:     `*[_type == "heroSlide"] | order(order asc) { title, headline, mediaType, image, mobileImage, "videoUrl": video.asset->url, videoPoster, ctaText, ctaLink, order }`,
 };

@@ -3,7 +3,7 @@
 // FounderCard/MissionVision components; the "Want to Know More?" banner
 // uses CtaBanner (Prompt 2). Carousel/reveal behaviors come from
 // /scripts/site-effects.js.
-import { sanityClient, queries, type Founder } from "../lib/sanity";
+import { sanityClient, queries, type Founder, type SiteSettings } from "../lib/sanity";
 import { resolveImage } from "../lib/sanityImage";
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
@@ -19,7 +19,10 @@ import nitishPhoto from "../assets/images/Nitish.png";
 import nidhhiPhoto from "../assets/images/Nidhhi.png";
 
 const founderOrder = ["dev-piyush-rakhecha", "nidhhi-rakhecha", "nitish-rakhecha", "megha-rakhecha"];
-const founderEntries = await sanityClient.fetch<Founder[]>(queries.allFounders);
+const [founderEntries, siteSettings] = await Promise.all([
+  sanityClient.fetch<Founder[]>(queries.allFounders),
+  sanityClient.fetch<SiteSettings | null>(queries.siteSettings),
+]);
 const founders = founderOrder
   .map((slug) => founderEntries.find((f) => f.slug === slug))
   .filter((f): f is Founder => Boolean(f));
@@ -375,7 +378,9 @@ const founderPhotos: Record<string, ImageMetadata> = {
       heading="Want to Know More?"
       description="Download our comprehensive company profile to explore our specialized strategies and client success stories."
       buttonText="Download Company Deck"
+      buttonHref={siteSettings?.companyDeckUrl}
       icon="download"
+      openInNewTab={true}
     />
   </main>
 

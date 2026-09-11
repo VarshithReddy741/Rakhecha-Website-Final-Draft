@@ -41,12 +41,12 @@ const serviceGroups = await Promise.all(
   </div>
 
   <nav class="hidden md:flex gap-8 items-center">
-    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md" href="/about-us">About Us</a>
+    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/about-us">About Us</a>
     {
       serviceGroups.map((group) => (
         <div class="relative group">
           <a
-            class="flex items-center gap-1 text-on-surface-variant dark:text-outline-variant hover:text-primary-light focus:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md"
+            class="flex items-center gap-1 text-on-surface-variant dark:text-outline-variant hover:text-primary-light focus:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold"
             href={group.href}
             aria-haspopup="true"
           >
@@ -74,8 +74,8 @@ const serviceGroups = await Promise.all(
         </div>
       ))
     }
-    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md" href="/knowledge-hub">Knowledge Hub</a>
-    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md" href="/careers">Careers</a>
+    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/knowledge-hub">Knowledge Hub</a>
+    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/careers">Careers</a>
   </nav>
 
   <div class="hidden md:block">

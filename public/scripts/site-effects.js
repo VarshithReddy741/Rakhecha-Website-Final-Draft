@@ -15,11 +15,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const wrapper = track.parentElement;
     if (!wrapper) return;
 
+    let hovering = false;
     const pause = () => track.classList.add("marquee-paused");
-    const resume = () => track.classList.remove("marquee-paused");
+    // Only lift the pause if the mouse isn't still resting on the card —
+    // otherwise a click (mousedown+mouseup, e.g. the "Read more" toggle)
+    // resumes the marquee out from under a still-hovering cursor.
+    const resume = () => {
+      if (!hovering) track.classList.remove("marquee-paused");
+    };
 
-    wrapper.addEventListener("mouseenter", pause);
-    wrapper.addEventListener("mouseleave", resume);
+    wrapper.addEventListener("mouseenter", () => {
+      hovering = true;
+      pause();
+    });
+    wrapper.addEventListener("mouseleave", () => {
+      hovering = false;
+      resume();
+    });
     wrapper.addEventListener("touchstart", pause, { passive: true });
     wrapper.addEventListener("touchend", resume, { passive: true });
     wrapper.addEventListener("touchcancel", resume, { passive: true });

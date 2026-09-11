@@ -8,6 +8,7 @@ import { businessCardSchema } from "./businessCard";
 import { serviceSchema } from "./service";
 import { heroSlideSchema } from "./heroSlide";
 import { siteSettingsSchema } from "./siteSettings";
+import { testimonialSchema } from "./testimonial";
 
 export const schemaTypes = [
   articleSchema,
@@ -20,4 +21,5 @@ export const schemaTypes = [
   serviceSchema,
   heroSlideSchema,
   siteSettingsSchema,
+  testimonialSchema,
 ];

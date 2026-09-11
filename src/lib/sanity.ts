@@ -137,6 +137,14 @@ export interface SiteSettings {
   companyDeckUrl?: string;
 }
 
+export interface Testimonial {
+  quote: string;
+  authorName: string;
+  authorCompany?: string;
+  photo?: SanityImageSource;
+  order?: number;
+}
+
 export const queries = {
   reportArticles: `*[_type == "article" && category == "Report"] | order(date desc) { "slug": slug.current, title, category, date, readTime, imageUrl, authorName, authorRole, authorPhotoUrl, excerpt, body }`,
   blogArticles:   `*[_type == "article" && category == "Blog"] | order(date desc) { "slug": slug.current, title, category, date, readTime, imageUrl, authorName, authorRole, authorPhotoUrl, excerpt, body }`,
@@ -161,4 +169,6 @@ export const queries = {
   siteSettings: `*[_type == "siteSettings"][0] { "companyDeckUrl": companyDeck.asset->url }`,
 
   heroSlides:     `*[_type == "heroSlide"] | order(order asc) { title, headline, mediaType, image, mobileImage, "videoUrl": video.asset->url, videoPoster, ctaText, ctaLink, order }`,
+
+  testimonials:   `*[_type == "testimonial"] | order(order asc) { quote, authorName, authorCompany, photo, order }`,
 };

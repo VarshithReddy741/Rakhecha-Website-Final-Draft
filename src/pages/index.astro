@@ -4,7 +4,7 @@
 // founders collection (Prompt 3) instead of main.js's client-rendered
 // innerHTML. Carousel/reveal behaviors (auto-scroll-x, founder-scroll-btn,
 // hero-card-anim) come from /scripts/site-effects.js (see Prompt 4 notes).
-import { sanityClient, queries, type Founder, type UpcomingEvent, type BusinessCard, type HeroSlide } from "../lib/sanity";
+import { sanityClient, queries, type Founder, type UpcomingEvent, type BusinessCard, type HeroSlide, type Testimonial } from "../lib/sanity";
 import { urlFor, resolveImage } from "../lib/sanityImage";
 import devPhoto from "../assets/images/Dev.png";
 import nitishPhoto from "../assets/images/Nitish.png";
@@ -17,11 +17,12 @@ import FounderCard from "../components/FounderCard.astro";
 import EventRegistrationModal from "../components/EventRegistrationModal.astro";
 
 const founderOrder = ["dev-piyush-rakhecha", "nidhhi-rakhecha", "nitish-rakhecha", "megha-rakhecha"];
-const [founderEntries, allUpcomingEvents, businessCards, heroSlides] = await Promise.all([
+const [founderEntries, allUpcomingEvents, businessCards, heroSlides, testimonials] = await Promise.all([
   sanityClient.fetch<Founder[]>(queries.allFounders),
   sanityClient.fetch<UpcomingEvent[]>(queries.upcomingEvents),
   sanityClient.fetch<BusinessCard[]>(queries.businessCards),
   sanityClient.fetch<HeroSlide[]>(queries.heroSlides),
+  sanityClient.fetch<Testimonial[]>(queries.testimonials),
 ]);
 const founders = founderOrder
   .map((slug) => founderEntries.find((f) => f.slug === slug))
@@ -299,107 +300,30 @@ const founderPhotos: Record<string, ImageMetadata> = {
       </div>
       <div class="marquee overflow-hidden">
         <div class="marquee-track flex gap-8 py-4" style="animation-duration: 50s;">
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"The level of precision and independent thinking Rakhecha Finserv brings to our family office is unparalleled in the industry."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Managing Director</div>
-                <div class="text-body-sm text-on-surface-variant">Global Technology Firm</div>
+          {
+            [...testimonials, ...testimonials].map((testimonial) => (
+              <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
+                <p class="text-body-lg font-body-lg text-primary mb-8 italic">"{testimonial.quote}"</p>
+                <div class="flex items-center gap-4">
+                  {testimonial.photo ? (
+                    <img
+                      src={urlFor(testimonial.photo).width(96).height(96).url()}
+                      alt={testimonial.authorName}
+                      class="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div class="w-12 h-12 rounded-full bg-surface-variant" />
+                  )}
+                  <div>
+                    <div class="font-bold text-primary">{testimonial.authorName}</div>
+                    {testimonial.authorCompany && (
+                      <div class="text-body-sm text-on-surface-variant">{testimonial.authorCompany}</div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"Their conflict-free approach gave us the confidence to restructure our entire global portfolio during a period of extreme volatility."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Chief Investment Officer</div>
-                <div class="text-body-sm text-on-surface-variant">Private Equity Group</div>
-              </div>
-            </div>
-          </div>
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"A true partner in wealth stewardship. They understand the nuances of generational wealth better than any traditional bank."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Founder &amp; CEO</div>
-                <div class="text-body-sm text-on-surface-variant">Industrial Conglomerate</div>
-              </div>
-            </div>
-          </div>
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"Their proactive portfolio adaptation during market shifts has consistently protected our downside while capturing upside we would have otherwise missed."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Partner</div>
-                <div class="text-body-sm text-on-surface-variant">Family Office</div>
-              </div>
-            </div>
-          </div>
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"Transparent, research-backed advice with none of the conflicted incentives we experienced with our previous bank-led advisors."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Director of Finance</div>
-                <div class="text-body-sm text-on-surface-variant">NRI Client, Singapore</div>
-              </div>
-            </div>
-          </div>
-          <!-- Duplicate for seamless loop -->
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"The level of precision and independent thinking Rakhecha Finserv brings to our family office is unparalleled in the industry."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Managing Director</div>
-                <div class="text-body-sm text-on-surface-variant">Global Technology Firm</div>
-              </div>
-            </div>
-          </div>
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"Their conflict-free approach gave us the confidence to restructure our entire global portfolio during a period of extreme volatility."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Chief Investment Officer</div>
-                <div class="text-body-sm text-on-surface-variant">Private Equity Group</div>
-              </div>
-            </div>
-          </div>
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"A true partner in wealth stewardship. They understand the nuances of generational wealth better than any traditional bank."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Founder &amp; CEO</div>
-                <div class="text-body-sm text-on-surface-variant">Industrial Conglomerate</div>
-              </div>
-            </div>
-          </div>
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"Their proactive portfolio adaptation during market shifts has consistently protected our downside while capturing upside we would have otherwise missed."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Partner</div>
-                <div class="text-body-sm text-on-surface-variant">Family Office</div>
-              </div>
-            </div>
-          </div>
-          <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-            <p class="text-body-lg font-body-lg text-primary mb-8 italic">"Transparent, research-backed advice with none of the conflicted incentives we experienced with our previous bank-led advisors."</p>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-surface-variant"></div>
-              <div>
-                <div class="font-bold text-primary">Director of Finance</div>
-                <div class="text-body-sm text-on-surface-variant">NRI Client, Singapore</div>
-              </div>
-            </div>
-          </div>
+            ))
+          }
         </div>
       </div>
     </div>

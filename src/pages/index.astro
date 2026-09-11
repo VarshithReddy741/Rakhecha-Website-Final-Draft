@@ -303,8 +303,11 @@ const founderPhotos: Record<string, ImageMetadata> = {
           {
             [...testimonials, ...testimonials].map((testimonial) => (
               <div class="flex-shrink-0 w-[85vw] sm:w-[400px] p-8 border border-outline-variant rounded-lg bg-surface-container-lowest">
-                <p class="text-body-lg font-body-lg text-primary mb-8 italic">"{testimonial.quote}"</p>
-                <div class="flex items-center gap-4">
+                <p class="testimonial-quote line-clamp-6 text-body-lg font-body-lg text-primary mb-2 italic">"{testimonial.quote}"</p>
+                {testimonial.quote.length > 220 && (
+                  <button type="button" class="testimonial-toggle text-body-sm font-bold text-secondary hover:underline mb-6">Read more</button>
+                )}
+                <div class="flex items-center gap-4 mt-6">
                   {testimonial.photo ? (
                     <img
                       src={urlFor(testimonial.photo).width(96).height(96).url()}
@@ -569,6 +572,21 @@ const founderPhotos: Record<string, ImageMetadata> = {
 
       goTo(1, false);
       startAuto();
+    })();
+  </script>
+
+  <script>
+    // Testimonial quotes are clamped to 6 lines by default; "Read more"
+    // expands the specific card in place.
+    (function () {
+      document.querySelectorAll(".testimonial-toggle").forEach((button) => {
+        button.addEventListener("click", () => {
+          const quote = button.previousElementSibling as HTMLElement | null;
+          if (!quote) return;
+          const expanded = quote.classList.toggle("line-clamp-6") === false;
+          button.textContent = expanded ? "Read less" : "Read more";
+        });
+      });
     })();
   </script>
 

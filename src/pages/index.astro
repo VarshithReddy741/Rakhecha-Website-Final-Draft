@@ -72,7 +72,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
   <Header />
 
   <!-- Hero Slideshow -->
-  <section class="relative w-full h-screen md:h-[819px] min-h-[600px] bg-white overflow-hidden" id="hero-slideshow">
+  <section class="relative w-full h-screen md:min-h-screen md:max-h-[900px] min-h-[600px] bg-white overflow-hidden" id="hero-slideshow">
     <div class="hero-track flex w-full h-full transition-transform duration-700 ease-in-out" id="hero-track">
       {heroSlides.map((slide) => (
         <div class="hero-slide relative w-full h-full flex-shrink-0 flex items-start md:items-center">

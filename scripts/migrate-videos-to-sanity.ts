@@ -3,10 +3,8 @@
 // the user, uploading each video's YouTube thumbnail as a real Sanity
 // asset.
 //
-// The `date` field is required by the schema but no publish dates were
-// supplied, so this assigns descending placeholder dates (today, today-1,
-// ...) purely to preserve the given display order — edit the real dates
-// in Sanity Studio afterward if they matter.
+// `date` is intentionally left unset here — the actual publish dates
+// weren't provided, so fill them in per-video in Sanity Studio.
 //
 // Idempotent: uses deterministic `_id`s via createOrReplace, safe to re-run.
 // Requires an EDITOR-level Sanity token in SANITY_MIGRATION_TOKEN env var,
@@ -63,13 +61,8 @@ async function uploadThumbnail(youtubeId: string): Promise<{ _type: "image"; ass
 async function migrate() {
   console.log("Uploading thumbnails and queuing video documents...");
   const tx = client.transaction();
-  const today = new Date();
 
-  for (let i = 0; i < videos.length; i++) {
-    const v = videos[i];
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-
+  for (const v of videos) {
     const thumbnailUrl = await uploadThumbnail(v.youtubeId);
     console.log(`  ${v.id}: thumbnail uploaded`);
 
@@ -77,7 +70,6 @@ async function migrate() {
       _type: "video",
       _id: "video-" + v.id,
       title: v.title,
-      date: date.toISOString().slice(0, 10),
       embedUrl: `https://www.youtube.com/watch?v=${v.youtubeId}`,
       thumbnailUrl,
     });

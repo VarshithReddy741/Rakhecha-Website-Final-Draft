@@ -170,12 +170,27 @@ const ibItems = ibServices.map((svc) => ({
     <!-- Services Interactive Section -->
     <section class="py-section-gap bg-white relative z-20 -mt-20">
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-        <ServiceAccordionGallery items={ibItems} />
-        <div class="mt-16">
+        <h3 class="md:hidden font-headline-lg text-headline-lg text-primary mb-4">Capabilities</h3>
+        <div class="hidden md:flex items-center justify-between mb-6">
+          <h3 class="font-headline-lg text-headline-lg text-primary">Capabilities</h3>
+          <select
+            data-layout-select
+            aria-label="Choose how capabilities are displayed"
+            class="text-body-sm font-body-sm text-on-surface-variant border border-outline-variant rounded-md px-3 py-1.5 bg-white focus:outline-none focus:border-primary"
+          >
+            <option value="accordion">Expanding Panels</option>
+            <option value="scroll">Scroll Gallery</option>
+            <option value="grid">Grid View</option>
+          </select>
+        </div>
+        <div data-layout-panel="accordion">
+          <ServiceAccordionGallery items={ibItems} />
+        </div>
+        <div data-layout-panel="scroll">
           <ServiceScrollRow items={ibItems} />
         </div>
-        <div class="mt-12">
-          <ServicePanel items={ibItems} columns={3} expandedHeight="h-[300px]" expandedScale={false} />
+        <div data-layout-panel="grid">
+          <ServicePanel items={ibItems} columns={3} expandedHeight="h-[300px]" expandedScale={false} capabilitiesHeading="" />
         </div>
       </div>
     </section>
@@ -195,3 +210,27 @@ const ibItems = ibServices.map((svc) => ({
 
   <Footer />
 </BaseLayout>
+
+<script>
+  // Capabilities layout switcher (Investment Banking, desktop only): the
+  // dropdown picks which of the three card views is visible. On mobile,
+  // clear any inline override so each component's own responsive classes
+  // decide as before — ServicePanel's mobile accordion always shows there
+  // regardless of the desktop-selected layout.
+  const select = document.querySelector<HTMLSelectElement>("[data-layout-select]");
+  const panels = Array.from(document.querySelectorAll<HTMLElement>("[data-layout-panel]"));
+  if (select && panels.length) {
+    const mq = window.matchMedia("(min-width: 768px)");
+
+    function applyLayout() {
+      const value = select!.value;
+      panels.forEach((panel) => {
+        panel.style.display = mq.matches ? (panel.dataset.layoutPanel === value ? "" : "none") : "";
+      });
+    }
+
+    select.addEventListener("change", applyLayout);
+    mq.addEventListener("change", applyLayout);
+    applyLayout();
+  }
+</script>

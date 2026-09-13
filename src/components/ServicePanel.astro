@@ -57,9 +57,13 @@ const panelId = `sp-${Math.random().toString(36).slice(2, 9)}`;
 const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
 ---
 
-<h3 id={`${panelId}-capabilities-heading`} class="font-headline-lg text-headline-lg text-primary mb-4">
-  {capabilitiesHeading}
-</h3>
+{
+  capabilitiesHeading && (
+    <h3 id={`${panelId}-capabilities-heading`} class="font-headline-lg text-headline-lg text-primary mb-4">
+      {capabilitiesHeading}
+    </h3>
+  )
+}
 <div
   class="relative md:min-h-[600px] w-full"
   data-service-panel={panelId}

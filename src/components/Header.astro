@@ -18,10 +18,10 @@ const serviceGroups = await Promise.all(
 ---
 
 <header
-  class="sticky top-0 w-full flex justify-between items-center px-margin-mobile min-[900px]:px-[clamp(1.25rem,calc(4vw-1rem),3rem)] py-4 z-50 bg-surface-container-lowest dark:bg-surface-dim shadow-sm dark:shadow-none"
+  class="sticky top-0 w-full flex justify-between items-center px-margin-mobile min-[840px]:px-6 py-4 z-50 bg-surface-container-lowest dark:bg-surface-dim shadow-sm dark:shadow-none"
 >
   <button
-    class="min-[900px]:hidden text-primary order-2"
+    class="min-[840px]:hidden text-primary order-2"
     id="mobile-nav-toggle"
     type="button"
     aria-expanded="false"
@@ -30,7 +30,7 @@ const serviceGroups = await Promise.all(
     <span class="material-symbols-outlined text-3xl" id="mobile-nav-icon">menu</span>
   </button>
 
-  <div class="flex-shrink-0 w-64 min-[900px]:w-[clamp(11rem,calc(16vw+2rem),16rem)] order-1 min-[900px]:order-none">
+  <div class="flex-shrink-0 w-64 min-[840px]:w-[200px] order-1 min-[840px]:order-none">
     <a href="/">
       <img
         alt="Rakhecha Finserv"
@@ -40,7 +40,7 @@ const serviceGroups = await Promise.all(
     </a>
   </div>
 
-  <nav class="hidden min-[900px]:flex flex-wrap justify-center gap-[clamp(0.25rem,calc(2.28571vw-1.03571rem),1.25rem)] items-center">
+  <nav class="hidden min-[840px]:flex justify-center gap-[clamp(0.25rem,calc(4vw-2.75rem),1.25rem)] items-center">
     <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/about-us">About Us</a>
     {
       serviceGroups.map((group) => (
@@ -77,16 +77,16 @@ const serviceGroups = await Promise.all(
     <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/careers">Careers</a>
   </nav>
 
-  <div class="hidden min-[900px]:block">
-    <div class="flex flex-col min-[1360px]:flex-row items-center gap-2 min-[1360px]:gap-6">
-      <a href="https://rakhechafinserv.investwell.app/app/#/login" target="_blank" rel="noopener noreferrer" class="w-[124px] bg-white border border-secondary text-primary font-cta-text px-4 py-1.5 min-[1360px]:py-2 rounded hover:bg-surface-container-low transition-colors inline-block text-center whitespace-nowrap">Client Login</a>
-      <a href="/contact-us" class="w-[124px] bg-primary text-white border border-secondary font-cta-text px-4 py-1.5 min-[1360px]:py-2 rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center whitespace-nowrap">Contact Us</a>
+  <div class="hidden min-[840px]:block">
+    <div class="flex flex-col min-[1200px]:flex-row items-center gap-2 min-[1200px]:gap-3">
+      <a href="https://rakhechafinserv.investwell.app/app/#/login" target="_blank" rel="noopener noreferrer" class="w-[124px] bg-white border border-secondary text-primary font-cta-text px-4 py-1.5 min-[1200px]:py-2 rounded hover:bg-surface-container-low transition-colors inline-block text-center whitespace-nowrap">Client Login</a>
+      <a href="/contact-us" class="w-[124px] bg-primary text-white border border-secondary font-cta-text px-4 py-1.5 min-[1200px]:py-2 rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center whitespace-nowrap">Contact Us</a>
     </div>
   </div>
 
   <!-- Mobile Nav Panel -->
   <div
-    class="hidden min-[900px]:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
+    class="hidden min-[840px]:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
     id="mobile-nav-panel"
   >
     <div class="flex flex-col divide-y divide-outline-variant px-margin-mobile">

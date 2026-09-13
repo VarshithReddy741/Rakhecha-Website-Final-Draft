@@ -113,7 +113,12 @@ header .font-body-md {
         font-weight: 400;
         line-height: 20px;
     }
-    /* Mobile navigation/menu */
+}
+
+/* Mobile navigation/menu: matches the header's hamburger-menu breakpoint
+   (min-[1180px] in Header.astro) rather than the 767px content breakpoint
+   above, since the hamburger panel now covers tablet widths too. */
+@media (max-width: 1179px) {
     header .text-body-md,
     header .font-body-md {
         font-size: 20px;

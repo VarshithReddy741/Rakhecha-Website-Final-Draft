@@ -18,10 +18,10 @@ const serviceGroups = await Promise.all(
 ---
 
 <header
-  class="sticky top-0 w-full flex justify-between items-center px-margin-mobile md:px-[clamp(1.25rem,calc(5.46875vw-1.375rem),3rem)] py-4 z-50 bg-surface-container-lowest dark:bg-surface-dim shadow-sm dark:shadow-none"
+  class="sticky top-0 w-full flex justify-between items-center px-margin-mobile min-[1180px]:px-[clamp(1.25rem,calc(6.66667vw-3.667rem),3rem)] py-4 z-50 bg-surface-container-lowest dark:bg-surface-dim shadow-sm dark:shadow-none"
 >
   <button
-    class="md:hidden text-primary order-2"
+    class="min-[1180px]:hidden text-primary order-2"
     id="mobile-nav-toggle"
     type="button"
     aria-expanded="false"
@@ -30,7 +30,7 @@ const serviceGroups = await Promise.all(
     <span class="material-symbols-outlined text-3xl" id="mobile-nav-icon">menu</span>
   </button>
 
-  <div class="flex-shrink-0 w-64 md:w-64 order-1 md:order-none">
+  <div class="flex-shrink-0 w-64 min-[1180px]:w-64 order-1 min-[1180px]:order-none">
     <a href="/">
       <img
         alt="Rakhecha Finserv"
@@ -40,7 +40,7 @@ const serviceGroups = await Promise.all(
     </a>
   </div>
 
-  <nav class="hidden md:flex gap-[clamp(0.5rem,calc(4.6875vw-1.75rem),2rem)] items-center">
+  <nav class="hidden min-[1180px]:flex gap-[clamp(0.5rem,calc(5.714286vw-3.714rem),2rem)] items-center">
     <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/about-us">About Us</a>
     {
       serviceGroups.map((group) => (
@@ -78,7 +78,7 @@ const serviceGroups = await Promise.all(
     <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/careers">Careers</a>
   </nav>
 
-  <div class="hidden md:block">
+  <div class="hidden min-[1180px]:block">
     <div class="flex items-center gap-6">
       <a href="https://rakhechafinserv.investwell.app/app/#/login" target="_blank" rel="noopener noreferrer" class="bg-white border border-secondary text-primary font-cta-text px-6 py-2 rounded hover:bg-surface-container-low transition-colors inline-block text-center">Client Login</a>
       <a href="/contact-us" class="bg-primary text-white border border-secondary font-cta-text px-6 py-2 rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center">Contact Us</a>
@@ -87,7 +87,7 @@ const serviceGroups = await Promise.all(
 
   <!-- Mobile Nav Panel -->
   <div
-    class="hidden md:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
+    class="hidden min-[1180px]:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
     id="mobile-nav-panel"
   >
     <div class="flex flex-col divide-y divide-outline-variant px-margin-mobile">

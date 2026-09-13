@@ -115,9 +115,9 @@ const founderPhotos: Record<string, ImageMetadata> = {
           </div>
           <div class="relative z-10 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-[20vh] md:pt-0">
             <div class="max-w-2xl md:max-w-none">
-              <h1 class="text-display-lg font-display-lg text-primary mb-6 leading-tight md:whitespace-nowrap">{slide.headline}</h1>
+              <h1 class="reveal mask-reveal text-display-lg font-display-lg text-primary mb-6 leading-tight md:whitespace-nowrap"><span>{slide.headline}</span></h1>
               {slide.ctaText && slide.ctaLink && (
-                <div class="flex gap-4">
+                <div class="reveal flex gap-4" style="transition-delay: 0.28s">
                   <a href={slide.ctaLink} class="bg-primary text-white border border-secondary px-8 py-3 rounded text-cta-text font-cta-text hover:bg-primary-dark transition-colors duration-300 inline-block text-center">{slide.ctaText}</a>
                 </div>
               )}
@@ -139,22 +139,22 @@ const founderPhotos: Record<string, ImageMetadata> = {
   <!-- Stats Strip -->
   <section class="bg-surface py-10">
     <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-outline-variant">
-        <div class="flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 first:pt-0 text-center sm:text-left">
+      <div class="reveal-stagger grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-outline-variant">
+        <div class="reveal flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 first:pt-0 text-center sm:text-left">
           <div class="flex items-center justify-center w-14 h-14 rounded-full border-2 border-primary text-primary shrink-0"><span class="material-symbols-outlined text-2xl">apartment</span></div>
           <div class="text-center sm:text-left">
             <span class="block font-display-lg text-headline-md md:text-display-lg text-primary">₹<span class="count-up" data-target="200">200</span> Cr+</span>
             <span class="block font-label-bold text-label-bold uppercase tracking-widest text-on-surface-variant">Assets Under Management</span>
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
+        <div class="reveal flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
           <div class="flex items-center justify-center w-14 h-14 rounded-full border-2 border-primary text-primary shrink-0"><span class="material-symbols-outlined text-2xl">calendar_month</span></div>
           <div class="text-center sm:text-left">
             <span class="block font-display-lg text-headline-md md:text-display-lg text-primary"><span class="count-up" data-target="10">10</span>+</span>
             <span class="block font-label-bold text-label-bold uppercase tracking-widest text-on-surface-variant">Years in Business</span>
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
+        <div class="reveal flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
           <div class="flex items-center justify-center w-14 h-14 rounded-full border-2 border-primary text-primary shrink-0"><span class="material-symbols-outlined text-2xl">groups</span></div>
           <div class="text-center sm:text-left">
             <span class="block font-display-lg text-headline-md md:text-display-lg text-primary"><span class="count-up" data-target="300">300</span>+</span>
@@ -168,7 +168,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
   <!-- Our Businesses -->
   <section class="py-14 bg-surface-yellow-light">
     <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-12 md:mb-16">
-      <h2 class="text-headline-lg md:text-display-lg font-display-lg text-primary mb-4 text-center">Our Businesses</h2>
+      <h2 class="reveal text-headline-lg md:text-display-lg font-display-lg text-primary mb-4 text-center">Our Businesses</h2>
     </div>
     <!-- Desktop Layout: Vertical Strips -->
     <div class="hidden md:flex h-[600px] w-full max-w-container-max mx-auto px-margin-desktop gap-2 overflow-hidden">
@@ -186,7 +186,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
             </div>
             <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
               <p class="text-white/90 text-body-md mb-6 max-w-md">{card.description}</p>
-              <span class="flex items-center gap-2 text-gold font-cta-text group-hover:text-white transition-colors">READ MORE <span class="material-symbols-outlined">arrow_forward</span></span>
+              <span class="flex items-center gap-2 text-gold font-cta-text group-hover:text-white transition-colors">READ MORE <span class="material-symbols-outlined arrow-hover">arrow_forward</span></span>
             </div>
           </div>
         </a>
@@ -220,7 +220,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
   <section id="core-values-section" class="py-14 bg-white relative overflow-hidden scroll-mt-24">
     <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
       <div class="text-center mb-16">
-        <h3 class="font-headline-lg text-headline-lg text-primary mb-4">The Pillars of Our Practice</h3>
+        <h3 class="reveal font-headline-lg text-headline-lg text-primary mb-4">The Pillars of Our Practice</h3>
       </div>
       <div class="flex flex-col gap-5 md:grid md:grid-cols-[1fr_auto_1fr] md:grid-rows-[auto_auto] md:gap-x-14 md:gap-y-14 md:items-center">
         <div class="values-badge hidden md:flex shrink-0 relative w-48 h-48 md:w-56 md:h-56 md:col-start-2 md:row-start-1 md:row-span-2 md:justify-self-center items-center justify-center">
@@ -276,7 +276,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
   <section class="py-14 bg-surface-yellow-light">
     <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
       <div class="text-center mb-16">
-        <h3 class="font-headline-lg text-headline-lg text-primary mb-4">Our Leadership</h3>
+        <h3 class="reveal font-headline-lg text-headline-lg text-primary mb-4">Our Leadership</h3>
       </div>
       <div class="relative">
         <div class="founder-scroll no-scrollbar flex overflow-x-auto snap-x snap-mandatory scroll-smooth md:overflow-visible p-2 md:p-4 pb-8 md:pb-4 md:grid md:grid-cols-4 gap-4 md:gap-6" id="home-founder-cards">
@@ -295,7 +295,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
     <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
       <div class="mb-12 flex flex-col items-center gap-6">
         <div>
-          <h2 class="text-headline-lg md:text-display-lg font-display-lg text-primary mb-4 text-center">Testimonials</h2>
+          <h2 class="reveal text-headline-lg md:text-display-lg font-display-lg text-primary mb-4 text-center">Testimonials</h2>
         </div>
       </div>
       <div class="marquee overflow-hidden">
@@ -339,7 +339,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
   <!-- Our Clients -->
   <section class="py-14 bg-surface-yellow-light overflow-hidden">
     <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-12">
-      <h2 class="text-headline-lg md:text-display-lg font-display-lg text-primary text-center mb-4">Our Clients</h2>
+      <h2 class="reveal text-headline-lg md:text-display-lg font-display-lg text-primary text-center mb-4">Our Clients</h2>
     </div>
     <div class="space-y-12">
       <div class="relative">
@@ -402,7 +402,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <div class="lg:col-span-7 group cursor-pointer">
         <div class="relative h-[400px] mb-6 overflow-hidden rounded-lg">
-          <img alt="Financial Markets" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3IxSWjlmhSNWObBh0S2jp4qCJY-0FbKF9xT7HajjMwHYqB9GXuKrO1iza1TpsZIYSEE1fraUVAoHqGoLSMCYXCGEOfTuUvXh4apQeHQnq5qdYRtEkJUTz-AJJ6AlYcEnhPwAlWsqsafSLmbsyn9yDrhPy8-BzLizWKC2ZTR19rG8pyLbyV4IuCN3qyb4yFyz6izPHjATMXMTquRouUmzkZXIOWh-QfOYfZ4wXDmBEeMKjaSTWGVFOw" />
+          <img alt="Financial Markets" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3IxSWjlmhSNWObBh0S2jp4qCJY-0FbKF9xT7HajjMwHYqB9GXuKrO1iza1TpsZIYSEE1fraUVAoHqGoLSMCYXCGEOfTuUvXh4apQeHQnq5qdYRtEkJUTz-AJJ6AlYcEnhPwAlWsqsafSLmbsyn9yDrhPy8-BzLizWKC2ZTR19rG8pyLbyV4IuCN3qyb4yFyz6izPHjATMXMTquRouUmzkZXIOWh-QfOYfZ4wXDmBEeMKjaSTWGVFOw" />
         </div>
         <span class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-wider mb-2 block">EXCHANGES</span>
         <h3 class="text-headline-md font-headline-md text-primary mb-3 group-hover:text-gold transition-colors">Why the US and Japan Coordinated to Stabilize the Yen</h3>
@@ -495,8 +495,6 @@ const founderPhotos: Record<string, ImageMetadata> = {
   <Footer />
 
   <EventRegistrationModal />
-
-  <script is:inline src="/scripts/site-effects.js"></script>
 
   <script>
     // Hero slideshow: infinite loop with cloned end slides, autoplay, and

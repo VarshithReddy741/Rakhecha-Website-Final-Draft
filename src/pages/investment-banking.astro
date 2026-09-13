@@ -140,7 +140,7 @@ const ibItems = ibServices.map((svc) => ({
   <main class="flex-grow flex flex-col">
     <!-- Hero Section -->
     <section class="relative h-screen min-h-[600px] flex items-start md:items-center justify-start overflow-hidden">
-      <div class="absolute inset-0 z-0">
+      <div class="parallax absolute inset-0 z-0">
         <Picture
           src={ibHeroDesktop}
           alt="Distinctive glass skyscraper with an observation deck against a clear sky"
@@ -163,16 +163,16 @@ const ibItems = ibServices.map((svc) => ({
         />
       </div>
       <div class="relative z-10 w-full max-w-container-max px-margin-mobile md:px-margin-desktop pt-[24vh] md:pt-0">
-        <h1 class="text-display-lg font-display-lg text-primary mb-6 max-w-4xl">Unlocking the Next Stage of Growth.</h1>
+        <h1 class="reveal mask-reveal text-display-lg font-display-lg text-primary mb-6 max-w-4xl"><span>Unlocking the Next Stage of Growth.</span></h1>
         <div class="flex gap-4"></div>
       </div>
     </section>
     <!-- Services Interactive Section -->
     <section class="py-section-gap bg-white relative z-20 -mt-20">
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-        <h3 class="md:hidden font-headline-lg text-headline-lg text-primary mb-4">Capabilities</h3>
+        <h3 class="reveal md:hidden font-headline-lg text-headline-lg text-primary mb-4">Capabilities</h3>
         <div class="hidden md:flex items-center justify-between mb-6">
-          <h3 class="font-headline-lg text-headline-lg text-primary">Capabilities</h3>
+          <h3 class="reveal font-headline-lg text-headline-lg text-primary">Capabilities</h3>
           <select
             data-layout-select
             aria-label="Choose how capabilities are displayed"
@@ -197,7 +197,7 @@ const ibItems = ibServices.map((svc) => ({
     <!-- Contact CTA -->
     <section class="py-14 md:py-20 px-margin-mobile md:px-margin-desktop">
       <div class="max-w-container-max mx-auto">
-        <div class="bg-primary text-on-primary rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="reveal bg-primary text-on-primary rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
           <div class="max-w-xl">
             <h2 class="font-headline-lg text-headline-lg mb-2">Ready to Navigate Global Capital Markets?</h2>
             <p class="font-body-md text-body-md text-primary-fixed opacity-90">Speak with our team to discuss how our investment banking expertise can serve your goals.</p>

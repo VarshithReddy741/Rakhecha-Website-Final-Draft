@@ -23,7 +23,7 @@ const { heading, description, buttonText, buttonHref, icon, openInNewTab = false
 
 <section class="py-14 md:py-20 px-margin-mobile md:px-margin-desktop">
   <div class="max-w-container-max mx-auto">
-    <div class="bg-primary text-on-primary rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+    <div class="reveal bg-primary text-on-primary rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
       <div class="max-w-xl">
         <h2 class="font-headline-lg text-headline-lg mb-2">{heading}</h2>
         <p class="font-body-md text-body-md text-primary-fixed opacity-90">{description}</p>
@@ -34,17 +34,17 @@ const { heading, description, buttonText, buttonHref, icon, openInNewTab = false
             href={buttonHref}
             target={openInNewTab ? "_blank" : undefined}
             rel={openInNewTab ? "noopener noreferrer" : undefined}
-            class="bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap inline-flex items-center gap-2 text-center"
+            class="group bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap inline-flex items-center gap-2 text-center"
           >
-            {icon && <span class="material-symbols-outlined">{icon}</span>}
+            {icon && <span class="material-symbols-outlined arrow-hover">{icon}</span>}
             {buttonText}
           </a>
         ) : (
           <button
             type="button"
-            class="bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap inline-flex items-center gap-2"
+            class="group bg-secondary-fixed text-on-secondary-fixed font-cta-text text-cta-text px-6 py-3 rounded-lg hover:bg-secondary-fixed-dim transition-colors whitespace-nowrap inline-flex items-center gap-2"
           >
-            {icon && <span class="material-symbols-outlined">{icon}</span>}
+            {icon && <span class="material-symbols-outlined arrow-hover">{icon}</span>}
             {buttonText}
           </button>
         )

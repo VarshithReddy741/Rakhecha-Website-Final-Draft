@@ -51,7 +51,7 @@ function formatEventDate(dateStr?: string) {
 
   <main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-12 pb-section-gap">
     <header class="mb-12">
-      <h1 class="font-display-lg text-display-lg text-primary mb-8 md:text-display-lg text-headline-lg-mobile">Events &amp; Experiences</h1>
+      <h1 class="reveal font-display-lg text-display-lg text-primary mb-8 md:text-display-lg text-headline-lg-mobile">Events &amp; Experiences</h1>
       <div class="flex overflow-x-auto border-b border-outline-variant/30 hide-scrollbar gap-8">
         <button class="tab-btn font-cta-text text-cta-text text-primary border-b-2 border-primary pb-4 whitespace-nowrap active-tab" data-target="upcoming-events">Upcoming Events</button>
         <button class="tab-btn font-cta-text text-cta-text text-on-surface-variant hover:text-primary pb-4 whitespace-nowrap transition-colors" data-target="past-events">Past Events</button>
@@ -116,7 +116,7 @@ function formatEventDate(dateStr?: string) {
                 <p class="font-body-md text-body-md text-on-surface-variant mb-8 line-clamp-3">{featuredEvent.description}</p>
               )}
               <div class="flex flex-col sm:flex-row items-center gap-6 mt-auto">
-                <button class="w-full sm:w-auto bg-primary text-on-primary font-cta-text text-cta-text px-8 py-3 rounded-lg hover:bg-on-primary-fixed transition-colors flex items-center justify-center gap-2" data-register-event={featuredEvent.title} data-register-event-id={featuredEvent._id}>Register Now <span class="material-symbols-outlined">arrow_forward</span></button>
+                <button class="group w-full sm:w-auto bg-primary text-on-primary font-cta-text text-cta-text px-8 py-3 rounded-lg hover:bg-on-primary-fixed transition-colors flex items-center justify-center gap-2" data-register-event={featuredEvent.title} data-register-event-id={featuredEvent._id}>Register Now <span class="material-symbols-outlined arrow-hover">arrow_forward</span></button>
                 <div class="event-countdown flex items-center gap-4 text-center" data-event-date={featuredEvent.date}>
                   <div class="flex flex-col">
                     <span class="font-headline-md text-headline-md text-primary countdown-days">--</span>
@@ -142,7 +142,7 @@ function formatEventDate(dateStr?: string) {
       </section>
       <section class="mb-section-gap">
         <div class="flex justify-between items-end mb-8">
-          <h3 class="font-headline-lg text-headline-lg text-primary">Upcoming Sessions</h3>
+          <h3 class="reveal font-headline-lg text-headline-lg text-primary">Upcoming Sessions</h3>
           <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">View Calendar <span class="material-symbols-outlined text-[18px]">calendar_month</span></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -167,7 +167,7 @@ function formatEventDate(dateStr?: string) {
       </section>
       <section class="bg-primary text-on-primary rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
         <div class="max-w-xl">
-          <h3 class="font-headline-lg text-headline-lg mb-2">Curated Insights, Delivered.</h3>
+          <h3 class="reveal font-headline-lg text-headline-lg mb-2">Curated Insights, Delivered.</h3>
           <p class="font-body-md text-body-md text-primary-fixed opacity-90">Subscribe to receive exclusive invitations to future events, expert market commentary, and premium research reports directly in your inbox.</p>
         </div>
         <form id="newsletterForm" class="w-full md:w-auto flex flex-col sm:flex-row gap-4">
@@ -199,7 +199,7 @@ function formatEventDate(dateStr?: string) {
         {pastEvents.length > 0 ? pastEvents.map((e) => (
           <article class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden ambient-shadow group cursor-pointer">
             <div class="relative h-48 overflow-hidden">
-              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style={`background-image: url('${resolveImage(e.imageUrl, 600)}')`}></div>
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-[1.04]" style={`background-image: url('${resolveImage(e.imageUrl, 600)}')`}></div>
               {e.recordingUrl && (
                 <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div class="bg-surface-container-lowest/90 backdrop-blur-sm text-primary rounded-full w-12 h-12 flex items-center justify-center"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span></div>
@@ -221,7 +221,7 @@ function formatEventDate(dateStr?: string) {
               )}
               <div class="flex justify-between items-center border-t border-outline-variant pt-4 mt-auto">
                 {e.recordingUrl ? (
-                  <a class="text-primary font-cta-text text-cta-text text-sm hover:underline flex items-center gap-1" href={e.recordingUrl} target="_blank" rel="noopener noreferrer">Watch Recording <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+                  <a class="group text-primary font-cta-text text-cta-text text-sm hover:underline flex items-center gap-1" href={e.recordingUrl} target="_blank" rel="noopener noreferrer">Watch Recording <span class="material-symbols-outlined text-[16px] arrow-hover">arrow_forward</span></a>
                 ) : <span></span>}
               </div>
             </div>
@@ -236,8 +236,8 @@ function formatEventDate(dateStr?: string) {
     <div class="tab-content hidden animate-fade-in" id="reports">
       <section class="mb-section-gap">
         <div class="flex justify-between items-end mb-8">
-          <h3 class="font-headline-lg text-headline-lg text-primary">Featured Research</h3>
-          <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">View All Reports <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+          <h3 class="reveal font-headline-lg text-headline-lg text-primary">Featured Research</h3>
+          <a class="group text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">View All Reports <span class="material-symbols-outlined text-[18px] arrow-hover">arrow_forward</span></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reports.map((a) => (
@@ -263,8 +263,8 @@ function formatEventDate(dateStr?: string) {
     <div class="tab-content hidden animate-fade-in" id="videos">
       <section class="mb-section-gap">
         <div class="flex justify-between items-end mb-8">
-          <h3 class="font-headline-lg text-headline-lg text-primary">Multimedia</h3>
-          <a class="text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">Browse Videos <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+          <h3 class="reveal font-headline-lg text-headline-lg text-primary">Multimedia</h3>
+          <a class="group text-secondary font-cta-text text-cta-text hover:text-secondary-container transition-colors flex items-center gap-1" href="#">Browse Videos <span class="material-symbols-outlined text-[18px] arrow-hover">arrow_forward</span></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {videos.length > 0 ? videos.map((v) => (
@@ -298,7 +298,7 @@ function formatEventDate(dateStr?: string) {
     <div class="tab-content hidden animate-fade-in" id="blog">
       <section class="mb-section-gap">
         <div class="flex justify-between items-end mb-8">
-          <h3 class="font-headline-lg text-headline-lg text-primary">Editorial Insights</h3>
+          <h3 class="reveal font-headline-lg text-headline-lg text-primary">Editorial Insights</h3>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {blogs.map((a) => (
@@ -324,8 +324,6 @@ function formatEventDate(dateStr?: string) {
   <Footer />
 
   <EventRegistrationModal />
-
-  <script is:inline src="/scripts/site-effects.js"></script>
 
   <script>
     // Tab switching. Ported verbatim from Knowledge hub.html.

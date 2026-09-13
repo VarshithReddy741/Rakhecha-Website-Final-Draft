@@ -136,3 +136,72 @@ document.addEventListener("DOMContentLoaded", () => {
 
   targets.forEach((el) => observer.observe(el));
 });
+
+// Generic reveal-on-scroll for any element opted in with class "reveal" or
+// "reveal-sm" (see global.css's motion system). Site-wide counterpart to the
+// "hero-card-anim" observer above, which stays scoped to the homepage hero
+// cards it already ships per-page delay classes for. Fires once per element
+// (header/hero content included, since it's already in the initial viewport)
+// and never re-triggers on scrolling back up.
+document.addEventListener("DOMContentLoaded", () => {
+  const targets = document.querySelectorAll(".reveal, .reveal-sm");
+  if (!targets.length) return;
+
+  if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    targets.forEach((el) => el.classList.add("in-view"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          obs.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
+  );
+
+  targets.forEach((el) => observer.observe(el));
+});
+
+// Subtle parallax for hero photography (.parallax elements): as the page
+// scrolls, each element's own scroll progress through the viewport drives a
+// small --parallax-y offset (clamped so the image only ever drifts a little,
+// never enough to read as "an animation" rather than depth). rAF-throttled
+// and skipped entirely under reduced motion.
+document.addEventListener("DOMContentLoaded", () => {
+  const targets = Array.from(document.querySelectorAll(".parallax"));
+  if (!targets.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const RANGE_PX = 24;
+  let ticking = false;
+
+  function update() {
+    const viewportH = window.innerHeight;
+    targets.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      // Progress of the element's center through the viewport: -1 (center at
+      // top) .. 0 (center of element at center of viewport) .. 1 (center at
+      // bottom) — used, not scroll position directly, so it self-corrects
+      // for each element's own position/height on the page.
+      const center = rect.top + rect.height / 2;
+      const progress = (center - viewportH / 2) / (viewportH / 2 + rect.height / 2);
+      const clamped = Math.max(-1, Math.min(1, progress));
+      el.style.setProperty("--parallax-y", `${(clamped * RANGE_PX).toFixed(1)}px`);
+    });
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  }
+
+  update();
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+});

@@ -30,7 +30,7 @@ const serviceGroups = await Promise.all(
     <span class="material-symbols-outlined text-3xl" id="mobile-nav-icon">menu</span>
   </button>
 
-  <div class="flex-shrink-0 w-64 min-[840px]:w-[200px] order-1 min-[840px]:order-none">
+  <div class="reveal-sm flex-shrink-0 w-64 min-[840px]:w-[200px] order-1 min-[840px]:order-none">
     <a href="/">
       <img
         alt="Rakhecha Finserv"
@@ -40,19 +40,19 @@ const serviceGroups = await Promise.all(
     </a>
   </div>
 
-  <nav class="hidden min-[840px]:flex justify-center gap-[clamp(0.25rem,calc(4vw-2.75rem),1.25rem)] items-center">
-    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/about-us">About Us</a>
+  <nav class="reveal-stagger hidden min-[840px]:flex justify-center gap-[clamp(0.25rem,calc(4vw-2.75rem),1.25rem)] items-center">
+    <a class="reveal-sm nav-underline text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold" href="/about-us">About Us</a>
     {
       serviceGroups.map((group) => (
-        <div class="relative group">
+        <div class="reveal-sm relative group">
           <a
-            class="block text-center text-on-surface-variant dark:text-outline-variant hover:text-primary-light focus:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold"
+            class="nav-underline block text-center text-on-surface-variant dark:text-outline-variant hover:text-primary-light focus:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold"
             href={group.href}
             aria-haspopup="true"
           >
             {group.label.split(" ").slice(0, -1).map((word) => `${word} `)}<span class="whitespace-nowrap">{group.label.split(" ").at(-1)}&nbsp;<span class="material-symbols-outlined text-base align-middle transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span></span>
           </a>
-          <div class="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+          <div class="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-3 -translate-y-1 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0" style="transform-origin: top center;">
             <div class="overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-container-lowest py-2 shadow-xl dark:bg-surface-dim">
               <a class="block px-4 py-2.5 text-sm font-semibold text-primary hover:bg-surface-container-low transition-colors" href={group.href}>
                 Explore {group.label}
@@ -73,11 +73,11 @@ const serviceGroups = await Promise.all(
         </div>
       ))
     }
-    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/knowledge-hub">Knowledge Hub</a>
-    <a class="text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer transition-all active:scale-95 text-body-md font-body-md font-bold" href="/careers">Careers</a>
+    <a class="reveal-sm nav-underline text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold" href="/knowledge-hub">Knowledge Hub</a>
+    <a class="reveal-sm nav-underline text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold" href="/careers">Careers</a>
   </nav>
 
-  <div class="hidden min-[840px]:block">
+  <div class="reveal-sm hidden min-[840px]:block" style="transition-delay: 0.2s">
     <div class="flex flex-col min-[1200px]:flex-row items-center gap-2 min-[1200px]:gap-3">
       <a href="https://rakhechafinserv.investwell.app/app/#/login" target="_blank" rel="noopener noreferrer" class="w-[124px] bg-white border border-secondary text-primary font-cta-text px-4 py-1.5 min-[1200px]:py-2 rounded hover:bg-surface-container-low transition-colors inline-block text-center whitespace-nowrap">Client Login</a>
       <a href="/contact-us" class="w-[124px] bg-primary text-white border border-secondary font-cta-text px-4 py-1.5 min-[1200px]:py-2 rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center whitespace-nowrap">Contact Us</a>

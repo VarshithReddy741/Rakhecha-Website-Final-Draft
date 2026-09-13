@@ -48,13 +48,13 @@ const founderPhotos: Record<string, ImageMetadata> = {
     <!-- Company Story -->
     <section class="py-14 bg-surface-yellow-light scroll-mt-24" id="our-story">
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-        <h2 class="font-headline-lg text-headline-lg text-primary mb-6 text-center md:hidden">Our Story</h2>
+        <h2 class="reveal font-headline-lg text-headline-lg text-primary mb-6 text-center md:hidden">Our Story</h2>
         <div class="flex flex-col md:flex-row items-start gap-16">
           <div class="flex-1 w-full md:sticky md:top-28 aspect-[4/5] md:aspect-[3/4] relative rounded-2xl overflow-hidden shadow-xl">
             <Image src={ourJourneyImage} alt="Dev Piyush Rakhecha, Founder of Rakhecha Finserv" width={800} class="w-full h-full object-cover object-top" />
           </div>
           <div class="flex-1 space-y-6">
-            <h2 class="hidden md:block font-headline-lg text-headline-lg text-primary mb-2">Our Story</h2>
+            <h2 class="reveal hidden md:block font-headline-lg text-headline-lg text-primary mb-2">Our Story</h2>
             <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Rakhecha Finserv has been helping individuals and corporates manage and grow their wealth for nearly a decade. With over 200 Crore in Assets Under Management (AUM), we specialize in providing the best risk-adjusted returns for our clients.</p>
             <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Starting as a mutual fund distributor, we have diversified our offerings to include a wide range of asset classes, detailed in our list of services. As a long-term oriented wealth management firm, we prioritize financial success over short-term gains.</p>
             <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Founded by two brothers with MBA degrees, Rakhecha Finserv aspires to become one of India's leading wealth management firms. Their expertise allows them to thoroughly evaluate and recommend the best funds, ensuring an excellent client experience.</p>
@@ -68,22 +68,22 @@ const founderPhotos: Record<string, ImageMetadata> = {
     <!-- Stats Strip -->
     <section class="bg-surface py-10 mt-8">
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-outline-variant">
-          <div class="flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 first:pt-0 text-center sm:text-left">
+        <div class="reveal-stagger grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-outline-variant">
+          <div class="reveal flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 first:pt-0 text-center sm:text-left">
             <div class="flex items-center justify-center w-14 h-14 rounded-full border-2 border-primary text-primary shrink-0"><span class="material-symbols-outlined text-2xl">apartment</span></div>
             <div class="text-center sm:text-left">
               <span class="block font-display-lg text-headline-md md:text-display-lg text-primary">₹<span class="count-up" data-target="200">200</span> Cr+</span>
               <span class="block font-label-bold text-label-bold uppercase tracking-widest text-on-surface-variant">Assets Under Management</span>
             </div>
           </div>
-          <div class="flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
+          <div class="reveal flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
             <div class="flex items-center justify-center w-14 h-14 rounded-full border-2 border-primary text-primary shrink-0"><span class="material-symbols-outlined text-2xl">calendar_month</span></div>
             <div class="text-center sm:text-left">
               <span class="block font-display-lg text-headline-md md:text-display-lg text-primary"><span class="count-up" data-target="10">10</span>+</span>
               <span class="block font-label-bold text-label-bold uppercase tracking-widest text-on-surface-variant">Years in Business</span>
             </div>
           </div>
-          <div class="flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
+          <div class="reveal flex flex-col sm:flex-row items-center sm:justify-start gap-3 sm:gap-4 pt-8 sm:pt-0 sm:pl-6 text-center sm:text-left">
             <div class="flex items-center justify-center w-14 h-14 rounded-full border-2 border-primary text-primary shrink-0"><span class="material-symbols-outlined text-2xl">groups</span></div>
             <div class="text-center sm:text-left">
               <span class="block font-display-lg text-headline-md md:text-display-lg text-primary"><span class="count-up" data-target="300">300</span>+</span>
@@ -105,7 +105,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
     <section class="py-14 bg-surface-yellow-light scroll-mt-24" id="our-leadership">
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
         <div class="text-center mb-16">
-          <h3 class="font-headline-lg text-headline-lg text-primary mb-4">Our Leadership</h3>
+          <h3 class="reveal font-headline-lg text-headline-lg text-primary mb-4">Our Leadership</h3>
         </div>
         <div class="relative">
           <div class="founder-scroll no-scrollbar flex overflow-x-auto snap-x snap-mandatory scroll-smooth md:overflow-visible p-2 md:p-4 pb-8 md:pb-4 md:grid md:grid-cols-4 gap-4 md:gap-6" id="about-founder-cards">
@@ -122,7 +122,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
     <!-- Awards & Recognitions -->
     <section class="py-14 bg-surface scroll-mt-24" id="awards-recognition">
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop text-center">
-        <h3 class="font-headline-lg text-headline-lg text-primary mb-4">Industry Recognition</h3>
+        <h3 class="reveal font-headline-lg text-headline-lg text-primary mb-4">Industry Recognition</h3>
         <div class="marquee overflow-hidden mt-12">
           <div class="marquee-track flex gap-6 py-4 text-left" style="animation-duration: 45s;">
             <div class="flex-none w-[300px] md:w-[350px] bg-surface-container-lowest p-8 rounded-2xl border border-surface-variant transition-all duration-300 hover:border-[#C9A84C] hover:shadow-lg flex flex-col items-start text-left space-y-4 group">
@@ -291,7 +291,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
     <section class="py-14 bg-surface-yellow-light">
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
         <div class="text-center mb-12">
-          <h3 class="font-headline-lg text-headline-lg text-primary mb-4">News Mentions</h3>
+          <h3 class="reveal font-headline-lg text-headline-lg text-primary mb-4">News Mentions</h3>
         </div>
         <div class="marquee overflow-hidden">
           <div class="marquee-track flex gap-6 py-4" style="animation-duration: 35s;">
@@ -385,8 +385,6 @@ const founderPhotos: Record<string, ImageMetadata> = {
   </main>
 
   <Footer />
-
-  <script is:inline src="/scripts/site-effects.js"></script>
 
   <script>
     // Animated count-up for the stats strip. Ported verbatim from Home Page.html.

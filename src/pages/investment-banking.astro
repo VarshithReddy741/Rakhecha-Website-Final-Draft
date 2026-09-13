@@ -169,19 +169,29 @@ const ibItems = ibServices.map((svc) => ({
     </section>
     <!-- Services Interactive Section -->
     <section class="py-section-gap bg-white relative z-20 -mt-20">
-      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop" data-service-ids={ibItems.map((item) => item.id).join(",")}>
         <h3 class="reveal md:hidden font-headline-lg text-headline-lg text-primary mb-4">Capabilities</h3>
         <div class="hidden md:flex items-center justify-between mb-6">
           <h3 class="reveal font-headline-lg text-headline-lg text-primary">Capabilities</h3>
-          <select
-            data-layout-select
-            aria-label="Choose how capabilities are displayed"
-            class="text-body-sm font-body-sm text-on-surface-variant border border-outline-variant rounded-md px-3 py-1.5 bg-white focus:outline-none focus:border-primary"
-          >
-            <option value="accordion">Expanding Panels</option>
-            <option value="scroll">Scroll Gallery</option>
-            <option value="grid">Grid View</option>
-          </select>
+          <div class="flex items-center gap-3">
+            <select
+              data-layout-select
+              aria-label="Choose how capabilities are displayed"
+              class="text-body-sm font-body-sm text-on-surface-variant border border-outline-variant rounded-md px-3 py-1.5 bg-white focus:outline-none focus:border-primary"
+            >
+              <option value="accordion">Expanding Panels</option>
+              <option value="scroll">Scroll Gallery</option>
+              <option value="grid">Grid View</option>
+            </select>
+            <select
+              data-display-select
+              aria-label="Choose whether a card opens in page or in a popup"
+              class="text-body-sm font-body-sm text-on-surface-variant border border-outline-variant rounded-md px-3 py-1.5 bg-white focus:outline-none focus:border-primary"
+            >
+              <option value="page">Opens In Page</option>
+              <option value="popup">Opens In Popup</option>
+            </select>
+          </div>
         </div>
         <div data-layout-panel="accordion">
           <ServiceAccordionGallery items={ibItems} />
@@ -192,6 +202,26 @@ const ibItems = ibServices.map((svc) => ({
         <div data-layout-panel="grid">
           <ServicePanel items={ibItems} columns={3} capabilitiesHeading="" />
         </div>
+      </div>
+
+      <!-- Popup mode: shared modal that any of the three layouts above opens
+           into when "Opens In Popup" is selected, instead of their own
+           in-page expansion (see the click-interceptor script below). Reuses
+           whichever hidden per-card content node the active layout already
+           rendered rather than duplicating bodyHtml a fourth time. -->
+      <div class="service-modal-backdrop hidden" data-service-modal>
+        <button type="button" class="service-modal-arrow service-modal-arrow-left" data-service-modal-prev aria-label="Previous service">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <div class="service-modal-panel" data-service-modal-panel>
+          <button type="button" class="service-modal-close" data-service-modal-close aria-label="Close">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+          <div class="service-modal-content" data-service-modal-content></div>
+        </div>
+        <button type="button" class="service-modal-arrow service-modal-arrow-right" data-service-modal-next aria-label="Next service">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
       </div>
     </section>
     <!-- Contact CTA -->
@@ -210,6 +240,208 @@ const ibItems = ibServices.map((svc) => ({
 
   <Footer />
 </BaseLayout>
+
+<style>
+  .service-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem 5rem;
+    background: rgba(10, 22, 34, 0.62);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .service-modal-backdrop.hidden {
+    display: none;
+  }
+  .service-modal-backdrop.is-open {
+    opacity: 1;
+  }
+
+  .service-modal-panel {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: var(--color-surface-container-lowest, #f7f8fa);
+    border: 1px solid var(--color-outline-variant, #d5dbe1);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 32px 64px rgba(0, 0, 0, 0.35);
+    transform: translateY(24px) scale(0.98);
+    opacity: 0;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+  .service-modal-backdrop.is-open .service-modal-panel {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  .service-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    color: var(--color-on-surface-variant, #444);
+    cursor: pointer;
+  }
+  .service-modal-close:hover {
+    background: var(--color-surface-container-low, #eceff2);
+  }
+
+  .service-modal-arrow {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .service-modal-arrow:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  @media (max-width: 767px) {
+    .service-modal-backdrop {
+      padding: 1.5rem;
+    }
+    .service-modal-arrow {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Popup display mode (Investment Banking, desktop only): when the second
+  // dropdown is set to "Opens In Popup", clicking a card in any of the three
+  // layouts above opens this shared modal instead of that layout's own
+  // in-page panel/accordion — arrow buttons cycle through every service,
+  // the X and a backdrop click both close it. A capture-phase listener on
+  // the document intercepts the click (and stops it) before each layout's
+  // own bubble-phase click handler runs, so nothing in those three
+  // components needs to know popup mode exists.
+  (function () {
+    const modal = document.querySelector<HTMLElement>("[data-service-modal]");
+    const content = modal?.querySelector<HTMLElement>("[data-service-modal-content]");
+    const closeBtn = modal?.querySelector<HTMLElement>("[data-service-modal-close]");
+    const prevBtn = modal?.querySelector<HTMLButtonElement>("[data-service-modal-prev]");
+    const nextBtn = modal?.querySelector<HTMLButtonElement>("[data-service-modal-next]");
+    const idsHost = document.querySelector<HTMLElement>("[data-service-ids]");
+    const ids = (idsHost?.dataset.serviceIds ?? "").split(",").filter(Boolean);
+    const displaySelect = document.querySelector<HTMLSelectElement>("[data-display-select]");
+    if (!modal || !content || !closeBtn || !prevBtn || !nextBtn || !ids.length) return;
+
+    let currentId: string | null = null;
+
+    function triggerFundAnim(root: Element) {
+      const els = root.querySelectorAll(".fund-anim");
+      if (!els.length) return;
+      els.forEach((el) => el.classList.remove("in-view"));
+      void (root as HTMLElement).offsetWidth;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          els.forEach((el) => el.classList.add("in-view"));
+        });
+      });
+    }
+
+    function bodyHtmlFor(id: string): string {
+      const source = document.querySelector<HTMLElement>(
+        `[data-desktop-content="${id}"], [data-panel-body="${id}"], [data-row-panel-body="${id}"]`,
+      );
+      return source ? source.innerHTML : "";
+    }
+
+    function renderId(id: string) {
+      currentId = id;
+      content!.innerHTML = bodyHtmlFor(id);
+      content!.scrollTop = 0;
+      triggerFundAnim(content!);
+    }
+
+    function openModal(id: string) {
+      renderId(id);
+      modal!.classList.remove("hidden");
+      void modal!.offsetWidth;
+      modal!.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      modal!.classList.remove("is-open");
+      document.body.style.overflow = "";
+      window.setTimeout(() => {
+        if (!modal!.classList.contains("is-open")) modal!.classList.add("hidden");
+      }, 300);
+      currentId = null;
+    }
+
+    function step(delta: number) {
+      if (!currentId) return;
+      const idx = ids.indexOf(currentId);
+      if (idx === -1) return;
+      renderId(ids[(idx + delta + ids.length) % ids.length]);
+    }
+
+    closeBtn.addEventListener("click", closeModal);
+    prevBtn.addEventListener("click", () => step(-1));
+    nextBtn.addEventListener("click", () => step(1));
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (modal!.classList.contains("hidden")) return;
+      if (e.key === "Escape") closeModal();
+      if (e.key === "ArrowLeft") step(-1);
+      if (e.key === "ArrowRight") step(1);
+    });
+
+    function isPopupMode() {
+      return displaySelect?.value === "popup" && window.matchMedia("(min-width: 768px)").matches;
+    }
+
+    document.addEventListener(
+      "click",
+      (e) => {
+        if (!isPopupMode()) return;
+        const card = (e.target as HTMLElement).closest<HTMLElement>("[data-card], [data-panel], [data-scroll-card]");
+        if (!card) return;
+        const id = card.dataset.card || card.dataset.panel || card.dataset.scrollCard;
+        if (!id) return;
+        e.preventDefault();
+        e.stopPropagation();
+        openModal(id);
+      },
+      true,
+    );
+
+    // Popup mode is desktop-only (same scope as the display-mode dropdown
+    // itself); drop back below the breakpoint and any open modal should
+    // close rather than get stranded.
+    window.matchMedia("(min-width: 768px)").addEventListener("change", (e) => {
+      if (!e.matches) closeModal();
+    });
+  })();
+</script>
 
 <script>
   // Capabilities layout switcher (Investment Banking, desktop only): the

@@ -142,6 +142,7 @@ export interface Testimonial {
   authorName: string;
   authorCompany?: string;
   photo?: SanityImageSource;
+  gender?: "Male" | "Female";
   order?: number;
 }
 
@@ -170,5 +171,5 @@ export const queries = {
 
   heroSlides:     `*[_type == "heroSlide"] | order(order asc) { title, headline, mediaType, image, mobileImage, "videoUrl": video.asset->url, videoPoster, ctaText, ctaLink, order }`,
 
-  testimonials:   `*[_type == "testimonial"] | order(order asc) { quote, authorName, authorCompany, photo, order }`,
+  testimonials:   `*[_type == "testimonial"] | order(order asc) { quote, authorName, authorCompany, photo, gender, order }`,
 };

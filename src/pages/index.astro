@@ -315,7 +315,11 @@ const founderPhotos: Record<string, ImageMetadata> = {
                       class="w-12 h-12 rounded-full object-cover"
                     />
                   ) : (
-                    <div class="w-12 h-12 rounded-full bg-surface-variant" />
+                    <img
+                      src={testimonial.gender === "Female" ? "/images/avatar-placeholder-female.svg" : "/images/avatar-placeholder-male.svg"}
+                      alt={testimonial.authorName}
+                      class="w-12 h-12 rounded-full object-cover"
+                    />
                   )}
                   <div>
                     <div class="font-bold text-primary">{testimonial.authorName}</div>

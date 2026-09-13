@@ -6,6 +6,7 @@ export const testimonialSchema = defineType({
     defineField({ name: "authorName", title: "Author Name / Role (e.g. Managing Director)", type: "string", validation: (r) => r.required() }),
     defineField({ name: "authorCompany", title: "Author Company (e.g. Global Technology Firm)", type: "string" }),
     defineField({ name: "photo", title: "Photo (optional — falls back to a placeholder)", type: "image", options: { hotspot: true } }),
+    defineField({ name: "gender", title: "Gender (used to pick the placeholder silhouette when no photo is set)", type: "string", options: { list: ["Male", "Female"] } }),
     defineField({ name: "order", title: "Display Order (1 = first)", type: "number" }),
   ],
   preview: { select: { title: "authorName", subtitle: "authorCompany" } }

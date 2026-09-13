@@ -548,6 +548,31 @@ const founderPhotos: Record<string, ImageMetadata> = {
         timer = setInterval(next, 3000);
       }
 
+      function stopAuto() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      }
+
+      // The auto-advance interval keeps ticking while the tab is hidden, but
+      // CSS transitions (and their transitionend event) freeze while hidden —
+      // so the transitionend-based wraparound below never runs, `current` can
+      // walk past the cloned slides, and the track ends up translated fully
+      // out of view (a blank hero) by the time the tab is visible again.
+      // Pausing the timer while hidden avoids the drift entirely; snapping to
+      // a safe index on return covers any tick that slipped through first.
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          stopAuto();
+        } else {
+          if (current < 1 || current > slides.length - 2) {
+            goTo(1, false);
+          }
+          startAuto();
+        }
+      });
+
       prevBtn.addEventListener("click", () => {
         prev();
         startAuto();

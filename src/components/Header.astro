@@ -22,7 +22,7 @@ const serviceGroups = await Promise.all(
 >
   <div class="site-header-row px-margin-mobile">
     <button
-      class="min-[1300px]:hidden text-primary order-2"
+      class="min-[1260px]:hidden text-primary order-2"
       id="mobile-nav-toggle"
       type="button"
       aria-expanded="false"
@@ -31,7 +31,7 @@ const serviceGroups = await Promise.all(
       <span class="material-symbols-outlined text-3xl" id="mobile-nav-icon">menu</span>
     </button>
 
-    <div class="site-header-logo reveal-sm flex-shrink-0 w-64 order-1 min-[1300px]:order-none">
+    <div class="site-header-logo reveal-sm flex-shrink-0 w-64 order-1 min-[1260px]:order-none">
       <a href="/">
         <img
           alt="Rakhecha Finserv"
@@ -41,7 +41,7 @@ const serviceGroups = await Promise.all(
       </a>
     </div>
 
-    <nav class="site-header-nav reveal-stagger hidden min-[1300px]:flex">
+    <nav class="site-header-nav reveal-stagger hidden min-[1260px]:flex">
       <a class="reveal-sm nav-underline nav-item text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer font-bold" href="/about-us">About Us</a>
       {
         serviceGroups.map((group) => (
@@ -79,7 +79,7 @@ const serviceGroups = await Promise.all(
       <a class="reveal-sm nav-underline nav-item text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer font-bold" href="/careers">Careers</a>
     </nav>
 
-    <div class="site-header-actions reveal-sm hidden min-[1300px]:flex" style="transition-delay: 0.2s">
+    <div class="site-header-actions reveal-sm hidden min-[1260px]:flex" style="transition-delay: 0.2s">
       <a href="https://rakhechafinserv.investwell.app/app/#/login" target="_blank" rel="noopener noreferrer" class="action-btn bg-white border border-secondary text-primary font-cta-text rounded hover:bg-surface-container-low transition-colors inline-block text-center">Client Login</a>
       <a href="/contact-us" class="action-btn bg-primary text-white border border-secondary font-cta-text rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center">Contact Us</a>
     </div>
@@ -87,7 +87,7 @@ const serviceGroups = await Promise.all(
 
   <!-- Mobile Nav Panel -->
   <div
-    class="hidden min-[1300px]:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
+    class="hidden min-[1260px]:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
     id="mobile-nav-panel"
   >
     <div class="flex flex-col divide-y divide-outline-variant px-margin-mobile">
@@ -129,18 +129,18 @@ const serviceGroups = await Promise.all(
 <style>
   /* Responsive header layout: a three-zone row (logo / nav / actions) that
      compresses fluidly with clamp() as the desktop viewport narrows, rather
-     than snapping between a handful of fixed breakpoints. Below 1300px —
+     than snapping between a handful of fixed breakpoints. Below 1260px —
      the width this exact nav (6 items, including "Investment Banking" and
      "Wealth Management") actually needs to stay on one nowrap line even at
      its most compressed, with the logo at its full ~90%-of-header-height
      size — it collapses to the mobile hamburger layout instead (unchanged,
-     handled by the existing Tailwind `hidden`/`min-[1300px]:` utilities in
+     handled by the existing Tailwind `hidden`/`min-[1260px]:` utilities in
      the markup). That number came from measuring real rendered nav-item
      widths at the floor clamp values below, not from a round-number guess.
 
      Every one of logo height, header padding, nav gap, nav font-size and
      button padding is one clamp() spanning the same two anchor widths
-     (1300px -> the floor value, 1920px -> the ceiling value), so they all
+     (1260px -> the floor value, 1920px -> the ceiling value), so they all
      compress together in lockstep as the window narrows toward the mobile
      breakpoint — a "compact desktop" band that shows up naturally in the
      lower part of this range, without a second hand-tuned tier. (An
@@ -152,11 +152,11 @@ const serviceGroups = await Promise.all(
   .site-header {
     --header-h: clamp(58px, 4.84vw - 4.9px, 88px);
     --header-pad-x: clamp(1rem, 5.16vw - 51.1px, 3rem);
-    --nav-gap: clamp(0.5rem, 3.23vw - 33.9px, 1.75rem);
+    --nav-gap: clamp(1rem, 2.58vw - 17.5px, 2rem);
     --nav-font: clamp(15px, 0.484vw + 8.71px, 18px);
     --btn-pad-x: clamp(0.6rem, 1.68vw - 12.2px, 1.25rem);
     --btn-gap: clamp(0.3rem, 1.16vw - 10.3px, 0.75rem);
-    --col-gap: clamp(0.5rem, 3.87vw - 42.3px, 2rem);
+    --col-gap: clamp(0.25rem, 1.94vw - 21.2px, 1rem);
   }
 
   .site-header-row {
@@ -165,7 +165,7 @@ const serviceGroups = await Promise.all(
     align-items: center;
   }
 
-  @media (min-width: 1300px) {
+  @media (min-width: 1260px) {
     /* --header-h becomes the header's total height at this breakpoint —
        the vertical py-4 padding is dropped in favor of the row owning the
        full height directly, so "90% of the header's height" (below) has

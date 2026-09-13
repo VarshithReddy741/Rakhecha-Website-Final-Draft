@@ -9,6 +9,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import ServicePanel from "../components/ServicePanel.astro";
+import ServiceAccordionGallery from "../components/ServiceAccordionGallery.astro";
 import { sanityClient, queries, type Service } from "../lib/sanity";
 import { urlFor } from "../lib/sanityImage";
 import { renderPortableText } from "../lib/portableText";
@@ -168,7 +169,10 @@ const ibItems = ibServices.map((svc) => ({
     <!-- Services Interactive Section -->
     <section class="py-section-gap bg-white relative z-20 -mt-20">
       <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-        <ServicePanel items={ibItems} columns={3} expandedHeight="h-[300px]" expandedScale={false} />
+        <ServiceAccordionGallery items={ibItems} />
+        <div class="mt-12">
+          <ServicePanel items={ibItems} columns={3} expandedHeight="h-[300px]" expandedScale={false} />
+        </div>
       </div>
     </section>
     <!-- Contact CTA -->

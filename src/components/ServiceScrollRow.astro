@@ -8,6 +8,8 @@ export interface ScrollRowItem {
   title: string;
   desc: string;
   image: string;
+  /** Rendered HTML shown in the pop-out panel when a card is clicked. Falls back to `desc` when omitted. */
+  bodyHtml?: string;
 }
 
 export interface Props {
@@ -30,7 +32,7 @@ const rowId = `ssr-${Math.random().toString(36).slice(2, 9)}`;
   <div class="flex service-scroll-row hide-scrollbar" data-row={rowId}>
     {
       items.map((item) => (
-        <a href={`#service-${item.id}`} class="service-scroll-card" aria-label={item.title}>
+        <a href={`#service-${item.id}`} class="service-scroll-card" data-scroll-card={item.id} aria-label={item.title} aria-expanded="false">
           <div class="service-scroll-image" style={`background-image:url("${item.image}")`} />
           <div class="service-scroll-overlay" />
           <div class="service-scroll-text">
@@ -40,6 +42,19 @@ const rowId = `ssr-${Math.random().toString(36).slice(2, 9)}`;
         </a>
       ))
     }
+  </div>
+
+  <div class="service-scroll-detail" data-row-panel-root hidden>
+    <button type="button" class="service-scroll-detail-close" data-row-panel-close aria-label="Close">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div>
+      {
+        items.map((item) => (
+          <div class="hidden" data-row-panel-body={item.id} set:html={item.bodyHtml ?? `<p class="font-body-md text-body-md text-on-surface-variant">${item.desc}</p>`} />
+        ))
+      }
+    </div>
   </div>
 </div>
 
@@ -108,6 +123,11 @@ const rowId = `ssr-${Math.random().toString(36).slice(2, 9)}`;
     transform: translateY(-4px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
   }
+  .service-scroll-card.is-active {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 28px 56px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+  }
 
   .service-scroll-image {
     position: absolute;
@@ -151,15 +171,108 @@ const rowId = `ssr-${Math.random().toString(36).slice(2, 9)}`;
     line-height: 1.5;
     color: rgba(255, 255, 255, 0.9);
   }
+
+  .service-scroll-detail {
+    position: relative;
+    margin-top: 2.5rem;
+    padding: 2.5rem;
+    border-radius: 12px;
+    background: var(--color-surface-container-lowest, #f7f8fa);
+    border: 1px solid var(--color-outline-variant, #d5dbe1);
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s ease;
+  }
+  .service-scroll-detail.is-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .service-scroll-detail-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    color: var(--color-on-surface-variant, #444);
+    cursor: pointer;
+  }
+  .service-scroll-detail-close:hover {
+    background: var(--color-surface-container-low, #eceff2);
+  }
 </style>
 
 <script>
+  function triggerFundAnim(root: Element) {
+    const els = root.querySelectorAll(".fund-anim");
+    if (!els.length) return;
+    els.forEach((el) => el.classList.remove("in-view"));
+    void (root as HTMLElement).offsetWidth;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        els.forEach((el) => el.classList.add("in-view"));
+      });
+    });
+  }
+
   function initRow(row: HTMLElement) {
     const id = row.dataset.row;
     const controls = document.querySelector<HTMLElement>(`[data-row-controls="${id}"]`);
     const prevBtn = controls?.querySelector<HTMLButtonElement>("[data-row-prev]");
     const nextBtn = controls?.querySelector<HTMLButtonElement>("[data-row-next]");
-    if (!controls || !prevBtn || !nextBtn) return;
+    const wrap = row.closest<HTMLElement>(".service-scroll-wrap");
+    const panelRoot = wrap?.querySelector<HTMLElement>("[data-row-panel-root]");
+    const panelClose = wrap?.querySelector<HTMLElement>("[data-row-panel-close]");
+    if (!controls || !prevBtn || !nextBtn || !wrap || !panelRoot || !panelClose) return;
+
+    const cards = Array.from(row.querySelectorAll<HTMLElement>("[data-scroll-card]"));
+    let activeId: string | null = null;
+
+    function openPanel(cardId: string) {
+      panelRoot!.querySelectorAll("[data-row-panel-body]").forEach((el) => {
+        el.classList.toggle("hidden", el.getAttribute("data-row-panel-body") !== cardId);
+      });
+      panelRoot!.hidden = false;
+      void panelRoot!.offsetWidth;
+      panelRoot!.classList.add("is-open");
+      const shown = panelRoot!.querySelector(`[data-row-panel-body="${cardId}"]`);
+      if (shown) triggerFundAnim(shown);
+    }
+
+    function closePanel() {
+      panelRoot!.classList.remove("is-open");
+      window.setTimeout(() => {
+        if (!activeId) panelRoot!.hidden = true;
+      }, 500);
+    }
+
+    function setActive(card: HTMLElement | null) {
+      activeId = card?.dataset.scrollCard ?? null;
+      cards.forEach((c) => {
+        c.classList.toggle("is-active", c === card);
+        c.setAttribute("aria-expanded", String(c === card));
+      });
+      if (card && activeId) {
+        card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        openPanel(activeId);
+      } else {
+        closePanel();
+      }
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener("click", (e) => {
+        e.preventDefault();
+        setActive(activeId === card.dataset.scrollCard ? null : card);
+      });
+    });
+    panelClose.addEventListener("click", () => setActive(null));
 
     function update() {
       const hasOverflow = row.scrollWidth > row.clientWidth + 1;

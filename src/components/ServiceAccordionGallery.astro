@@ -2,14 +2,16 @@
 // Horizontal expanding-accordion gallery (desktop only) — an editorial,
 // hover-to-reveal alternative view of the same service cards rendered by
 // ServicePanel below it. Deliberately static/plain-props (no Sanity import
-// here): callers just pass the same {id, title, desc, image} items they
-// already fetched, so this component has zero content of its own to keep
-// in sync.
+// here): callers just pass the same {id, title, desc, image, bodyHtml}
+// items they already fetched, so this component has zero content of its
+// own to keep in sync.
 export interface GalleryItem {
   id: string;
   title: string;
   desc: string;
   image: string;
+  /** Rendered HTML shown in the pop-out panel when a card is clicked. Falls back to `desc` when omitted. */
+  bodyHtml?: string;
 }
 
 export interface Props {
@@ -38,11 +40,17 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
           data-panel={item.id}
           style={`background-image:url("${item.image}")`}
           aria-label={item.title}
+          aria-expanded="false"
         >
           <span class="service-accordion-overlay" />
           <span class="service-accordion-content">
             <span class="service-accordion-title">
-              {item.title.split(" ").map((word, i) => (i === 0 ? word : <>{" "}<br class="service-accordion-title-break" />{word}</>))}
+              {item.title.split(" ").map((word, i) => (
+                <>
+                  {i > 0 && " "}
+                  <span class="service-accordion-title-word">{word}</span>
+                </>
+              ))}
             </span>
             <span class="service-accordion-desc">{item.desc}</span>
             <span class="service-accordion-cta">
@@ -53,6 +61,19 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
         </a>
       ))
     }
+  </div>
+
+  <div class="service-accordion-detail" data-panel-root hidden>
+    <button type="button" class="service-accordion-detail-close" data-panel-close aria-label="Close">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div data-panel-content>
+      {
+        items.map((item) => (
+          <div class="hidden" data-panel-body={item.id} set:html={item.bodyHtml ?? `<p class="font-body-md text-body-md text-on-surface-variant">${item.desc}</p>`} />
+        ))
+      }
+    </div>
   </div>
 </div>
 
@@ -113,7 +134,16 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     border-radius: 3px;
     background-size: cover;
     background-position: center;
-    transition: flex-basis 0.6s cubic-bezier(0.22, 0.68, 0, 1);
+    transition:
+      flex-basis 0.6s cubic-bezier(0.22, 0.68, 0, 1),
+      transform 0.6s cubic-bezier(0.22, 0.68, 0, 1),
+      box-shadow 0.6s cubic-bezier(0.22, 0.68, 0, 1);
+  }
+
+  .service-accordion-card.is-active {
+    transform: scale(1.015);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
+    z-index: 2;
   }
 
   .service-accordion-overlay {
@@ -122,7 +152,8 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     background: rgba(8, 20, 32, 0.4);
     transition: background 0.6s cubic-bezier(0.22, 0.68, 0, 1);
   }
-  .service-accordion-card:hover .service-accordion-overlay {
+  .service-accordion-card:hover .service-accordion-overlay,
+  .service-accordion-card.is-active .service-accordion-overlay {
     background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 55%, rgba(0, 0, 0, 0.05) 100%);
   }
 
@@ -140,23 +171,24 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
   .service-accordion-title {
     display: block;
     font-family: var(--font-headline-lg);
-    font-size: 15px;
+    font-size: var(--saw-collapsed-size, 15px);
     font-weight: 700;
     line-height: 1.3;
     margin-bottom: 0.5rem;
     transition: font-size 0.4s ease;
   }
-  .service-accordion-title-break {
+  .service-accordion-title-word {
     display: block;
-    content: "";
   }
   .service-accordion-card:hover .service-accordion-title,
-  .service-accordion-card:focus-visible .service-accordion-title {
+  .service-accordion-card:focus-visible .service-accordion-title,
+  .service-accordion-card.is-active .service-accordion-title {
     font-size: 24px;
   }
-  .service-accordion-card:hover .service-accordion-title-break,
-  .service-accordion-card:focus-visible .service-accordion-title-break {
-    display: none;
+  .service-accordion-card:hover .service-accordion-title-word,
+  .service-accordion-card:focus-visible .service-accordion-title-word,
+  .service-accordion-card.is-active .service-accordion-title-word {
+    display: inline;
   }
 
   .service-accordion-desc {
@@ -192,7 +224,9 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
   .service-accordion-card:hover .service-accordion-desc,
   .service-accordion-card:hover .service-accordion-cta,
   .service-accordion-card:focus-visible .service-accordion-desc,
-  .service-accordion-card:focus-visible .service-accordion-cta {
+  .service-accordion-card:focus-visible .service-accordion-cta,
+  .service-accordion-card.is-active .service-accordion-desc,
+  .service-accordion-card.is-active .service-accordion-cta {
     opacity: 1;
     transform: translateY(0);
   }
@@ -200,11 +234,82 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
   .service-accordion-card:focus-visible .service-accordion-overlay {
     background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 55%, rgba(0, 0, 0, 0.05) 100%);
   }
+
+  .service-accordion-detail {
+    position: relative;
+    margin-top: 2rem;
+    padding: 2.5rem;
+    border-radius: 12px;
+    background: var(--color-surface-container-lowest, #f7f8fa);
+    border: 1px solid var(--color-outline-variant, #d5dbe1);
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s ease;
+  }
+  .service-accordion-detail.is-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .service-accordion-detail-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    color: var(--color-on-surface-variant, #444);
+    cursor: pointer;
+  }
+  .service-accordion-detail-close:hover {
+    background: var(--color-surface-container-low, #eceff2);
+  }
 </style>
 
 <script>
   const EXPANDED_WIDTH = 640;
   const COLLAPSED_WIDTH = 210;
+  const MAX_TITLE_SIZE = 24;
+  const MIN_TITLE_SIZE = 10;
+  const CONTENT_PADDING = 64; // 2rem each side
+
+  function fitTitles(gallery: HTMLElement) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    gallery.querySelectorAll<HTMLElement>("[data-panel]").forEach((card) => {
+      const title = card.querySelector<HTMLElement>(".service-accordion-title");
+      const words = Array.from(card.querySelectorAll<HTMLElement>(".service-accordion-title-word"));
+      if (!title || !words.length) return;
+
+      const cs = getComputedStyle(title);
+      ctx.font = `${cs.fontWeight} ${MAX_TITLE_SIZE}px ${cs.fontFamily}`;
+      const longestWordWidth = Math.max(...words.map((w) => ctx.measureText(w.textContent || "").width));
+
+      const availableWidth = Math.max(0, COLLAPSED_WIDTH - CONTENT_PADDING);
+      const fitSize = longestWordWidth > 0 ? (availableWidth / longestWordWidth) * MAX_TITLE_SIZE : MAX_TITLE_SIZE;
+      const size = Math.max(MIN_TITLE_SIZE, Math.min(MAX_TITLE_SIZE, Math.floor(fitSize)));
+      title.style.setProperty("--saw-collapsed-size", `${size}px`);
+    });
+  }
+
+  function triggerFundAnim(root: Element) {
+    const els = root.querySelectorAll(".fund-anim");
+    if (!els.length) return;
+    els.forEach((el) => el.classList.remove("in-view"));
+    void (root as HTMLElement).offsetWidth;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        els.forEach((el) => el.classList.add("in-view"));
+      });
+    });
+  }
 
   function initGallery(gallery: HTMLElement) {
     const cards = Array.from(gallery.querySelectorAll<HTMLElement>("[data-panel]"));
@@ -212,7 +317,12 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     const controls = document.querySelector<HTMLElement>(`[data-gallery-controls="${id}"]`);
     const prevBtn = controls?.querySelector<HTMLButtonElement>("[data-gallery-prev]");
     const nextBtn = controls?.querySelector<HTMLButtonElement>("[data-gallery-next]");
-    if (!controls || !prevBtn || !nextBtn) return;
+    const wrap = gallery.closest<HTMLElement>(".service-accordion-wrap");
+    const panelRoot = wrap?.querySelector<HTMLElement>("[data-panel-root]");
+    const panelClose = wrap?.querySelector<HTMLElement>("[data-panel-close]");
+    if (!controls || !prevBtn || !nextBtn || !wrap || !panelRoot || !panelClose) return;
+
+    let activeId: string | null = null;
 
     // flex-grow alone can't expand a card once the row is already wider
     // than its container (no positive free space left to redistribute) —
@@ -220,9 +330,9 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     // an explicit flex-basis per card works in both the fitting and
     // overflowing cases, at the cost of driving it from JS instead of pure
     // CSS :hover.
-    function setActive(activeCard: HTMLElement | null) {
+    function applyWidths(targetCard: HTMLElement | null) {
       cards.forEach((c) => {
-        if (!activeCard) {
+        if (!targetCard) {
           c.style.flex = "";
           return;
         }
@@ -231,22 +341,61 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
         // this, flex-shrink would immediately squash the expanded card's
         // basis right back down to fit the container instead of letting
         // the row scroll wider.
-        const width = c === activeCard ? EXPANDED_WIDTH : COLLAPSED_WIDTH;
+        const width = c === targetCard ? EXPANDED_WIDTH : COLLAPSED_WIDTH;
         c.style.flex = `0 0 ${width}px`;
       });
     }
 
+    function hoverPreview(card: HTMLElement | null) {
+      if (activeId) return; // a clicked card takes priority over hover
+      applyWidths(card);
+    }
+
+    function openPanel(id: string) {
+      panelRoot!.querySelectorAll("[data-panel-body]").forEach((el) => {
+        el.classList.toggle("hidden", el.getAttribute("data-panel-body") !== id);
+      });
+      panelRoot!.hidden = false;
+      void panelRoot!.offsetWidth;
+      panelRoot!.classList.add("is-open");
+      const shown = panelRoot!.querySelector(`[data-panel-body="${id}"]`);
+      if (shown) triggerFundAnim(shown);
+    }
+
+    function closePanel() {
+      panelRoot!.classList.remove("is-open");
+      window.setTimeout(() => {
+        if (!activeId) panelRoot!.hidden = true;
+      }, 500);
+    }
+
+    function setActiveCard(card: HTMLElement | null) {
+      activeId = card?.dataset.panel ?? null;
+      cards.forEach((c) => {
+        c.classList.toggle("is-active", c === card);
+        c.setAttribute("aria-expanded", String(c === card));
+      });
+      applyWidths(card);
+      if (card && activeId) {
+        openPanel(activeId);
+      } else {
+        closePanel();
+      }
+    }
+
     cards.forEach((card) => {
-      card.addEventListener("mouseenter", () => setActive(card));
-      card.addEventListener("focus", () => setActive(card));
+      card.addEventListener("mouseenter", () => hoverPreview(card));
+      card.addEventListener("focus", () => hoverPreview(card));
+      card.addEventListener("click", (e) => {
+        e.preventDefault();
+        setActiveCard(activeId === card.dataset.panel ? null : card);
+      });
     });
-    gallery.addEventListener("mouseleave", () => setActive(null));
-    gallery.addEventListener(
-      "focusout",
-      (e) => {
-        if (!gallery.contains((e as FocusEvent).relatedTarget as Node)) setActive(null);
-      },
-    );
+    gallery.addEventListener("mouseleave", () => hoverPreview(null));
+    gallery.addEventListener("focusout", (e) => {
+      if (!gallery.contains((e as FocusEvent).relatedTarget as Node)) hoverPreview(null);
+    });
+    panelClose.addEventListener("click", () => setActiveCard(null));
 
     function update() {
       const hasOverflow = gallery.scrollWidth > gallery.clientWidth + 1;
@@ -264,9 +413,16 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
 
     gallery.addEventListener("scroll", update);
     window.addEventListener("resize", update);
-    // Expanding a card on hover changes scrollWidth, so re-check then too.
+    // Expanding a card on hover/click changes scrollWidth, so re-check then too.
     gallery.addEventListener("transitionend", update);
     update();
+
+    fitTitles(gallery);
+    let resizeTimer: number | undefined;
+    window.addEventListener("resize", () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => fitTitles(gallery), 150);
+    });
   }
 
   document.querySelectorAll<HTMLElement>("[data-gallery]").forEach(initGallery);

@@ -116,10 +116,10 @@ header .font-body-md {
 }
 
 /* Mobile navigation/menu: matches the header's hamburger-menu breakpoint
-   (min-[1180px] in Header.astro) rather than the 767px content breakpoint
+   (min-[1130px] in Header.astro) rather than the 767px content breakpoint
    above, since the hamburger panel now covers tablet/small-laptop widths
    too — the full desktop nav needs that much room to stay on one line. */
-@media (max-width: 1179px) {
+@media (max-width: 1129px) {
     header .text-body-md,
     header .font-body-md {
         font-size: 20px;

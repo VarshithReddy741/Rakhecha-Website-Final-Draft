@@ -22,7 +22,7 @@ const serviceGroups = await Promise.all(
 >
   <div class="site-header-row px-margin-mobile">
     <button
-      class="min-[1180px]:hidden text-primary order-2"
+      class="min-[1130px]:hidden text-primary order-2"
       id="mobile-nav-toggle"
       type="button"
       aria-expanded="false"
@@ -31,7 +31,7 @@ const serviceGroups = await Promise.all(
       <span class="material-symbols-outlined text-3xl" id="mobile-nav-icon">menu</span>
     </button>
 
-    <div class="site-header-logo reveal-sm flex-shrink-0 w-64 order-1 min-[1180px]:order-none">
+    <div class="site-header-logo reveal-sm flex-shrink-0 w-64 order-1 min-[1130px]:order-none">
       <a href="/">
         <img
           alt="Rakhecha Finserv"
@@ -41,7 +41,7 @@ const serviceGroups = await Promise.all(
       </a>
     </div>
 
-    <nav class="site-header-nav reveal-stagger hidden min-[1180px]:flex">
+    <nav class="site-header-nav reveal-stagger hidden min-[1130px]:flex">
       <a class="reveal-sm nav-underline nav-item text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer font-bold" href="/about-us">About Us</a>
       {
         serviceGroups.map((group) => (
@@ -52,7 +52,7 @@ const serviceGroups = await Promise.all(
               aria-haspopup="true"
             >
               <span>{group.label}</span>
-              <span class="material-symbols-outlined text-base align-middle ml-0.5 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span>
+              <span class="material-symbols-outlined nav-chevron align-middle transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span>
             </a>
             <div class="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-3 -translate-y-1 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0" style="transform-origin: top center;">
               <div class="overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-container-lowest py-2 shadow-xl dark:bg-surface-dim">
@@ -79,7 +79,7 @@ const serviceGroups = await Promise.all(
       <a class="reveal-sm nav-underline nav-item text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer font-bold" href="/careers">Careers</a>
     </nav>
 
-    <div class="site-header-actions reveal-sm hidden min-[1180px]:flex" style="transition-delay: 0.2s">
+    <div class="site-header-actions reveal-sm hidden min-[1130px]:flex" style="transition-delay: 0.2s">
       <a href="https://rakhechafinserv.investwell.app/app/#/login" target="_blank" rel="noopener noreferrer" class="action-btn bg-white border border-secondary text-primary font-cta-text rounded hover:bg-surface-container-low transition-colors inline-block text-center">Client Login</a>
       <a href="/contact-us" class="action-btn bg-primary text-white border border-secondary font-cta-text rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center">Contact Us</a>
     </div>
@@ -87,7 +87,7 @@ const serviceGroups = await Promise.all(
 
   <!-- Mobile Nav Panel -->
   <div
-    class="hidden min-[1180px]:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
+    class="hidden min-[1130px]:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
     id="mobile-nav-panel"
   >
     <div class="flex flex-col divide-y divide-outline-variant px-margin-mobile">
@@ -129,12 +129,12 @@ const serviceGroups = await Promise.all(
 <style>
   /* Responsive header layout: a three-zone row (logo / nav / actions) that
      compresses fluidly with clamp() as the desktop viewport narrows, rather
-     than snapping between a handful of fixed breakpoints. Below 1180px —
+     than snapping between a handful of fixed breakpoints. Below 1130px —
      the width this exact nav (6 items, including "Investment Banking" and
      "Wealth Management") actually needs to stay on one nowrap line even at
      its most compressed, with the logo at its full ~90%-of-header-height
      size — it collapses to the mobile hamburger layout instead (unchanged,
-     handled by the existing Tailwind `hidden`/`min-[1180px]:` utilities in
+     handled by the existing Tailwind `hidden`/`min-[1130px]:` utilities in
      the markup). That number came from measuring real rendered nav-item
      widths at the floor clamp values below, not from a round-number guess.
 
@@ -157,6 +157,8 @@ const serviceGroups = await Promise.all(
     --btn-pad-x: clamp(0.6rem, 1.68vw - 12.2px, 1.25rem);
     --btn-gap: clamp(0.3rem, 1.16vw - 10.3px, 0.75rem);
     --col-gap: clamp(0.25rem, 1.94vw - 21.2px, 1rem);
+    --btn-font: 16px;
+    --chevron-size: 1rem;
   }
 
   /* Below 1300px the same properties keep shrinking, just on a steeper
@@ -178,6 +180,8 @@ const serviceGroups = await Promise.all(
       --btn-pad-x: clamp(6px, 2.43vw - 21.9px, 9.64px);
       --btn-gap: clamp(3px, 1.19vw - 10.65px, 4.78px);
       --col-gap: clamp(2px, 1.35vw - 13.5px, 4.02px);
+      --btn-font: clamp(15px, 0.667vw + 7.33px, 16px);
+      --chevron-size: clamp(14px, 1.33vw - 1.33px, 16px);
     }
   }
 
@@ -187,7 +191,7 @@ const serviceGroups = await Promise.all(
     align-items: center;
   }
 
-  @media (min-width: 1180px) {
+  @media (min-width: 1130px) {
     /* --header-h becomes the header's total height at this breakpoint —
        the vertical py-4 padding is dropped in favor of the row owning the
        full height directly, so "90% of the header's height" (below) has
@@ -243,6 +247,12 @@ const serviceGroups = await Promise.all(
     .site-header-nav .nav-trigger {
       font-size: var(--nav-font);
     }
+    /* The dropdown chevron is an icon-font glyph, so its font-size IS its
+       width. Easing it 16px -> 14px alongside everything else reclaims
+       ~12px across the three dropdowns without touching label text. */
+    .site-header-nav .nav-chevron {
+      font-size: var(--chevron-size);
+    }
 
     .site-header-actions {
       justify-content: flex-end;
@@ -252,6 +262,7 @@ const serviceGroups = await Promise.all(
     }
     .site-header-actions .action-btn {
       white-space: nowrap;
+      font-size: var(--btn-font);
       padding-top: 0.5rem;
       padding-bottom: 0.5rem;
       padding-left: var(--btn-pad-x);

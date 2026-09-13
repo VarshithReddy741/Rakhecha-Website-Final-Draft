@@ -1,0 +1,184 @@
+---
+// Plain horizontal-scrolling card row (desktop only) with prev/next arrow
+// buttons — a simpler, non-accordion sibling to ServiceAccordionGallery.
+// Same static-props shape (no Sanity import here): callers pass the same
+// {id, title, desc, image} items they already fetched.
+export interface ScrollRowItem {
+  id: string;
+  title: string;
+  desc: string;
+  image: string;
+}
+
+export interface Props {
+  items: ScrollRowItem[];
+}
+
+const { items } = Astro.props;
+const rowId = `ssr-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<div class="hidden md:block service-scroll-wrap">
+  <div class="service-scroll-controls" data-row-controls={rowId}>
+    <button type="button" class="service-scroll-arrow" data-row-prev aria-label="Scroll left">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+    <button type="button" class="service-scroll-arrow" data-row-next aria-label="Scroll right">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+  </div>
+  <div class="flex service-scroll-row hide-scrollbar" data-row={rowId}>
+    {
+      items.map((item) => (
+        <a href={`#service-${item.id}`} class="service-scroll-card" aria-label={item.title}>
+          <div class="service-scroll-image" style={`background-image:url("${item.image}")`} />
+          <div class="service-scroll-overlay" />
+          <div class="service-scroll-text">
+            <h3 class="service-scroll-title">{item.title}</h3>
+            <p class="service-scroll-desc">{item.desc}</p>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .service-scroll-wrap {
+    position: relative;
+  }
+
+  .service-scroll-controls {
+    position: absolute;
+    top: -52px;
+    right: 0;
+    display: none;
+    gap: 0.5rem;
+    z-index: 5;
+  }
+  .service-scroll-controls.is-visible {
+    display: flex;
+  }
+
+  .service-scroll-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--color-outline-variant, #d5dbe1);
+    background: #fff;
+    color: var(--color-primary, #123b5d);
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      opacity 0.2s ease;
+  }
+  .service-scroll-arrow:hover {
+    background: var(--color-surface-container-low, #f0f2f5);
+  }
+  .service-scroll-arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .service-scroll-row {
+    width: 100%;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 0.5rem;
+  }
+
+  .service-scroll-card {
+    position: relative;
+    display: block;
+    flex: 0 0 300px;
+    height: 420px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-outline-variant, #d5dbe1);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .service-scroll-card:hover,
+  .service-scroll-card:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+  }
+
+  .service-scroll-image {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.6s ease;
+  }
+  .service-scroll-card:hover .service-scroll-image,
+  .service-scroll-card:focus-visible .service-scroll-image {
+    transform: scale(1.06);
+  }
+
+  .service-scroll-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.15) 55%, rgba(0, 0, 0, 0.05) 100%);
+  }
+
+  .service-scroll-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    color: #fff;
+  }
+
+  .service-scroll-title {
+    font-family: var(--font-headline-md);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+
+  .service-scroll-desc {
+    font-family: var(--font-body-sm);
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+  }
+</style>
+
+<script>
+  function initRow(row: HTMLElement) {
+    const id = row.dataset.row;
+    const controls = document.querySelector<HTMLElement>(`[data-row-controls="${id}"]`);
+    const prevBtn = controls?.querySelector<HTMLButtonElement>("[data-row-prev]");
+    const nextBtn = controls?.querySelector<HTMLButtonElement>("[data-row-next]");
+    if (!controls || !prevBtn || !nextBtn) return;
+
+    function update() {
+      const hasOverflow = row.scrollWidth > row.clientWidth + 1;
+      controls!.classList.toggle("is-visible", hasOverflow);
+      prevBtn!.disabled = row.scrollLeft <= 1;
+      nextBtn!.disabled = row.scrollLeft >= row.scrollWidth - row.clientWidth - 1;
+    }
+
+    prevBtn.addEventListener("click", () => {
+      row.scrollBy({ left: -row.clientWidth * 0.8, behavior: "smooth" });
+    });
+    nextBtn.addEventListener("click", () => {
+      row.scrollBy({ left: row.clientWidth * 0.8, behavior: "smooth" });
+    });
+
+    row.addEventListener("scroll", update);
+    window.addEventListener("resize", update);
+    update();
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-row]").forEach(initRow);
+</script>

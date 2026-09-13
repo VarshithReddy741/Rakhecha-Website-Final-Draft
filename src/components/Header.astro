@@ -150,7 +150,13 @@ const serviceGroups = await Promise.all(
      continuous curve can't have that seam.)
   */
   .site-header {
-    --header-h: clamp(58px, 4.84vw - 4.9px, 88px);
+    /* +20% over the original clamp(58px, 4.84vw - 4.9px, 88px) — every
+       number (floor, vw coefficient, offset, ceiling) scaled by 1.2 in
+       lockstep so the curve's shape is unchanged, just taller throughout.
+       The logo is sized off this via calc() below, so it grows with it
+       automatically; nav/button font-size live in their own separate
+       variables and are untouched. */
+    --header-h: clamp(69.6px, 5.808vw - 5.88px, 105.6px);
     --header-pad-x: clamp(1rem, 5.16vw - 51.1px, 3rem);
     --nav-gap: clamp(1rem, 2.58vw - 17.5px, 2rem);
     --nav-font: clamp(15px, 0.484vw + 8.71px, 18px);

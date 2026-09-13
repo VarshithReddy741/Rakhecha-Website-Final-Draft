@@ -182,7 +182,14 @@ const serviceGroups = await Promise.all(
   @media (max-width: 1299px) {
     .site-header {
       --header-pad-x: clamp(8px, 5.32vw - 53.2px, 15.98px);
-      --nav-gap: clamp(8px, 5.33vw - 53.3px, 16.04px);
+      /* Floor bumped 8px -> 12px so the nav items keep more breathing room
+         right at the edge of the hamburger collapse, per explicit request —
+         everything else in this compact-desktop band is untouched. This
+         eats 20 of the ~24px safety margin cb3b6bd measured between the
+         true overflow point (1106px) and the 1130px breakpoint, leaving
+         ~4px; if six labels ever wrap right around 1130-1150px, that's the
+         margin to revisit first. */
+      --nav-gap: clamp(12px, 5.33vw - 53.3px, 16.04px);
       --btn-pad-x: clamp(6px, 2.43vw - 21.9px, 9.64px);
       --btn-gap: clamp(3px, 1.19vw - 10.65px, 4.78px);
       --col-gap: clamp(2px, 1.35vw - 13.5px, 4.02px);

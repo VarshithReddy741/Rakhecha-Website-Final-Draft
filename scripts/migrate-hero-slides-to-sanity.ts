@@ -45,8 +45,8 @@ async function uploadImage(filename: string): Promise<{ _type: "image"; asset: {
 const heroSlides = [
   {
     id: "invest-today",
-    title: "Invest Today for a Better Tomorrow",
-    headline: "Invest Today for a Better Tomorrow",
+    title: "Where Trust Meets Expertise",
+    headline: "Where Trust Meets Expertise",
     image: "Homepage image web.png",
     mobileImage: "Home page moblie.png",
     ctaText: "Contact Us",

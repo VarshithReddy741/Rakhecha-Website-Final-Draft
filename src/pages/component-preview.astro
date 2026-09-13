@@ -99,7 +99,7 @@ const ibItems = [
 
     <section>
       <h2 class="font-headline-md text-headline-md text-primary mb-6">ServicePanel (IB config: 3 cols, expandedHeight=h-[300px], expandedScale=false)</h2>
-      <ServicePanel items={ibItems} columns={3} expandedHeight="h-[300px]" expandedScale={false}>
+      <ServicePanel items={ibItems} columns={3}>
         <Fragment slot="panel-fundraising">
           <h2 class="fund-anim fund-anim-1 font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-5">Fundraising</h2>
           <p class="fund-anim fund-anim-2 font-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">We advise startups, growth-stage companies, and established businesses in raising capital across equity, quasi-equity, and structured debt instruments. Our end-to-end fundraising mandate covers everything from pitch preparation to investor outreach, term sheet negotiation, and deal closure.</p>
@@ -155,9 +155,6 @@ const ibItems = [
           { id: "business", title: "Business Insurance", desc: "Strategic risk management and comprehensive coverage for corporate entities.", image: businessInsuranceOptimized.src },
         ]}
         columns={2}
-        expandedHeight="h-[440px]"
-        expandedScale={true}
-        collapsedSpanFull={true}
       >
         <Fragment slot="panel-individual">
           <h2 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-4">Individual Insurance</h2>

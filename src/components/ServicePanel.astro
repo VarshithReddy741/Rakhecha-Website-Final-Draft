@@ -3,13 +3,12 @@
 // previously duplicated in IB.html (toggleIBPanel/toggleIBMobile),
 // "Wealth Management.html" (toggleWMPanel/toggleWMMobile), and
 // "Insurance Page.html" (toggleInsurancePanel/toggleInsuranceMobile) into
-// one generic, data-driven component. The three copies differed only in:
-//   - number of grid columns (3 for IB/WM, 2 for Insurance)
-//   - the clicked card's expanded size (IB: h-[300px] no scale;
-//     WM/Insurance: h-[440px] + scale-105)
-//   - whether the collapsed sibling card also spans full width
-//     (Insurance only, since it has just one sibling left over)
-// those differences are now props instead of copy-pasted functions.
+// one generic, data-driven component. The three copies differed only in
+// column count (3 for IB/WM, 2 for Insurance) — the rest of the original
+// per-page variation (expanded card height/scale, shrunk siblings) has been
+// replaced by a single behavior: clicking a card opens its content as a
+// full-width panel directly below that card's row, and the grid itself
+// never reflows.
 //
 // Accessibility fix: the original trigger elements were `<div onclick="">`
 // with no keyboard support. They're real <button> elements here, which
@@ -36,22 +35,9 @@ export interface Props {
   items: ServicePanelItem[];
   columns?: 2 | 3;
   capabilitiesHeading?: string;
-  /** Tailwind height class applied to the clicked/expanded card, e.g. "h-[300px]" or "h-[440px]". */
-  expandedHeight?: string;
-  /** Whether the expanded card also gets `scale-105` (WM/Insurance did; IB didn't). */
-  expandedScale?: boolean;
-  /** Whether collapsed sibling cards also get `md:col-span-2` (Insurance's 2-card layout only). */
-  collapsedSpanFull?: boolean;
 }
 
-const {
-  items,
-  columns = 3,
-  capabilitiesHeading = "Capabilities",
-  expandedHeight = "h-[440px]",
-  expandedScale = true,
-  collapsedSpanFull = false,
-} = Astro.props;
+const { items, columns = 3, capabilitiesHeading = "Capabilities" } = Astro.props;
 
 const panelId = `sp-${Math.random().toString(36).slice(2, 9)}`;
 const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
@@ -64,41 +50,13 @@ const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
     </h3>
   )
 }
-<div
-  class="relative md:min-h-[600px] w-full"
-  data-service-panel={panelId}
-  data-expanded-height={expandedHeight}
-  data-expanded-scale={String(expandedScale)}
-  data-collapsed-span-full={String(collapsedSpanFull)}
-  data-heading-id={`${panelId}-capabilities-heading`}
->
-  <!-- Active card + detail panel: its own isolated grid, separate from
-       the card grid below, so its sticky freeze/release is bounded by
-       this row's own content height and never bleeds into other cards. -->
-  <div class="mb-8" data-active-row style="display:none; gap:1.5rem;">
-    <div class="hidden md:col-span-2" data-desktop-panel>
-      <div class="rounded-xl p-8 relative">
-        <button
-          type="button"
-          class="absolute top-6 right-6 text-on-surface-variant hover:text-primary"
-          data-close-btn
-          aria-label="Close"
-        >
-          <span class="material-symbols-outlined">close</span>
-        </button>
-        <div id={`${panelId}-desktop-panel-content`} data-desktop-panel-content>
-          {
-            items.map((item) => (
-              <div class="hidden" data-desktop-content={item.id} set:html={item.bodyHtml} />
-            ))
-          }
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Desktop Grid View -->
-  <div class:list={["hidden md:grid gap-6 mb-8", colsClass]} data-desktop-grid>
+<div class="relative w-full" data-service-panel={panelId} data-heading-id={`${panelId}-capabilities-heading`}>
+  <!-- Desktop Grid View. The clicked card stays exactly where it is — no
+       resizing, no reordering — and the detail panel below is a normal grid
+       item that JS moves to sit right after the last card of that card's
+       row, spanning the full row width, so it reads as "content opening
+       below the card" without ever reflowing the grid around it. -->
+  <div class:list={["hidden md:grid gap-6 mb-8", colsClass]} data-desktop-grid data-columns={columns}>
     {
       items.map((item) => (
         <button
@@ -128,6 +86,26 @@ const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
         </button>
       ))
     }
+
+    <div class="hidden" data-desktop-panel style="grid-column: 1 / -1;">
+      <div class="rounded-xl border border-outline-variant/30 bg-surface-container-lowest shadow-lg p-8 relative">
+        <button
+          type="button"
+          class="absolute top-6 right-6 text-on-surface-variant hover:text-primary"
+          data-close-btn
+          aria-label="Close"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div id={`${panelId}-desktop-panel-content`} data-desktop-panel-content>
+          {
+            items.map((item) => (
+              <div class="hidden" data-desktop-content={item.id} set:html={item.bodyHtml} />
+            ))
+          }
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Mobile Accordion View -->
@@ -216,23 +194,16 @@ const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
   .animate-fade-in {
     animation: fadeIn 0.4s ease-out forwards;
   }
+
+  /* Subtle "this card is open" indicator — a border/shadow change only, so
+     the grid never reflows or resizes around the active card. */
+  [data-card][aria-expanded="true"] {
+    border-color: var(--color-primary-light);
+    box-shadow: 0 12px 28px rgba(18, 59, 93, 0.18);
+  }
 </style>
 
 <script>
-  const COLLAPSED_HEIGHT = "h-[400px]";
-  const SHRUNK_HEIGHT = "h-[260px]";
-  const EXPANDED_EXTRA_CLASSES = ["border-primary-light", "shadow-lg", "z-10", "sticky", "top-24", "self-start"];
-  const ALL_VARIABLE_CLASSES = [
-    COLLAPSED_HEIGHT,
-    SHRUNK_HEIGHT,
-    "h-[300px]",
-    "h-[440px]",
-    "opacity-60",
-    "scale-105",
-    "md:col-span-2",
-    ...EXPANDED_EXTRA_CLASSES,
-  ];
-
   function triggerFundAnim(root: Element) {
     const els = root.querySelectorAll(".fund-anim");
     if (!els.length) return;
@@ -247,33 +218,14 @@ const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
 
   function initServicePanel(root: HTMLElement) {
     const grid = root.querySelector<HTMLElement>("[data-desktop-grid]");
-    const activeRow = root.querySelector<HTMLElement>("[data-active-row]");
     const desktopPanel = root.querySelector<HTMLElement>("[data-desktop-panel]");
     const closeBtn = root.querySelector<HTMLElement>("[data-close-btn]");
-    const headingId = root.dataset.headingId;
-    const heading = headingId ? document.getElementById(headingId) : null;
-    if (!grid || !activeRow || !desktopPanel || !closeBtn) return;
+    if (!grid || !desktopPanel || !closeBtn) return;
 
-    const expandedHeight = root.dataset.expandedHeight || "h-[440px]";
-    const expandedScale = root.dataset.expandedScale === "true";
-    const collapsedSpanFull = root.dataset.collapsedSpanFull === "true";
-
+    const columns = Number(grid.dataset.columns) || 3;
     let activeType: string | null = null;
-    let activeCardAnchor: ChildNode | null = null;
+    let activeCard: HTMLElement | null = null;
     let activeMobile: string | null = null;
-
-    function restoreActiveCardToGrid() {
-      const activeCard = activeRow!.querySelector("[data-card]");
-      if (activeCard) {
-        const anchor = activeCardAnchor;
-        if (anchor && anchor.parentNode === grid) {
-          grid!.insertBefore(activeCard, anchor);
-        } else {
-          grid!.appendChild(activeCard);
-        }
-      }
-      activeCardAnchor = null;
-    }
 
     function setDesktopContent(type: string) {
       desktopPanel!.querySelectorAll("[data-desktop-content]").forEach((el) => {
@@ -283,56 +235,42 @@ const colsClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
       if (shown) triggerFundAnim(shown);
     }
 
+    // Moves the (single, reused) detail panel node to sit immediately after
+    // the last card of the clicked card's row, so it always renders as a
+    // full-width strip directly below that row rather than mid-row (which
+    // would leave a gap where the following cards used to be).
+    function movePanelAfterCardRow(card: HTMLElement) {
+      const cards = Array.from(grid!.querySelectorAll<HTMLElement>("[data-card]"));
+      const idx = cards.indexOf(card);
+      if (idx === -1) return;
+      const rowEndIdx = Math.min(cards.length, (Math.floor(idx / columns) + 1) * columns) - 1;
+      const referenceCard = cards[rowEndIdx + 1] ?? null;
+      grid!.insertBefore(desktopPanel!, referenceCard);
+    }
+
     function openPanel(type: string) {
-      const clickedCard =
-        grid!.querySelector<HTMLElement>(`[data-card="${type}"]`) ||
-        activeRow!.querySelector<HTMLElement>(`[data-card="${type}"]`);
+      const clickedCard = grid!.querySelector<HTMLElement>(`[data-card="${type}"]`);
       if (!clickedCard) return;
 
-      restoreActiveCardToGrid();
+      activeCard?.setAttribute("aria-expanded", "false");
+      clickedCard.setAttribute("aria-expanded", "true");
+      activeCard = clickedCard;
+
       setDesktopContent(type);
-
-      const cards = Array.from(grid!.children).filter((el) => el.hasAttribute("data-card"));
-      cards.forEach((c) => {
-        c.classList.remove(...ALL_VARIABLE_CLASSES);
-        const desc = c.querySelector("p");
-        if (c === clickedCard) {
-          c.classList.add(expandedHeight, ...EXPANDED_EXTRA_CLASSES);
-          if (expandedScale) c.classList.add("scale-105");
-          desc?.classList.remove("hidden");
-          c.setAttribute("aria-expanded", "true");
-        } else {
-          c.classList.add(SHRUNK_HEIGHT, "opacity-60");
-          if (collapsedSpanFull) c.classList.add("md:col-span-2");
-          desc?.classList.add("hidden");
-          c.setAttribute("aria-expanded", "false");
-        }
-      });
-
-      activeCardAnchor = clickedCard.nextSibling;
-      activeRow!.insertBefore(clickedCard, activeRow!.firstElementChild);
-      activeRow!.style.display = "grid";
-      activeRow!.style.gridTemplateColumns = "0.75fr 1.125fr 1.125fr";
+      movePanelAfterCardRow(clickedCard);
 
       desktopPanel!.classList.remove("hidden");
+      desktopPanel!.classList.remove("animate-fade-in");
+      void desktopPanel!.offsetWidth;
       desktopPanel!.classList.add("animate-fade-in");
 
       activeType = type;
-      heading?.scrollIntoView({ behavior: "smooth", block: "start" });
+      desktopPanel!.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
     function closePanel() {
-      restoreActiveCardToGrid();
-
-      const cards = Array.from(grid!.children).filter((el) => el.hasAttribute("data-card"));
-      cards.forEach((c) => {
-        c.classList.remove(...ALL_VARIABLE_CLASSES);
-        c.classList.add(COLLAPSED_HEIGHT);
-        c.querySelector("p")?.classList.remove("hidden");
-        c.setAttribute("aria-expanded", "false");
-      });
-
-      activeRow!.style.display = "none";
+      activeCard?.setAttribute("aria-expanded", "false");
+      activeCard = null;
       desktopPanel!.classList.add("hidden");
       desktopPanel!.classList.remove("animate-fade-in");
       activeType = null;

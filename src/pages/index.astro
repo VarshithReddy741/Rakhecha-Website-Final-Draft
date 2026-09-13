@@ -171,7 +171,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
       <h2 class="text-headline-lg md:text-display-lg font-display-lg text-primary mb-4">Our Businesses</h2>
     </div>
     <!-- Desktop Layout: Vertical Strips -->
-    <div class="hidden md:flex h-[600px] w-full gap-2 overflow-hidden">
+    <div class="hidden md:flex h-[600px] w-full max-w-container-max mx-auto px-margin-desktop gap-2 overflow-hidden">
       {businessCards.map((card, i) => (
         <a href={card.href} class="group relative flex-grow transition-all duration-500 ease-in-out hover:flex-[3] cursor-pointer overflow-hidden rounded-lg">
           <img

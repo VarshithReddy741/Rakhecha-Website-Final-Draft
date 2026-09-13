@@ -18,75 +18,76 @@ const serviceGroups = await Promise.all(
 ---
 
 <header
-  class="sticky top-0 w-full flex justify-between items-center px-margin-mobile min-[840px]:px-6 py-4 z-50 bg-surface-container-lowest dark:bg-surface-dim shadow-sm dark:shadow-none"
+  class="site-header sticky top-0 w-full py-4 z-50 bg-surface-container-lowest dark:bg-surface-dim shadow-sm dark:shadow-none"
 >
-  <button
-    class="min-[840px]:hidden text-primary order-2"
-    id="mobile-nav-toggle"
-    type="button"
-    aria-expanded="false"
-    aria-controls="mobile-nav-panel"
-  >
-    <span class="material-symbols-outlined text-3xl" id="mobile-nav-icon">menu</span>
-  </button>
+  <div class="site-header-row px-margin-mobile">
+    <button
+      class="min-[1160px]:hidden text-primary order-2"
+      id="mobile-nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="mobile-nav-panel"
+    >
+      <span class="material-symbols-outlined text-3xl" id="mobile-nav-icon">menu</span>
+    </button>
 
-  <div class="reveal-sm flex-shrink-0 w-64 min-[840px]:w-[200px] order-1 min-[840px]:order-none">
-    <a href="/">
-      <img
-        alt="Rakhecha Finserv"
-        class="w-full h-auto"
-        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjCB1d4MUkOZYdq6TnWLDlbaNlkJiznVdFxQUyJLGJQXqp7wuFpGTYRMQtOWkM-S58Nspjm8zDG5sQT51xnt8QlxkiskJfT11JyPO4fR0yB-rJpf9ihbTOJetIoG2gMBYeQSkqdgAk7TeX9DJwjjZLLSh0ChOwH8hLCHjoDaXtK5RLuCNQ4mGhN6Tka3_VJxQpzKfkW6wHM_F18BSDRyVMurwxEiuDaLrUXxuVh-FFCvx18bqU_SziUpmDZ2uWszAU0ZA"
-      />
-    </a>
-  </div>
+    <div class="site-header-logo reveal-sm flex-shrink-0 w-64 order-1 min-[1160px]:order-none">
+      <a href="/">
+        <img
+          alt="Rakhecha Finserv"
+          class="block w-full h-auto"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjCB1d4MUkOZYdq6TnWLDlbaNlkJiznVdFxQUyJLGJQXqp7wuFpGTYRMQtOWkM-S58Nspjm8zDG5sQT51xnt8QlxkiskJfT11JyPO4fR0yB-rJpf9ihbTOJetIoG2gMBYeQSkqdgAk7TeX9DJwjjZLLSh0ChOwH8hLCHjoDaXtK5RLuCNQ4mGhN6Tka3_VJxQpzKfkW6wHM_F18BSDRyVMurwxEiuDaLrUXxuVh-FFCvx18bqU_SziUpmDZ2uWszAU0ZA"
+        />
+      </a>
+    </div>
 
-  <nav class="reveal-stagger hidden min-[840px]:flex justify-center gap-[clamp(0.25rem,calc(4vw-2.75rem),1.25rem)] items-center">
-    <a class="reveal-sm nav-underline text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold" href="/about-us">About Us</a>
-    {
-      serviceGroups.map((group) => (
-        <div class="reveal-sm relative group">
-          <a
-            class="nav-underline block text-center text-on-surface-variant dark:text-outline-variant hover:text-primary-light focus:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold"
-            href={group.href}
-            aria-haspopup="true"
-          >
-            {group.label.split(" ").slice(0, -1).map((word) => `${word} `)}<span class="whitespace-nowrap">{group.label.split(" ").at(-1)}&nbsp;<span class="material-symbols-outlined text-base align-middle transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span></span>
-          </a>
-          <div class="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-3 -translate-y-1 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0" style="transform-origin: top center;">
-            <div class="overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-container-lowest py-2 shadow-xl dark:bg-surface-dim">
-              <a class="block px-4 py-2.5 text-sm font-semibold text-primary hover:bg-surface-container-low transition-colors" href={group.href}>
-                Explore {group.label}
-              </a>
-              <div class="my-1 border-t border-outline-variant/30"></div>
-              {
-                group.services.map((service) => (
-                  <a
-                    class="block px-4 py-2 text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors"
-                    href={`${group.href}#service-${service.cardId}`}
-                  >
-                    {service.title}
-                  </a>
-                ))
-              }
+    <nav class="site-header-nav reveal-stagger hidden min-[1160px]:flex">
+      <a class="reveal-sm nav-underline nav-item text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer font-bold" href="/about-us">About Us</a>
+      {
+        serviceGroups.map((group) => (
+          <div class="reveal-sm nav-item relative group">
+            <a
+              class="nav-underline nav-trigger flex items-center text-on-surface-variant dark:text-outline-variant hover:text-primary-light focus:text-primary-light transition-colors duration-300 cursor-pointer font-bold"
+              href={group.href}
+              aria-haspopup="true"
+            >
+              <span>{group.label}</span>
+              <span class="material-symbols-outlined text-base align-middle ml-0.5 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span>
+            </a>
+            <div class="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-3 -translate-y-1 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0" style="transform-origin: top center;">
+              <div class="overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-container-lowest py-2 shadow-xl dark:bg-surface-dim">
+                <a class="block px-4 py-2.5 text-sm font-semibold text-primary hover:bg-surface-container-low transition-colors" href={group.href}>
+                  Explore {group.label}
+                </a>
+                <div class="my-1 border-t border-outline-variant/30"></div>
+                {
+                  group.services.map((service) => (
+                    <a
+                      class="block px-4 py-2 text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors"
+                      href={`${group.href}#service-${service.cardId}`}
+                    >
+                      {service.title}
+                    </a>
+                  ))
+                }
+              </div>
             </div>
           </div>
-        </div>
-      ))
-    }
-    <a class="reveal-sm nav-underline text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold" href="/knowledge-hub">Knowledge Hub</a>
-    <a class="reveal-sm nav-underline text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer text-body-md font-body-md font-bold" href="/careers">Careers</a>
-  </nav>
+        ))
+      }
+      <a class="reveal-sm nav-underline nav-item text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer font-bold" href="/knowledge-hub">Knowledge Hub</a>
+      <a class="reveal-sm nav-underline nav-item text-on-surface-variant dark:text-outline-variant hover:text-primary-light transition-colors duration-300 cursor-pointer font-bold" href="/careers">Careers</a>
+    </nav>
 
-  <div class="reveal-sm hidden min-[840px]:block" style="transition-delay: 0.2s">
-    <div class="flex flex-col min-[1200px]:flex-row items-center gap-2 min-[1200px]:gap-3">
-      <a href="https://rakhechafinserv.investwell.app/app/#/login" target="_blank" rel="noopener noreferrer" class="w-[124px] bg-white border border-secondary text-primary font-cta-text px-4 py-1.5 min-[1200px]:py-2 rounded hover:bg-surface-container-low transition-colors inline-block text-center whitespace-nowrap">Client Login</a>
-      <a href="/contact-us" class="w-[124px] bg-primary text-white border border-secondary font-cta-text px-4 py-1.5 min-[1200px]:py-2 rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center whitespace-nowrap">Contact Us</a>
+    <div class="site-header-actions reveal-sm hidden min-[1160px]:flex" style="transition-delay: 0.2s">
+      <a href="https://rakhechafinserv.investwell.app/app/#/login" target="_blank" rel="noopener noreferrer" class="action-btn bg-white border border-secondary text-primary font-cta-text rounded hover:bg-surface-container-low transition-colors inline-block text-center">Client Login</a>
+      <a href="/contact-us" class="action-btn bg-primary text-white border border-secondary font-cta-text rounded shadow-sm hover:bg-primary-dark transition-colors inline-block text-center">Contact Us</a>
     </div>
   </div>
 
   <!-- Mobile Nav Panel -->
   <div
-    class="hidden min-[840px]:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
+    class="hidden min-[1160px]:hidden absolute top-full left-0 w-full max-h-[80vh] overflow-y-auto bg-surface-container-lowest dark:bg-surface-dim shadow-lg z-40"
     id="mobile-nav-panel"
   >
     <div class="flex flex-col divide-y divide-outline-variant px-margin-mobile">
@@ -124,6 +125,103 @@ const serviceGroups = await Promise.all(
     </div>
   </div>
 </header>
+
+<style>
+  /* Responsive header layout: a three-zone row (logo / nav / actions) that
+     compresses fluidly with clamp() as the desktop viewport narrows, rather
+     than snapping between a handful of fixed breakpoints. Below 1160px —
+     the width this exact nav (6 items, including "Investment Banking" and
+     "Wealth Management") actually needs to stay on one nowrap line even at
+     its most compressed — it collapses to the mobile hamburger layout
+     instead (unchanged, handled by the existing Tailwind
+     `hidden`/`min-[1160px]:` utilities in the markup). That number came
+     from measuring real rendered nav-item widths at the floor clamp
+     values below, not from a round-number guess.
+
+     Two desktop tiers, each with its own clamp() ranges, so logo size, nav
+     gap, nav font-size and button padding all shrink together as one
+     coordinated "compact desktop" step before the mobile breakpoint —
+     rather than each property drifting independently:
+       - >=1500px : roomy desktop
+       - 1160-1500px : compact desktop
+  */
+  .site-header {
+    --header-pad-x: clamp(1.25rem, 2.5vw, 3rem);
+    --logo-w: clamp(160px, 10vw, 230px);
+    --nav-gap: clamp(0.75rem, 1.7vw, 1.75rem);
+    --nav-font: clamp(15px, 0.45vw + 9.6px, 18px);
+    --btn-pad-x: clamp(0.75rem, 1.2vw, 1.25rem);
+    --btn-gap: clamp(0.4rem, 1vw, 0.75rem);
+  }
+
+  @media (min-width: 1160px) and (max-width: 1500px) {
+    .site-header {
+      --header-pad-x: clamp(1rem, 1.6vw, 1.5rem);
+      --logo-w: clamp(130px, 8vw, 160px);
+      --nav-gap: clamp(0.35rem, 0.9vw, 0.75rem);
+      --nav-font: clamp(15px, 0.3vw + 9px, 16px);
+      --btn-pad-x: clamp(0.5rem, 0.8vw, 0.75rem);
+      --btn-gap: clamp(0.3rem, 0.5vw, 0.4rem);
+    }
+  }
+
+  .site-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @media (min-width: 1160px) {
+    .site-header-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: clamp(0.5rem, 1.4vw, 2rem);
+      padding-left: var(--header-pad-x);
+      padding-right: var(--header-pad-x);
+    }
+
+    .site-header-logo {
+      width: var(--logo-w);
+    }
+    .site-header-logo img {
+      width: 100%;
+      height: auto;
+    }
+
+    .site-header-nav {
+      justify-content: center;
+      align-items: center;
+      gap: var(--nav-gap);
+      min-width: 0;
+    }
+    /* Every nav item — including the dropdown trigger + its chevron, which
+       are one flex item together — stays a single nowrap unit. The nav
+       never wraps; it only compresses via --nav-gap/--nav-font above. */
+    .site-header-nav > .nav-item {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+    .site-header-nav .nav-item,
+    .site-header-nav .nav-trigger {
+      font-size: var(--nav-font);
+    }
+
+    .site-header-actions {
+      justify-content: flex-end;
+      align-items: center;
+      gap: var(--btn-gap);
+      flex-shrink: 0;
+    }
+    .site-header-actions .action-btn {
+      white-space: nowrap;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      padding-left: var(--btn-pad-x);
+      padding-right: var(--btn-pad-x);
+    }
+  }
+</style>
 
 <script>
   // Mobile nav toggle + accordion sections, ported from main.js's

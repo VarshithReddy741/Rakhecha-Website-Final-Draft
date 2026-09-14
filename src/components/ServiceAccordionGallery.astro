@@ -288,6 +288,7 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
 <script>
   const EXPANDED_WIDTH = 640;
   const COLLAPSED_WIDTH = 210;
+  const CARD_GAP = 3; // matches .service-accordion-gallery's gap: 3px
   const MAX_TITLE_SIZE = 24;
   const MIN_TITLE_SIZE = 10;
   const CONTENT_PADDING = 64; // 2rem each side
@@ -337,7 +338,6 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     if (!controls || !prevBtn || !nextBtn || !wrap || !panelRoot || !panelClose) return;
 
     let activeId: string | null = null;
-    let scrollIntoViewTimer: number | undefined;
 
     // flex-grow alone can't expand a card once the row is already wider
     // than its container (no positive free space left to redistribute) —
@@ -361,14 +361,24 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
       });
 
       // Expanding can push the target card partly (or entirely) past the
-      // gallery's visible edge. Wait for the flex-basis transition (0.6s,
-      // set in CSS below) to finish before scrolling it into view — reading
-      // its position any earlier would still measure the pre-expansion box.
-      window.clearTimeout(scrollIntoViewTimer);
+      // gallery's visible edge — scroll it fully into view. Computed from
+      // the known widths we just assigned above (every other card is
+      // exactly COLLAPSED_WIDTH) rather than read from the DOM, so this
+      // doesn't have to wait for the flex-basis transition to finish: it
+      // runs in the same tick as the expand, with no lag, and an explicit
+      // "instant" behavior so it isn't animated by the gallery's own
+      // scroll-behavior:smooth (which would otherwise make it lag/drift).
       if (targetCard) {
-        scrollIntoViewTimer = window.setTimeout(() => {
-          targetCard.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
-        }, 600);
+        const idx = cards.indexOf(targetCard);
+        const leftEdge = idx * (COLLAPSED_WIDTH + CARD_GAP);
+        const rightEdge = leftEdge + EXPANDED_WIDTH;
+        const viewLeft = gallery.scrollLeft;
+        const viewRight = viewLeft + gallery.clientWidth;
+        if (leftEdge < viewLeft) {
+          gallery.scrollTo({ left: leftEdge, behavior: "instant" });
+        } else if (rightEdge > viewRight) {
+          gallery.scrollTo({ left: rightEdge - gallery.clientWidth, behavior: "instant" });
+        }
       }
     }
 
@@ -451,12 +461,19 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     // over a card. Forward genuinely-vertical wheel input to the page
     // ourselves; only let a real horizontal gesture (trackpad/shift-wheel,
     // deltaX already dominant) move the gallery's own scroll position.
+    //
+    // behavior must be explicit "instant": html has scroll-behavior:smooth
+    // globally, and scrollBy()'s default "auto" behavior honors that — so
+    // every individual wheel tick (a scroll gesture fires dozens of these)
+    // was starting its own smooth-scroll animation and cutting off the
+    // previous one, which is what made this feel like it was only
+    // scrolling "a little" at a time instead of tracking the gesture.
     gallery.addEventListener(
       "wheel",
       (e) => {
         if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
           e.preventDefault();
-          window.scrollBy({ top: e.deltaY });
+          window.scrollBy({ top: e.deltaY, behavior: "instant" });
         }
       },
       { passive: false },

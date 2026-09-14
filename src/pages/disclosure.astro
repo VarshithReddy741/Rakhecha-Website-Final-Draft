@@ -1,0 +1,51 @@
+---
+// Ported from the live rakhechafinserv.com/disclosure/ page: the scheme-disclosure
+// table itself is embedded from the fund-distribution vendor (InvestWell) rather than
+// copied as static text, since it's meant to stay current rather than be a snapshot.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<BaseLayout
+  title="Disclosure - Rakhecha Finserv"
+  description="Scheme-type disclosure and commission information for Rakhecha Finserv's mutual fund distribution services."
+  bodyClass="bg-white text-on-surface font-body-md antialiased min-h-screen flex flex-col"
+>
+  <Header />
+
+  <main class="flex-grow max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap w-full">
+    <h1 class="reveal font-display-lg text-display-lg text-primary mb-10">Disclosure</h1>
+
+    <div class="max-w-3xl flex flex-col gap-8 font-body-md text-body-md text-on-surface-variant leading-relaxed">
+      <div class="border border-outline-variant rounded-lg overflow-hidden bg-surface-container-lowest">
+        <iframe
+          src="https://resources.investwellonline.com/disclosure.html"
+          title="Rakhecha Finserv scheme-type disclosure table"
+          width="100%"
+          height="900"
+          loading="lazy"
+          class="block w-full"
+        />
+      </div>
+
+      <div class="border-t border-outline-variant pt-8">
+        <p>
+          <strong class="text-primary font-semibold">Risk Factors –</strong> Investments in Mutual Funds are subject to Market Risks. Read all scheme
+          related documents carefully before investing. Mutual Fund Schemes do not assure or guarantee any returns. Past performances of any Mutual
+          Fund Scheme may or may not be sustained in future. There is no guarantee that the investment objective of any suggested scheme shall be
+          achieved. All existing and prospective investors are advised to check and evaluate the Exit loads and other cost structure (TER) applicable
+          at the time of making the investment before finalizing on any investment decision for Mutual Funds schemes. We deal in Regular Plans only
+          for Mutual Fund Schemes and earn a Trailing Commission on client investments. Disclosure For Commission earnings is made to clients at the
+          time of investments. Option of Direct Plan for every Mutual Fund Scheme is available to investors offering advantage of lower expense
+          ratio. We are not entitled to earn any commission on Direct plans. Hence we do not deal in Direct Plans.
+        </p>
+        <p class="text-center font-semibold text-primary mt-4">
+          AMFI Registered Mutual Fund Distributor – ARN 305993 | Date of initial registration – 20/08/2024 | Current validity of ARN – 19/08/2027
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

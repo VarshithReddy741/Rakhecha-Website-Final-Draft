@@ -80,12 +80,11 @@ const founderPhotos: Record<string, ImageMetadata> = {
           <div class="absolute inset-0 z-0">
             {slide.mediaType === "video" && slide.videoUrl ? (
               <video
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover object-[35%_center] md:object-center"
                 src={slide.videoUrl}
                 poster={slide.videoPoster ? urlFor(slide.videoPoster).width(1920).url() : undefined}
                 autoplay
                 muted
-                loop
                 playsinline
               />
             ) : (
@@ -518,7 +517,12 @@ const founderPhotos: Record<string, ImageMetadata> = {
       const slides = Array.from(track.children);
       const realCount = realSlides.length;
       let current = 1;
-      let timer: ReturnType<typeof setInterval> | null = null;
+      // A video slide advances itself (see scheduleAdvance) once its video
+      // fires "ended", rather than on the fixed timer image slides use —
+      // so `timer` and `armedVideo` are mutually exclusive, one or the
+      // other active at a time depending on what the current slide is.
+      let timer: ReturnType<typeof setTimeout> | null = null;
+      let armedVideo: HTMLVideoElement | null = null;
 
       function goTo(index: number, withTransition: boolean) {
         (track as HTMLElement).style.transition = withTransition ? "" : "none";
@@ -537,27 +541,59 @@ const founderPhotos: Record<string, ImageMetadata> = {
         goTo(current - 1, true);
       }
 
-      track.addEventListener("transitionend", () => {
+      function handleVideoEnded() {
+        armedVideo = null;
+        next();
+      }
+
+      function stopAuto() {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+        if (armedVideo) {
+          armedVideo.removeEventListener("ended", handleVideoEnded);
+          armedVideo = null;
+        }
+      }
+
+      // Image slides advance on the fixed 3s timer as before. A video slide
+      // instead plays its video from the start and waits for it to finish —
+      // "scroll" to the next slide only once the video has completely
+      // played — advancing when the browser fires "ended" instead of on a
+      // timer at all.
+      function scheduleAdvance() {
+        stopAuto();
+        const video = slides[current]?.querySelector("video") as HTMLVideoElement | null;
+        if (video) {
+          video.currentTime = 0;
+          void video.play().catch(() => {});
+          armedVideo = video;
+          video.addEventListener("ended", handleVideoEnded);
+        } else {
+          timer = setTimeout(next, 3000);
+        }
+      }
+
+      track.addEventListener("transitionend", (e) => {
+        // "transitionend" bubbles — the headline's .reveal/.mask-reveal
+        // fade-in and the CTA button's .reveal both live inside track and
+        // fire their own transitionend as they animate in on load, which
+        // would otherwise be mistaken for the slide's own move finishing.
+        // Left unfiltered, each of those bubbled events re-triggered
+        // scheduleAdvance() and reset a playing video slide's video back to
+        // currentTime 0 — so it kept restarting instead of ever playing
+        // through to "ended". Only react to track's own transform move.
+        if (e.target !== track || e.propertyName !== "transform") return;
         if (current === slides.length - 1) {
           goTo(1, false);
         } else if (current === 0) {
           goTo(realCount, false);
         }
+        scheduleAdvance();
       });
 
-      function startAuto() {
-        if (timer) clearInterval(timer);
-        timer = setInterval(next, 3000);
-      }
-
-      function stopAuto() {
-        if (timer) {
-          clearInterval(timer);
-          timer = null;
-        }
-      }
-
-      // The auto-advance interval keeps ticking while the tab is hidden, but
+      // The auto-advance timer keeps ticking while the tab is hidden, but
       // CSS transitions (and their transitionend event) freeze while hidden —
       // so the transitionend-based wraparound below never runs, `current` can
       // walk past the cloned slides, and the track ends up translated fully
@@ -571,17 +607,22 @@ const founderPhotos: Record<string, ImageMetadata> = {
           if (current < 1 || current > slides.length - 2) {
             goTo(1, false);
           }
-          startAuto();
+          scheduleAdvance();
         }
       });
 
+      // Cancel whatever's currently pending immediately on manual nav —
+      // otherwise a video slide's still-armed "ended" listener could fire
+      // mid-transition (its video keeps playing off-screen) and trigger a
+      // second, unwanted advance on top of this one. scheduleAdvance() for
+      // the new slide happens once the move settles, via transitionend.
       prevBtn.addEventListener("click", () => {
+        stopAuto();
         prev();
-        startAuto();
       });
       nextBtn.addEventListener("click", () => {
+        stopAuto();
         next();
-        startAuto();
       });
 
       section.addEventListener("mousemove", (e) => {
@@ -600,7 +641,7 @@ const founderPhotos: Record<string, ImageMetadata> = {
       });
 
       goTo(1, false);
-      startAuto();
+      scheduleAdvance();
     })();
   </script>
 

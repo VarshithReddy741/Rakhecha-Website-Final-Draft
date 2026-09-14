@@ -164,7 +164,7 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     inset: 0;
     display: flex;
     flex-direction: column;
-    padding: 2rem;
+    padding: 1.25rem;
     color: #fff;
     pointer-events: none;
   }
@@ -286,12 +286,16 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
 </style>
 
 <script>
-  const EXPANDED_WIDTH = 640;
-  const COLLAPSED_WIDTH = 210;
+  // Shrunk from 640/210 so all 7 cards fit within a typical desktop
+  // container width without needing to scroll at rest, and expanding one
+  // still fits (with room to spare) at common widths — see the
+  // direction-flip logic in applyWidths for the narrower cases.
+  const EXPANDED_WIDTH = 440;
+  const COLLAPSED_WIDTH = 110;
   const CARD_GAP = 3; // matches .service-accordion-gallery's gap: 3px
   const MAX_TITLE_SIZE = 24;
   const MIN_TITLE_SIZE = 10;
-  const CONTENT_PADDING = 64; // 2rem each side
+  const CONTENT_PADDING = 40; // 1.25rem each side, matches .service-accordion-content's padding
 
   function fitTitles(gallery: HTMLElement) {
     const canvas = document.createElement("canvas");
@@ -360,26 +364,44 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
         c.style.flex = `0 0 ${width}px`;
       });
 
-      // Expanding can push the target card partly (or entirely) past the
-      // gallery's visible edge — scroll it fully into view. Computed from
-      // the known widths we just assigned above (every other card is
-      // exactly COLLAPSED_WIDTH) rather than read from the DOM, so this
-      // doesn't have to wait for the flex-basis transition to finish: it
-      // runs in the same tick as the expand, with no lag, and an explicit
-      // "instant" behavior so it isn't animated by the gallery's own
-      // scroll-behavior:smooth (which would otherwise make it lag/drift).
-      if (targetCard) {
-        const idx = cards.indexOf(targetCard);
-        const leftEdge = idx * (COLLAPSED_WIDTH + CARD_GAP);
-        const rightEdge = leftEdge + EXPANDED_WIDTH;
-        const viewLeft = gallery.scrollLeft;
-        const viewRight = viewLeft + gallery.clientWidth;
-        if (leftEdge < viewLeft) {
-          gallery.scrollTo({ left: leftEdge, behavior: "instant" });
-        } else if (rightEdge > viewRight) {
-          gallery.scrollTo({ left: rightEdge - gallery.clientWidth, behavior: "instant" });
-        }
+      if (!targetCard) {
+        cards.forEach((c) => (c.style.transform = ""));
+        return;
       }
+
+      // Growing a card widens the whole row by `delta`. By default that
+      // extra width lands to the right of the card (normal flex flow: its
+      // own left edge stays put, later siblings get pushed right) — fine
+      // unless the card is close enough to the right edge that its new
+      // right edge would land past the gallery's visible width. In that
+      // case, shift every card left by `delta` instead: the target card's
+      // right edge is then exactly where it was collapsed (nothing spills
+      // off the right), and the extra width is taken from the left side —
+      // mirroring how the default case takes it from the right, just
+      // reflected. No scrolling involved, so nothing can retrigger a hover
+      // on a different card the way animating scrollLeft did.
+      const idx = cards.indexOf(targetCard);
+      const delta = EXPANDED_WIDTH - COLLAPSED_WIDTH;
+      const leftEdge = idx * (COLLAPSED_WIDTH + CARD_GAP);
+      const rightEdgeGrowingRight = leftEdge + EXPANDED_WIDTH;
+      const leftEdgeGrowingLeft = leftEdge - delta;
+      // Only flip if growing left would actually stay on-screen too —
+      // otherwise (a card too close to both edges for either direction to
+      // fully fit) fall back to the default rather than trade one overflow
+      // for another.
+      const growLeft = rightEdgeGrowingRight > gallery.clientWidth && leftEdgeGrowingLeft >= 0;
+
+      cards.forEach((c) => {
+        if (!growLeft) {
+          c.style.transform = "";
+          return;
+        }
+        // The active card also gets a CSS-driven scale(1.015) — reapply it
+        // alongside the translate here since an inline transform overrides
+        // the stylesheet rule entirely rather than combining with it.
+        const scalePart = c.classList.contains("is-active") ? " scale(1.015)" : "";
+        c.style.transform = `translateX(-${delta}px)${scalePart}`;
+      });
     }
 
     function hoverPreview(card: HTMLElement | null) {

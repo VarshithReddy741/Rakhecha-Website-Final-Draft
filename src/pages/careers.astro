@@ -9,7 +9,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import FormSuccessState from "../components/FormSuccessState.astro";
 import careersHeroDesktop from "../assets/images/Careers Web.png";
-import careersHeroMobile from "../assets/images/Careers Mobile.jpg";
+import careersHeroMobile from "../assets/images/Careers Mobile.png";
 
 const jobs = await sanityClient.fetch<Job[]>(queries.allJobs);
 ---
@@ -24,11 +24,9 @@ const jobs = await sanityClient.fetch<Job[]>(queries.allJobs);
   <main class="flex-grow w-full">
     <!-- Hero Section: same full-height Picture treatment as the Investment
          Banking/Insurance/Wealth Management heroes, with a separate desktop
-         and mobile image rather than one cropped both ways — the mobile
-         photo is object-left positioned specifically because its left third
-         is a built-in fade-to-white made for text to sit over, and an
-         object-cover crop on a narrow viewport would otherwise show only a
-         thin, arbitrarily-positioned slice of the wide source photo. -->
+         and mobile image — the mobile photo is a portrait crop of the same
+         rooftop scene, with open sky filling the upper portion for the
+         headline to sit over. -->
     <section class="relative h-screen min-h-[600px] flex items-start md:items-center justify-start overflow-hidden">
       <div class="absolute inset-0 z-0">
         <Picture
@@ -43,8 +41,8 @@ const jobs = await sanityClient.fetch<Job[]>(queries.allJobs);
         />
         <Picture
           src={careersHeroMobile}
-          alt="Rakhecha Finserv colleagues in conversation"
-          class="md:hidden w-full h-full object-cover object-left"
+          alt="Rakhecha Finserv team member looking out over the city at sunset"
+          class="md:hidden w-full h-full object-cover"
           widths={[480, 768]}
           sizes="100vw"
           formats={["webp"]}

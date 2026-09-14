@@ -3,19 +3,15 @@
 // /careers/[slug]/ page (pulled from the jobs collection) instead of the
 // single shared "Job detail.html" every card pointed to.
 import { sanityClient, queries, type Job } from "../lib/sanity";
-import { getImage } from "astro:assets";
+import { Picture } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import FormSuccessState from "../components/FormSuccessState.astro";
-import careersHeroImage from "../assets/images/Careers.jpg";
+import careersHeroDesktop from "../assets/images/Careers Web.png";
+import careersHeroMobile from "../assets/images/Careers Mobile.jpg";
 
 const jobs = await sanityClient.fetch<Job[]>(queries.allJobs);
-
-// Used as a CSS background-image, not an <img>/<Image> — pre-optimized
-// through Astro's image pipeline here so the page still gets a hashed,
-// resized WebP instead of the raw PNG.
-const careersHeroOptimized = await getImage({ src: careersHeroImage, width: 1920, format: "webp" });
 ---
 
 <BaseLayout
@@ -26,16 +22,41 @@ const careersHeroOptimized = await getImage({ src: careersHeroImage, width: 1920
   <Header />
 
   <main class="flex-grow w-full">
-    <!-- Hero Section -->
-    <section class="relative bg-primary pt-32 pb-48 px-margin-mobile md:px-margin-desktop overflow-hidden">
-      <div class="absolute inset-0 bg-cover bg-center" style={`background-image: url("${careersHeroOptimized.src}");`}></div>
-      <div class="max-w-container-max mx-auto relative z-10 flex flex-col md:flex-row items-center gap-12">
-        <div class="max-w-2xl flex-1">
-          <h1 class="reveal font-display-lg text-display-lg text-primary mb-8 leading-tight">Careers at<br />Rakhecha Finserv</h1>
-        </div>
+    <!-- Hero Section: same full-height Picture treatment as the Investment
+         Banking/Insurance/Wealth Management heroes, with a separate desktop
+         and mobile image rather than one cropped both ways — the mobile
+         photo is object-left positioned specifically because its left third
+         is a built-in fade-to-white made for text to sit over, and an
+         object-cover crop on a narrow viewport would otherwise show only a
+         thin, arbitrarily-positioned slice of the wide source photo. -->
+    <section class="relative h-screen min-h-[600px] flex items-start md:items-center justify-start overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <Picture
+          src={careersHeroDesktop}
+          alt="Rakhecha Finserv team member looking out over the city at sunset"
+          class="hidden md:block w-full h-full object-cover"
+          widths={[768, 1280, 1920]}
+          sizes="100vw"
+          formats={["webp"]}
+          fallbackFormat="webp"
+          loading="eager"
+        />
+        <Picture
+          src={careersHeroMobile}
+          alt="Rakhecha Finserv colleagues in conversation"
+          class="md:hidden w-full h-full object-cover object-left"
+          widths={[480, 768]}
+          sizes="100vw"
+          formats={["webp"]}
+          fallbackFormat="webp"
+          loading="eager"
+        />
+      </div>
+      <div class="relative z-10 w-full max-w-container-max px-margin-mobile md:px-margin-desktop pt-[24vh] md:pt-0">
+        <h1 class="reveal mask-reveal text-display-lg font-display-lg text-primary mb-6 max-w-4xl leading-tight"><span>Careers at Rakhecha Finserv</span></h1>
       </div>
     </section>
-    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop relative z-20 space-y-section-gap pb-section-gap mt-12">
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop relative z-20 space-y-section-gap pb-section-gap -mt-20">
       <!-- Current Openings Section -->
       <section>
         <div class="bg-surface-container-lowest p-8 md:p-12 rounded-xl shadow-[0_8px_32px_rgba(0,36,82,0.08)] border border-surface-container-low mx-auto">

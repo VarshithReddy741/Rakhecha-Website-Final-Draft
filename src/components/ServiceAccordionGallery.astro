@@ -163,7 +163,11 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
   }
   .service-accordion-card:hover .service-accordion-overlay,
   .service-accordion-card.is-active .service-accordion-overlay {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 55%, rgba(0, 0, 0, 0.05) 100%);
+    /* Bottom stays dark for the desc/CTA that reveal there; the top stop
+       (was 0.05, nearly see-through) is now a light dark tint too, since
+       the title lives top-left and needs its own contrast against the
+       photo once the overlay's own darkening thins out toward the top. */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.15) 45%, rgba(0, 0, 0, 0.35) 100%);
   }
 
   .service-accordion-content {
@@ -253,7 +257,11 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
   }
 
   .service-accordion-card:focus-visible .service-accordion-overlay {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 55%, rgba(0, 0, 0, 0.05) 100%);
+    /* Bottom stays dark for the desc/CTA that reveal there; the top stop
+       (was 0.05, nearly see-through) is now a light dark tint too, since
+       the title lives top-left and needs its own contrast against the
+       photo once the overlay's own darkening thins out toward the top. */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.15) 45%, rgba(0, 0, 0, 0.35) 100%);
   }
 
   .service-accordion-detail {

@@ -38,25 +38,31 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
           href={`#service-${item.id}`}
           class="service-accordion-card"
           data-panel={item.id}
-          style={`background-image:url("${item.image}")`}
           aria-label={item.title}
           aria-expanded="false"
         >
-          <span class="service-accordion-overlay" />
-          <span class="service-accordion-content">
-            <span class="service-accordion-title">
-              {item.title.split(" ").map((word, i) => (
-                <>
-                  {i > 0 && " "}
-                  <span class="service-accordion-title-word">{word}</span>
-                </>
-              ))}
-            </span>
-            <span class="service-accordion-bottom">
-              <span class="service-accordion-desc">{item.desc}</span>
-              <span class="service-accordion-cta">
-                Learn more
-                <span class="material-symbols-outlined text-base">arrow_forward</span>
+          {/* Purely decorative visual layer: absolutely positioned against
+              the gallery (not this anchor) and independently transitioned
+              in pixels, so it can animate freely without ever changing
+              which element the pointer is actually over — see the JS for
+              why the anchor above owns hit-testing exclusively. */}
+          <span class="service-accordion-card-visual" style={`background-image:url("${item.image}")`}>
+            <span class="service-accordion-overlay" />
+            <span class="service-accordion-content">
+              <span class="service-accordion-title">
+                {item.title.split(" ").map((word, i) => (
+                  <>
+                    {i > 0 && " "}
+                    <span class="service-accordion-title-word">{word}</span>
+                  </>
+                ))}
+              </span>
+              <span class="service-accordion-bottom">
+                <span class="service-accordion-desc">{item.desc}</span>
+                <span class="service-accordion-cta">
+                  Learn more
+                  <span class="material-symbols-outlined text-base">arrow_forward</span>
+                </span>
               </span>
             </span>
           </span>
@@ -120,6 +126,7 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
   }
 
   .service-accordion-gallery {
+    position: relative;
     width: 100%;
     height: 420px;
     gap: 3px;
@@ -127,23 +134,54 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     scroll-behavior: smooth;
   }
 
+  /* The anchor is the ONLY element that receives pointer events for a card.
+     Its flex-basis is set (and changed) with no transition of its own — see
+     the JS — so its box, and therefore its hit-testing geometry, is always
+     exactly the current target layout, never a mid-animation interpolation.
+     It has no visible content of its own; everything you see lives in
+     .service-accordion-card-visual below, which is free to animate however
+     it likes because it's pointer-events: none. */
   .service-accordion-card {
-    position: relative;
+    /* Deliberately not `position: relative` — it must stay a non-positioned
+       flex item so .service-accordion-card-visual below (an absolutely
+       positioned child) resolves its containing block up to the gallery
+       instead of to this anchor. If this were positioned, the visual layer
+       would just track this anchor's own (already-final) box and the whole
+       point of decoupling visual animation from hit-testing would be lost. */
     display: block;
     flex: 1 1 0%;
     min-width: 110px;
+    border-radius: 3px;
+  }
+
+  /* Absolutely positioned against the gallery (the anchor is position:
+     static, so it's skipped as a containing block) and driven purely by
+     JS-set left/width in pixels, read back from the anchor's own
+     already-final geometry each time it changes. That decoupling is what
+     lets this layer transition smoothly — including visually overlapping a
+     neighboring card mid-animation — without ever being able to steal a
+     pointer event, since it's pointer-events: none throughout.
+     scale()/box-shadow/filter live here rather than on the anchor for the
+     same reason: transforming the actual hit-tested element would move its
+     hitbox off its layout box. */
+  .service-accordion-card-visual {
+    position: absolute;
+    top: 0;
+    height: 100%;
     overflow: hidden;
     border-radius: 3px;
     background-size: cover;
     background-position: center;
+    pointer-events: none;
     transition:
-      flex-basis 0.6s cubic-bezier(0.22, 0.68, 0, 1),
+      left 0.6s cubic-bezier(0.22, 0.68, 0, 1),
+      width 0.6s cubic-bezier(0.22, 0.68, 0, 1),
       transform 0.6s cubic-bezier(0.22, 0.68, 0, 1),
       box-shadow 0.6s cubic-bezier(0.22, 0.68, 0, 1),
       filter 0.4s ease;
   }
 
-  .service-accordion-card.is-active {
+  .service-accordion-card.is-active .service-accordion-card-visual {
     transform: scale(1.015);
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
     z-index: 2;
@@ -151,7 +189,7 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
 
   /* While one card is expanded (hovered or clicked), every other card
      desaturates so the expanded one reads as the focus. */
-  .service-accordion-card.is-dimmed {
+  .service-accordion-card.is-dimmed .service-accordion-card-visual {
     filter: grayscale(1);
   }
 
@@ -243,7 +281,6 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     transition:
       opacity 0.5s ease 0.05s,
       transform 0.5s ease 0.05s;
-    pointer-events: auto;
   }
 
   .service-accordion-card:hover .service-accordion-desc,
@@ -301,11 +338,9 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
 </style>
 
 <script>
-  // The expanded card's target width. Non-target cards aren't pinned to a
-  // matching fixed constant — they use flex:1 1 0% (min-width: 110px in the
-  // CSS below is just the floor) and applyWidths() reads their real,
-  // already-equal-width rest state instead, so there's nothing for an
-  // idle-vs-hover size mismatch to jump between.
+  // The expanded card's target width. Non-target cards' widths are derived
+  // from this and the gallery's own clientWidth (see restWidth() below),
+  // never from their current rendered size.
   const EXPANDED_WIDTH = 440;
   const CARD_GAP = 3; // matches .service-accordion-gallery's gap: 3px
   const MAX_TITLE_SIZE = 24;
@@ -365,6 +400,10 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
 
   function initGallery(gallery: HTMLElement) {
     const cards = Array.from(gallery.querySelectorAll<HTMLElement>("[data-panel]"));
+    // Each card's purely decorative counterpart — see the CSS for why this
+    // is what actually animates, while the anchor in `cards` snaps to its
+    // destination instantly and owns pointer events exclusively.
+    const visuals = cards.map((c) => c.querySelector<HTMLElement>(".service-accordion-card-visual")!);
     const id = gallery.dataset.gallery;
     const controls = document.querySelector<HTMLElement>(`[data-gallery-controls="${id}"]`);
     const prevBtn = controls?.querySelector<HTMLButtonElement>("[data-gallery-prev]");
@@ -374,23 +413,35 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     const panelClose = wrap?.querySelector<HTMLElement>("[data-panel-close]");
     if (!controls || !prevBtn || !nextBtn || !wrap || !panelRoot || !panelClose) return;
 
+    // Single, explicit state model: a click-active card takes priority over
+    // whatever's currently hovered, and the effective target is always
+    // derived fresh from both rather than mutated in place.
+    let hoveredId: string | null = null;
     let activeId: string | null = null;
 
-    // Cards are flex:1 1 0% at rest, so they sit equal-width, sharing
-    // whatever room the gallery has — usually well past the CSS min-width
-    // floor. The previous version pinned every *other* card to that floor
-    // the moment any card was hovered, which
-    // made the whole row visibly snap narrower right as the target grew —
-    // a second, unintended jump on top of the intended expansion. That
-    // combined movement was abrupt, and shifting cards before the target
-    // could displace whatever the cursor was actually over, handing the
-    // hover to a neighboring card instead of staying on the one the mouse
-    // was on. Measuring the real idle width and using that as the "resting"
-    // size for non-target cards means only the target card's own box ever
-    // changes size — nothing else moves unless the target's growth
-    // requires it to.
+    // The destination geometry is computed directly from the gallery's own
+    // width, never from the cards' current (possibly mid-transition) widths.
+    // Reading widths off cards while they're animating meant a hover event
+    // arriving mid-transition would calculate the next layout from an
+    // intermediate size instead of the real idle/expanded geometry — that's
+    // what produced the "neighboring card opens first" glitch on middle
+    // cards. The gallery container's own clientWidth is stable regardless of
+    // what its children are doing mid-animation, so deriving from it keeps
+    // every recalculation anchored to the same destination.
     function restWidth(): number {
-      return (gallery.clientWidth - (cards.length - 1) * CARD_GAP) / cards.length;
+      return (gallery.clientWidth - EXPANDED_WIDTH - (cards.length - 1) * CARD_GAP) / (cards.length - 1);
+    }
+
+    // Copies each anchor's current (already-final — see applyWidths) box
+    // onto its visual counterpart, in pixels, so the visual can transition
+    // toward it. Called once synchronously after the anchors snap, so it
+    // always reads real, settled geometry rather than a value that's
+    // itself still animating.
+    function syncVisuals() {
+      cards.forEach((c, i) => {
+        visuals[i].style.left = `${c.offsetLeft}px`;
+        visuals[i].style.width = `${c.offsetWidth}px`;
+      });
     }
 
     function applyWidths(targetCard: HTMLElement | null) {
@@ -400,64 +451,52 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
         c.classList.toggle("is-dimmed", targetCard !== null && c !== targetCard);
       });
 
+      // The anchors (the elements that actually receive pointer events)
+      // have no CSS transition on flex-basis — see .service-accordion-card
+      // — so this assignment takes effect immediately, before the browser's
+      // next hit test. That's what makes hit-testing deterministic: there
+      // is never a frame where an anchor's box is a mid-animation
+      // interpolation, only ever the exact current target layout. Only the
+      // visual layer (synced below) is left to animate.
       if (!targetCard) {
         cards.forEach((c) => {
           c.style.flex = "";
-          c.style.transform = "";
         });
-        return;
+      } else {
+        // Non-target cards shrink to make room for the expanded one, rather
+        // than staying at their idle width and letting the row overflow.
+        const rest = restWidth();
+        cards.forEach((c) => {
+          const width = c === targetCard ? EXPANDED_WIDTH : rest;
+          c.style.flex = `0 0 ${width}px`;
+        });
       }
 
-      const rest = restWidth();
-      cards.forEach((c) => {
-        // flex-grow/shrink must be pinned to 0 here: the row is already at
-        // (or past) its min-width floor once it's overflowing, and without
-        // this, flex-shrink would immediately squash the expanded card's
-        // basis right back down to fit the container instead of letting
-        // the row scroll wider.
-        const width = c === targetCard ? EXPANDED_WIDTH : rest;
-        c.style.flex = `0 0 ${width}px`;
-      });
-
-      // Growing a card widens the whole row by `delta`. By default that
-      // extra width lands to the right of the card (normal flex flow: its
-      // own left edge stays put, later siblings get pushed right) — fine
-      // unless the card is close enough to the right edge that its new
-      // right edge would land past the gallery's visible width. In that
-      // case, shift every card left by `delta` instead: the target card's
-      // right edge is then exactly where it was collapsed (nothing spills
-      // off the right), and the extra width is taken from the left side —
-      // mirroring how the default case takes it from the right, just
-      // reflected. No scrolling involved, so nothing can retrigger a hover
-      // on a different card the way animating scrollLeft did.
-      const idx = cards.indexOf(targetCard);
-      const delta = Math.max(0, EXPANDED_WIDTH - rest);
-      const leftEdge = idx * (rest + CARD_GAP);
-      const rightEdgeGrowingRight = leftEdge + EXPANDED_WIDTH;
-      const leftEdgeGrowingLeft = leftEdge - delta;
-      // Only flip if growing left would actually stay on-screen too —
-      // otherwise (a card too close to both edges for either direction to
-      // fully fit) fall back to the default rather than trade one overflow
-      // for another.
-      const growLeft = rightEdgeGrowingRight > gallery.clientWidth && leftEdgeGrowingLeft >= 0;
-
-      cards.forEach((c) => {
-        if (!growLeft) {
-          c.style.transform = "";
-          return;
-        }
-        // The active card also gets a CSS-driven scale(1.015) — reapply it
-        // alongside the translate here since an inline transform overrides
-        // the stylesheet rule entirely rather than combining with it.
-        const scalePart = c.classList.contains("is-active") ? " scale(1.015)" : "";
-        c.style.transform = `translateX(-${delta}px)${scalePart}`;
-      });
+      syncVisuals();
     }
 
-    function hoverPreview(card: HTMLElement | null) {
-      if (activeId) return; // a clicked card takes priority over hover
-      applyWidths(card);
+    // Resolves current hover/active state into the single card that should
+    // be expanded right now, then applies it. Called any time either piece
+    // of state changes, so every hover/click/leave always recalculates the
+    // target from scratch against live state — never against whatever the
+    // previous call left mid-animation.
+    function render() {
+      const targetId = activeId ?? hoveredId;
+      const targetCard = targetId ? (cards.find((c) => c.dataset.panel === targetId) ?? null) : null;
+      applyWidths(targetCard);
     }
+
+    // First paint: give the visual layer its idle position/size immediately,
+    // with no transition — otherwise the browser would animate it in from
+    // its default (unset) left/width the instant this script runs.
+    visuals.forEach((v) => {
+      v.style.transition = "none";
+    });
+    syncVisuals();
+    void gallery.offsetWidth;
+    visuals.forEach((v) => {
+      v.style.transition = "";
+    });
 
     function openPanel(id: string) {
       panelRoot!.querySelectorAll("[data-panel-body]").forEach((el) => {
@@ -483,7 +522,7 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
         c.classList.toggle("is-active", c === card);
         c.setAttribute("aria-expanded", String(c === card));
       });
-      applyWidths(card);
+      render();
       if (card && activeId) {
         openPanel(activeId);
       } else {
@@ -492,16 +531,28 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     }
 
     cards.forEach((card) => {
-      card.addEventListener("mouseenter", () => hoverPreview(card));
-      card.addEventListener("focus", () => hoverPreview(card));
+      card.addEventListener("mouseenter", () => {
+        hoveredId = card.dataset.panel ?? null;
+        render();
+      });
+      card.addEventListener("focus", () => {
+        hoveredId = card.dataset.panel ?? null;
+        render();
+      });
       card.addEventListener("click", (e) => {
         e.preventDefault();
         setActiveCard(activeId === card.dataset.panel ? null : card);
       });
     });
-    gallery.addEventListener("mouseleave", () => hoverPreview(null));
+    gallery.addEventListener("mouseleave", () => {
+      hoveredId = null;
+      render();
+    });
     gallery.addEventListener("focusout", (e) => {
-      if (!gallery.contains((e as FocusEvent).relatedTarget as Node)) hoverPreview(null);
+      if (!gallery.contains((e as FocusEvent).relatedTarget as Node)) {
+        hoveredId = null;
+        render();
+      }
     });
     panelClose.addEventListener("click", () => setActiveCard(null));
 
@@ -555,7 +606,14 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     let resizeTimer: number | undefined;
     window.addEventListener("resize", () => {
       window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(() => fitTitles(gallery), 150);
+      resizeTimer = window.setTimeout(() => {
+        fitTitles(gallery);
+        // The gallery's width changed, so the expanded/rest geometry
+        // (derived from it) needs recalculating — re-run the same
+        // hover/active resolution rather than leaving stale pixel values on
+        // the visual layer.
+        render();
+      }, 150);
     });
   }
 

@@ -297,25 +297,35 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
   const MIN_TITLE_SIZE = 10;
   const CONTENT_PADDING = 40; // 1.25rem each side, matches .service-accordion-content's padding
 
+  // One shared font size across every collapsed title, not a per-card
+  // best-fit — otherwise a card with a short word (e.g. "FPI") renders
+  // much larger than a card with a long one (e.g. "Acquisitions"), which
+  // reads as uneven/inconsistent. Instead, find the single longest word
+  // across the whole gallery and use whatever size lets THAT word fit;
+  // every other card then renders at that same size, with room to spare.
   function fitTitles(gallery: HTMLElement) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    gallery.querySelectorAll<HTMLElement>("[data-panel]").forEach((card) => {
-      const title = card.querySelector<HTMLElement>(".service-accordion-title");
-      const words = Array.from(card.querySelectorAll<HTMLElement>(".service-accordion-title-word"));
-      if (!title || !words.length) return;
+    const titles = Array.from(gallery.querySelectorAll<HTMLElement>("[data-panel] .service-accordion-title"));
+    if (!titles.length) return;
 
+    const availableWidth = Math.max(0, COLLAPSED_WIDTH - CONTENT_PADDING);
+    let smallestFit = MAX_TITLE_SIZE;
+
+    titles.forEach((title) => {
+      const words = Array.from(title.querySelectorAll<HTMLElement>(".service-accordion-title-word"));
+      if (!words.length) return;
       const cs = getComputedStyle(title);
       ctx.font = `${cs.fontWeight} ${MAX_TITLE_SIZE}px ${cs.fontFamily}`;
       const longestWordWidth = Math.max(...words.map((w) => ctx.measureText(w.textContent || "").width));
-
-      const availableWidth = Math.max(0, COLLAPSED_WIDTH - CONTENT_PADDING);
-      const fitSize = longestWordWidth > 0 ? (availableWidth / longestWordWidth) * MAX_TITLE_SIZE : MAX_TITLE_SIZE;
-      const size = Math.max(MIN_TITLE_SIZE, Math.min(MAX_TITLE_SIZE, Math.floor(fitSize)));
-      title.style.setProperty("--saw-collapsed-size", `${size}px`);
+      if (longestWordWidth <= 0) return;
+      smallestFit = Math.min(smallestFit, (availableWidth / longestWordWidth) * MAX_TITLE_SIZE);
     });
+
+    const size = Math.max(MIN_TITLE_SIZE, Math.min(MAX_TITLE_SIZE, Math.floor(smallestFit)));
+    titles.forEach((title) => title.style.setProperty("--saw-collapsed-size", `${size}px`));
   }
 
   function triggerFundAnim(root: Element) {

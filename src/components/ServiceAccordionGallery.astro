@@ -301,12 +301,12 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
 </style>
 
 <script>
-  // Shrunk from 640/210 so all 7 cards fit within a typical desktop
-  // container width without needing to scroll at rest, and expanding one
-  // still fits (with room to spare) at common widths — see the
-  // direction-flip logic in applyWidths for the narrower cases.
+  // The expanded card's target width. Non-target cards aren't pinned to a
+  // matching fixed constant — they use flex:1 1 0% (min-width: 110px in the
+  // CSS below is just the floor) and applyWidths() reads their real,
+  // already-equal-width rest state instead, so there's nothing for an
+  // idle-vs-hover size mismatch to jump between.
   const EXPANDED_WIDTH = 440;
-  const COLLAPSED_WIDTH = 110;
   const CARD_GAP = 3; // matches .service-accordion-gallery's gap: 3px
   const MAX_TITLE_SIZE = 24;
   const MIN_TITLE_SIZE = 10;
@@ -320,10 +320,10 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
   // every other card then renders at that same size, with room to spare.
   //
   // Available width comes from each card's actual rendered clientWidth,
-  // not the COLLAPSED_WIDTH constant: cards use flex:1 1 0% at rest, so
-  // they stretch to fill whatever room the gallery has (typically well
-  // past COLLAPSED_WIDTH, its floor, not its real size) — sizing text off
-  // the constant left most of that real space unused and text tiny.
+  // not a fixed constant: cards use flex:1 1 0% at rest, so they stretch
+  // to fill whatever room the gallery has, well past the CSS min-width
+  // floor — sizing text off that floor left most of the real space unused
+  // and text tiny.
   function fitTitles(gallery: HTMLElement) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -376,12 +376,23 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
 
     let activeId: string | null = null;
 
-    // flex-grow alone can't expand a card once the row is already wider
-    // than its container (no positive free space left to redistribute) —
-    // which is exactly the overflowing state the arrows exist for. Setting
-    // an explicit flex-basis per card works in both the fitting and
-    // overflowing cases, at the cost of driving it from JS instead of pure
-    // CSS :hover.
+    // Cards are flex:1 1 0% at rest, so they sit equal-width, sharing
+    // whatever room the gallery has — usually well past the CSS min-width
+    // floor. The previous version pinned every *other* card to that floor
+    // the moment any card was hovered, which
+    // made the whole row visibly snap narrower right as the target grew —
+    // a second, unintended jump on top of the intended expansion. That
+    // combined movement was abrupt, and shifting cards before the target
+    // could displace whatever the cursor was actually over, handing the
+    // hover to a neighboring card instead of staying on the one the mouse
+    // was on. Measuring the real idle width and using that as the "resting"
+    // size for non-target cards means only the target card's own box ever
+    // changes size — nothing else moves unless the target's growth
+    // requires it to.
+    function restWidth(): number {
+      return (gallery.clientWidth - (cards.length - 1) * CARD_GAP) / cards.length;
+    }
+
     function applyWidths(targetCard: HTMLElement | null) {
       // Desaturate every other card while one is expanded, so the expanded
       // card reads as the focus of attention.
@@ -389,24 +400,24 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
         c.classList.toggle("is-dimmed", targetCard !== null && c !== targetCard);
       });
 
-      cards.forEach((c) => {
-        if (!targetCard) {
+      if (!targetCard) {
+        cards.forEach((c) => {
           c.style.flex = "";
-          return;
-        }
+          c.style.transform = "";
+        });
+        return;
+      }
+
+      const rest = restWidth();
+      cards.forEach((c) => {
         // flex-grow/shrink must be pinned to 0 here: the row is already at
         // (or past) its min-width floor once it's overflowing, and without
         // this, flex-shrink would immediately squash the expanded card's
         // basis right back down to fit the container instead of letting
         // the row scroll wider.
-        const width = c === targetCard ? EXPANDED_WIDTH : COLLAPSED_WIDTH;
+        const width = c === targetCard ? EXPANDED_WIDTH : rest;
         c.style.flex = `0 0 ${width}px`;
       });
-
-      if (!targetCard) {
-        cards.forEach((c) => (c.style.transform = ""));
-        return;
-      }
 
       // Growing a card widens the whole row by `delta`. By default that
       // extra width lands to the right of the card (normal flex flow: its
@@ -420,8 +431,8 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
       // reflected. No scrolling involved, so nothing can retrigger a hover
       // on a different card the way animating scrollLeft did.
       const idx = cards.indexOf(targetCard);
-      const delta = EXPANDED_WIDTH - COLLAPSED_WIDTH;
-      const leftEdge = idx * (COLLAPSED_WIDTH + CARD_GAP);
+      const delta = Math.max(0, EXPANDED_WIDTH - rest);
+      const leftEdge = idx * (rest + CARD_GAP);
       const rightEdgeGrowingRight = leftEdge + EXPANDED_WIDTH;
       const leftEdgeGrowingLeft = leftEdge - delta;
       // Only flip if growing left would actually stay on-screen too —

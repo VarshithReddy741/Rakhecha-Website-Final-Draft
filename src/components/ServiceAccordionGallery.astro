@@ -139,13 +139,20 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     transition:
       flex-basis 0.6s cubic-bezier(0.22, 0.68, 0, 1),
       transform 0.6s cubic-bezier(0.22, 0.68, 0, 1),
-      box-shadow 0.6s cubic-bezier(0.22, 0.68, 0, 1);
+      box-shadow 0.6s cubic-bezier(0.22, 0.68, 0, 1),
+      filter 0.4s ease;
   }
 
   .service-accordion-card.is-active {
     transform: scale(1.015);
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
     z-index: 2;
+  }
+
+  /* While one card is expanded (hovered or clicked), every other card
+     desaturates so the expanded one reads as the focus. */
+  .service-accordion-card.is-dimmed {
+    filter: grayscale(1);
   }
 
   .service-accordion-overlay {
@@ -303,6 +310,12 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
   // reads as uneven/inconsistent. Instead, find the single longest word
   // across the whole gallery and use whatever size lets THAT word fit;
   // every other card then renders at that same size, with room to spare.
+  //
+  // Available width comes from each card's actual rendered clientWidth,
+  // not the COLLAPSED_WIDTH constant: cards use flex:1 1 0% at rest, so
+  // they stretch to fill whatever room the gallery has (typically well
+  // past COLLAPSED_WIDTH, its floor, not its real size) — sizing text off
+  // the constant left most of that real space unused and text tiny.
   function fitTitles(gallery: HTMLElement) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -311,12 +324,14 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     const titles = Array.from(gallery.querySelectorAll<HTMLElement>("[data-panel] .service-accordion-title"));
     if (!titles.length) return;
 
-    const availableWidth = Math.max(0, COLLAPSED_WIDTH - CONTENT_PADDING);
     let smallestFit = MAX_TITLE_SIZE;
 
     titles.forEach((title) => {
       const words = Array.from(title.querySelectorAll<HTMLElement>(".service-accordion-title-word"));
-      if (!words.length) return;
+      const card = title.closest<HTMLElement>("[data-panel]");
+      if (!words.length || !card) return;
+      const availableWidth = Math.max(0, card.clientWidth - CONTENT_PADDING);
+      if (availableWidth <= 0) return;
       const cs = getComputedStyle(title);
       ctx.font = `${cs.fontWeight} ${MAX_TITLE_SIZE}px ${cs.fontFamily}`;
       const longestWordWidth = Math.max(...words.map((w) => ctx.measureText(w.textContent || "").width));
@@ -360,6 +375,12 @@ const galleryId = `sag-${Math.random().toString(36).slice(2, 9)}`;
     // overflowing cases, at the cost of driving it from JS instead of pure
     // CSS :hover.
     function applyWidths(targetCard: HTMLElement | null) {
+      // Desaturate every other card while one is expanded, so the expanded
+      // card reads as the focus of attention.
+      cards.forEach((c) => {
+        c.classList.toggle("is-dimmed", targetCard !== null && c !== targetCard);
+      });
+
       cards.forEach((c) => {
         if (!targetCard) {
           c.style.flex = "";
